@@ -1,3 +1,4 @@
 .sencha
 .idea/*
 *.iml
+build

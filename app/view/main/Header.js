@@ -1,6 +1,6 @@
 document.title = 'BinaryUI';
 
-Ext.define('Portal.view.main.Header', {
+Ext.define('BinaryUI.view.main.Header', {
     extend: 'Ext.Container',
 
     xtype: 'app-header',
