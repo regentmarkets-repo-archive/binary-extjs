@@ -11,7 +11,8 @@
     requires: [
         'Ext.layout.container.Border',
         'Ext.ux.dashboard.GoogleRssPart',
-        'Ext.dashboard.Dashboard'
+        'Ext.dashboard.Dashboard',
+        'Ext.util.History',
     ],
 
     controller: 'main',
@@ -50,26 +51,6 @@
                     text: 'Sencha Blog',
                     handler: 'onAddFeedUrl',
                     feedUrl: 'http://feeds.feedburner.com/extblog'
-                },{
-                    text: 'Ajaxian',
-                    handler: 'onAddFeedUrl',
-                    feedUrl: 'http://feeds.feedburner.com/ajaxian'
-                },{
-                    text: 'CNN',
-                    handler: 'onAddFeedUrl',
-                    feedUrl: 'http://rss.cnn.com/rss/edition.rss'
-                },{
-                    text: 'Sci/Tech - Google News',
-                    handler: 'onAddFeedUrl',
-                    feedUrl: 'http://news.google.com/news?ned=us&topic=t&output=rss'
-                }, {
-                    text: 'Yahoo News',
-                    handler: 'onAddFeedUrl',
-                    feedUrl: 'http://rss.cnn.com/rss/edition.rss'
-                }, {
-                    text: 'ESPN Top News',
-                    handler: 'onAddFeedUrl',
-                    feedUrl: 'http://sports.espn.go.com/espn/rss/news'
                 }]
             }]
         },
