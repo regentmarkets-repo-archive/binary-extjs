@@ -7,7 +7,7 @@ $app-header-use-gradient: false;
 
 @if $theme-name == 'ext-theme-neptune' or $theme-name == 'ext-theme-neptune-touch' {
     $app-header-background-color: #2a3f5d;
-    $app-header-use-gradient: false;
+    //$app-header-use-gradient: false;
     //$app-header-background-color: #81af34;
     //$app-header-text-shadow-color: #4e691f;
 }
@@ -38,10 +38,12 @@ $app-header-use-gradient: false;
             background-image: url(images/header-bg.png);
         }
     }
+
+    padding-left: 10px;
 }
 
 .app-header-title {
-    padding: 15px 0 10px 0;
+    padding: 15px 0 10px 10px;
 
     color: #fff;
     font-size: 18px;
@@ -52,8 +54,8 @@ $app-header-use-gradient: false;
 }
 
 .app-header-logo {
-    width: 40px;
-    height: 25px;
-
-    background: url(images/logo.svg) no-repeat center 4px;
+    height: 48px;
+    width: 48px;
+    background: url(images/logo.svg) no-repeat center 0px;
+    padding-right: 10px;
 }

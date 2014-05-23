@@ -21,6 +21,5 @@ Ext.define('BinaryUI.view.main.Header', {
         xtype: 'component',
         cls: 'app-header-title',
         html: document.title,
-        flex: 1
     }]
 });
