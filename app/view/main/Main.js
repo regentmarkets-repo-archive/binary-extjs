@@ -100,9 +100,8 @@
         stateful: false,
 
         columnWidths: [
-            0.35,
             0.40,
-            0.25
+            0.60,
         ],
         parts: {
             rss: 'google-rss',
@@ -134,6 +133,15 @@
                 }
             },
 
+            profittable: {
+                viewTemplate: {
+                    title: 'Profit Table',
+                    items: [{
+                        xtype: 'profittable'
+                    }]
+                }
+            },
+
             stockTicker: {
                 viewTemplate: {
                     title: 'Stocks',
@@ -149,6 +157,11 @@
             columnIndex: 0,
             height: 500,
             feedUrl: 'http://feeds.feedburner.com/extblog'
+
+        }, {
+            type: 'profittable',
+            columnIndex: 0,
+            height: 300
         }, {
             type: 'stockTicker',
             columnIndex: 1,
@@ -165,11 +178,7 @@
             type: 'stocks',
             columnIndex: 1,
             height: 300
-        }, {
-            type: 'rss',
-            columnIndex: 2,
-            height: 350,
-            feedUrl: 'http://rss.cnn.com/rss/edition.rss'
-        }]
+        },
+        ]
     }]
 });
