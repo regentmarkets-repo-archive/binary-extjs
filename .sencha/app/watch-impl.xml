@@ -10,6 +10,7 @@
 
     <target name="-watch-theme-package-css">
         <x-compass-watch
+            refName="compass-watch"
             rubyPath="${build.ruby.path}"
             dir="${compass.working.dir}"
             trace="${compass.compile.trace}"
@@ -25,6 +26,7 @@
         <attribute name="directory"/>
         <sequential>
             <x-compass-watch
+                refName="compass-watch"
                 rubyPath="${build.ruby.path}"
                 dir="@{directory}"
                 trace="${compass.compile.trace}"
@@ -35,7 +37,11 @@
     </macrodef>
 
     <target name="-watch-sass-dir">
-        <x-run-compass-watch directory="${app.sass.dir}"/>
+        <x-run-compass-watch directory="${app.sass.dir}" refName="compass-watch"/>
+    </target>
+    
+    <target name="-stop-compass-watch">
+        <x-compass-watch refName="compass-watch" stop="true"/>
     </target>
 
     <target name="-watch-theme-dir">
@@ -52,6 +58,10 @@
             <param name="enable.background.server" value="true"/>
         </x-ant-call>
         <x-ant-call target="${build.watcher.targets}"/>
+        <x-ant-call target="web-stop" unless="skip.web.start">
+            <param name="enable.background.server" value="true"/>
+        </x-ant-call>
+        <x-ant-call target="-stop-compass-watch"/>
     </target>
     <target name="-after-watch" depends="init"/>
 </project>

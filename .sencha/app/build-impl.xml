@@ -116,6 +116,10 @@ this file in most cases.
         <property name="build.environment" value="package"/>
     </target>
 
+    <target name="development"
+            description="Sets the build environment to development.">
+        <property name="build.environment" value="development"/>
+    </target>
 
     <!--
     ===============================================================
@@ -233,7 +237,7 @@ this file in most cases.
     -->
     <import file="${basedir}/.sencha/app/watch-impl.xml"/>
     <target name="watch"
-            depends="testing,init"
+            depends="development,init"
             description="Starts Watch to keep your app ready for dev mode">
         <x-ant-call>
             <target name="-before-watch"/>

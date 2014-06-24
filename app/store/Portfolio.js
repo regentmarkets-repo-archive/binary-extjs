@@ -1,12 +1,12 @@
 Ext.define('BinaryUI.store.Portfolio', {
-    extend: 'Ext.data.Store',
+	extend: 'Ext.data.Store',
 
-    alias: 'store.portfolio',
-    model: 'BinaryUI.model.Portfolio',
+	alias: 'store.portfolio',
+	model: 'BinaryUI.model.Portfolio',
 
-    proxy: {
-        type: 'memory',
-        data: [
+	proxy: {
+		type: 'memory',
+		data: [
             ['1205184341', 'AUD 1.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 1.95', 'AUD 1.46'],
             ['2305184341', 'AUD 2.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 2.95', 'AUD 2.46'],
             ['3305184341', 'AUD 3.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 3.95', 'AUD 3.46'],
@@ -17,7 +17,6 @@ Ext.define('BinaryUI.store.Portfolio', {
             ['8305184341', 'AUD 5.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 8.95', 'AUD 8.46'],
             ['9305184341', 'AUD 5.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 9.95', 'AUD 9.46'],
             ['10305184341', 'AUD 5.00 payout if French Index is strictly higher than entry spot at close on 2014-05-22.', 'AUD 10.95', 'AUD 10.46'],
-        ]
-    },
-
+		]
+	}
 });
