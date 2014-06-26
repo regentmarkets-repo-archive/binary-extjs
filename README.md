@@ -1,9 +1,10 @@
 # BinaryUI
 
-This folder is primarily a container for the top-level pieces of the application.
-While you can remove some files and folders that this application does not use,
-be sure to read below before deciding what can be deleted and what needs to be
-kept in source control.
+**BinaryUI is an open-source project to develop a new ExtJS5 front-end interface to the [Binary.com](https://www.binary.com) website. This front-end will consume the Binary.com [RESTful API](https://www.binary.com/partnerapi).**
+
+Binary.com is actively seeking contributors to this project. Please contribute by submitting pull requests.
+
+# Building the application
 
 The following files are all needed to build and load the application.
 
