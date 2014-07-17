@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+	<script src="../Scripts/jquery-1.9.1.js"></script>
+	<script src="../Scripts/Binary.Rpc.js"></script>
+</head>
+<body>
+    <script>
+        Binary.Rpc.GetAEXSymbolTicks(function (data) {
+            $("#result").html(JSON.stringify(data));
+        });
+	</script>
+	<div id="result" style="font-size:10px; color:#666666"></div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+﻿
+.x-portal .x-portal-column
+{
+    /* columns must have vertical padding to avoid losing dimensions when empty */
+    padding: 8px 8px 0 0;
+}
+.x-portal .x-panel-dd-spacer {
+    border: 2px dashed #99bbe8;
+    background: #f6f6f6;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    margin-bottom: 10px;
+}
+.x-portlet {
+    margin-bottom:10px;
+    padding: 1px;
+}
+.x-portlet .x-panel-body {
+    background: #fff;
+}
+.portlet-content {
+    padding: 10px;
+    font-size: 11px;
+}
+
+.x-panel-header-default {
+    background-color: rgb(78, 120, 177);
+}
+
+.x-accordion-item .settings
+{
+    background-image:url(images/folder_wrench.png);
+}
+.x-accordion-item .nav
+{
+    background-image:url(images/folder_go.png);
+}
+.x-accordion-item .info
+{
+    background-image:url(images/information.png);
+}
+
+
+.layout-thumbnail-container
+{
+	float:left;
+	padding:5px 5px 5px 5px;
+	margin:5px 5px 5px 5px;
+	cursor:pointer;
+}
+.layout-thumbnail-container-over
+{
+	background-color:#dce8ff;
+}
+.layout-thumbnail-container-selected
+{
+	background-color:#a1c8fe;
+}
+.layout-thumbnail-container .layout-name
+{
+	margin:0;
+	padding:0;
+	color:#333333;
+}
+.layout-thumbnail
+{
+	width:64px;
+	height:64px;
+	font-size:0px;
+}
+.layout-thumbnail td
+{
+	border:1px dotted #666666;
+}
+
+.dashboard-wrapper
+{
+	height:100%;
+}
