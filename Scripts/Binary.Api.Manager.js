@@ -3,7 +3,7 @@
 
 window.Binary.Api.ManagerClass=function()
 {
-	var proxyUrl = 'http://payments.override.expert:9997';
+	var proxyUrl = 'http://195.24.133.198';
 	var me = this;
 	me.Token = null;
 	me.EventBus = new Ext.util.MixedCollection();
