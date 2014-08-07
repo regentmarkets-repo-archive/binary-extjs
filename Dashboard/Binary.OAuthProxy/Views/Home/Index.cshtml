@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<script>
+    var binary = new BinaryClient("http://rmg-prod.apigee.net/v1/binary/", "gA6I9xiRgtW4xHBVK4sJ3T8aOomm99Pk");
+    if (!binary.IsAuthNeeded())
+    {
+        top.postMessage(JSON.stringify(
+        {
+            data: binary.GetAuthInfo(),
+            apiMethod: 'token'
+        }), '*');
+    }
+    else
+    {
+        binary.AuthorizeWebClient('@(Url.Action("oauth2CodeCallback", "Home", null, this.Request.Url.Scheme))', 'S110');
+    }
+</script>

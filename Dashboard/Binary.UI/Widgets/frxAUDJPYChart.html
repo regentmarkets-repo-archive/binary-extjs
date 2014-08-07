@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>   
+	<script src="../Scripts/jquery-1.9.1.js"></script>
+	<script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
+    <script src="../Widgets/highstock.js"></script>
+    <script src="../Widgets/exporting_stocks.js"></script>
+    <script src="../Widgets/ChartBarrier.js"></script>
+    <script src="../Widgets/Localize.js"></script>
+    <script src="../Widgets/LiveChartCommon.js"></script>
+    <script src="../Widgets/LiveChartTick.js"></script>    
+    <script src="../Widgets/LiveChartCandles.js"></script>
+</head>
+<body> 
+    <script>
+        $(document).ready(function ()
+        {
+            var live_chart;
+            var chart_closed;
+            var ticks_array = [];
+
+            function updateLiveChart(config, data)//create new chart with data or update existing
+            {
+                if (live_chart)
+                live_chart.close_chart();
+                //if (live_chart)
+                //{
+                //    if (!chart_closed)
+                //    {
+                //        live_chart.close_chart();
+                //    }
+                //    live_chart = null;
+                //}
+                if (config.resolution == 'tick')
+                {
+                    live_chart = new LiveChartTick(config);
+                } else
+                {
+                    live_chart = new LiveChartOHLC(config);                     
+                }
+                live_chart.show_chart();
+
+                live_chart.process_message(data, live_chart);
+                $("#show_spot").show();
+                chart_closed = false;
+            }
+
+            var minDT = new Date();
+            minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
+            var liveChartsFromDT, liveChartsToDT, liveChartConfig = {};
+
+            $(function ()
+            {
+                updateDatesFromConfig = function (config)
+                {
+                    live_chart.update_interval($("#min_time").val(), $("#max_time").val());
+                };
+            });
+
+            var show_chart_for_instrument = function (data, symbol, chartType) //changed
+            {
+                var disp_symb;
+                if (symbol && chartType)
+                {
+                    liveChartConfig.chartType = chartType;
+                    liveChartConfig.symbol = symbol;
+                    if (liveChartConfig.chartType == 'ticks') liveChartConfig.resolution = 'tick';
+                    liveChartConfig.renderTo = 'container';
+                    liveChartConfig.renderHeight = 300;
+                    
+                    liveChartConfig.live = 500;
+
+                    liveChartConfig.resolution_seconds = 1000;// for ohlc only
+
+                    updateLiveChart(liveChartConfig, data);
+                }
+            };
+
+            var build_markets_select = function ()
+            {
+                var market_select = $("#market_select");
+                markets.each(function ()
+                {
+                    market_select.append("<option id='opt_" + this.name + "' value='" + this.name + "'>" + this.translated_display_name() + "</option>");
+                });
+
+                $("#market_select").val(liveChartConfig.market.name);
+                build_instrument_select();
+
+                $("#market_select").change(build_instrument_select);
+            };
+
+            var build_instrument_select = function ()
+            {
+                var instrument_select = $("#instrument_select");
+                //var market = Binary.Markets['forex'];//get($('#market_select').val());
+                $("#instrument_span").hide();
+                if (Binary.Markets)
+                {
+                    $("#instrument_select option").remove();
+                    instrument_select.append("<option class='deleteme'></option>");
+                    $.each(Binary.Markets['forex'].symbols, function ()
+                    {
+                        if (this.symbol)
+                            instrument_select.append("<option value='" + this.symbol + "'>" + this.display_name + "</option>");
+                        });
+                    $("#instrument_span").show();
+                    $("#instrument_select").change(function () 
+                    {
+                            globalConfig.symbol = $("#instrument_select").val();
+                            Binary.Api.Client.symbols(function (symbols_data)
+                            {
+                                init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+                            },
+                            Binary.Api.Intervals.Once,
+                            globalConfig.symbol,
+                            globalConfig.chartType);
+                    });
+                    //$("#instrument_select").val(globalConfig.symbol);
+                    
+                    Binary.Api.Client.symbols(function (symbols_data)
+                    {
+                        init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+                    },
+                    Binary.Api.Intervals.Once,
+                    globalConfig.symbol,
+                    globalConfig.chartType);
+                }
+            };
+
+            var isSpot = false;
+
+            var init_live_chart = function (data, symbol, chartType) //changed
+            {
+                
+                configure_livechart();
+                //build_markets_select();
+                show_chart_for_instrument(data, symbol, chartType);
+                //updateDatesFromConfig(liveChartConfig);
+                //var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
+                //live_chart.add_indicator(barrier);
+                //setInterval(function ()
+                //{
+                //    live_chart.remove_indicator(barrier)
+                //}, 5000);
+                var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
+                var init = false;
+                if (!init)
+                $("#show_spot").on('click', function (e)
+                {
+                    init = true;
+                    e.preventDefault();
+                    if (!isSpot)
+                    {                        
+                        live_chart.add_indicator(barrier);
+                        isSpot = true;
+                    }
+                    else
+                    {
+                        live_chart.remove_indicator(barrier);
+                        isSpot = false;
+                    }
+                    //$(this).hide();
+                    //$('#live_charts_hide_spot').show();
+                });
+            };
+
+            var globalConfig = {};
+            globalConfig.symbol = "frxAUDJPY";
+            globalConfig.chartType = "ticks";
+
+            $("#show_spot").hide();
+            Binary.Api.Client.symbols(function (symbols_data)
+            {
+                init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+            },
+            Binary.Api.Intervals.Once,
+            globalConfig.symbol,
+            globalConfig.chartType);
+
+            Binary.Markets = {};
+            Binary.Markets['forex'] = { name: 'forex', symbols: [] };
+            //Binary.Markets['randoms'] = { name: 'randoms', symbols: [] };
+            //Binary.Markets['commodities'] = { name: 'commodities', symbols: [] };
+            //Binary.Markets['stocks'] = { name: 'stocks', symbols: [] };
+
+            for (var i in Binary.Markets)
+            {
+                Binary.Api.Client.markets.market(function (data)
+                {
+                    var m = data.symbols[0].exchange_name.toString().toLowerCase();
+                    for (var j in data.symbols)
+                    {
+                        if (m == 'forex')
+                            Binary.Markets[m].symbols.push(data.symbols[j]);
+                    }
+                    build_instrument_select();
+                },
+             Binary.Api.Intervals.Once,
+             Binary.Markets[i].name);
+            }
+                     
+        });
+	</script>
+    <div id="container" style="min-width: 310px; height: 320px; margin: 0 auto"></div>
+    <!--<input type="text" value="1406701740" id="min_time"  />
+    <label for="min_time">Start time (unix timestamp)</label>
+    <input type="text" value="1406721740" id="max_time"  />
+     <label for="max_time">End time (unix timestamp)</label>
+    <button onclick="$(function() { updateDatesFromConfig();})">Set dates</button></br>-->
+    <select id="market_select" name="market" onchange="">
+        <option id="opt_start" value="placeholder">Select market</option>
+        <option id="opt_forex" value="forex">Forex</option>
+       <!-- <option id="opt_indices" value="indices">Indices</option>
+        <option id="opt_stocks" value="stocks">Stocks</option>
+        <option id="opt_commodities" value="commodities">Commodities</option>
+        <option id="opt_sectors" value="sectors">Sectors</option>
+        <option id="opt_random" value="random">Randoms</option>
+        <option id="opt_smarties" value="smarties">Smart Indices</option>-->
+    </select>
+    <label for="market">Market</label></br>
+    <select id="instrument_select" name="symbol"></select>
+     <label for="symbol">Symbol</label></br>
+    <button id="show_spot" style="color:blue">Show\hide spot</button></br>
+
+</body>
+</html>

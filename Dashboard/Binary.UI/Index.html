@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DashboardDemo</title>
+
+    
+	<script src="Scripts/ext-all-debug-w-comments.js"></script>    
+	<script src="Scripts/ext-theme-neptune.js"></script>
+	<link href="Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+	<script src="Scripts/jquery-1.9.1.js"></script>
+
+	<script src="Scripts/Portlet.js"></script>
+	<script src="Scripts/PortalColumn.js"></script>
+	<script src="Scripts/PortalDropZone.js"></script>
+	<script src="Scripts/PortalPanel.js"></script>
+
+	<script src="Scripts/Dashboard.js"></script>
+    <script src="Scripts/Panel.js"></script>
+	<script src="Scripts/Mediator.js"></script>
+	<script src="Scripts/LayoutFactory.js"></script>
+	<script src="Scripts/LeftPanelDashboardEditor.js"></script>
+
+	<script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Manager.js"></script>
+	
+	<link href="Scripts/cs.css" rel="stylesheet" />
+	<style>
+	 html, body
+	 {
+		 height:100%;
+	 }
+	</style>
+</head>
+<body>
+    <div id="dashboardTest" class="dashboard-wrapper"></div>
+	<script>
+	    
+		Ext.onReady(function ()
+		{
+			Ext.Loader.setConfig({ enabled: true });
+			//'http://localhost:38139'
+			//"http://195.24.133.198"
+			Binary.Api.Manager = new window.Binary.Api.ManagerClass("http://localhost:38139");
+			Binary.Api.Manager.BeginProcessing();
+			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
+			Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
+
+			
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binary.UI", "Binary.UI\Binary.UI.csproj", "{3367EFD0-4DCA-4BAC-906D-B2AD11926F33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binary.OAuthProxy", "Binary.OAuthProxy\Binary.OAuthProxy.csproj", "{0D74BF53-D3A3-49EF-A563-65E8E4A7E3F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ext.Dashboard", "..\Dashboard\Ext.Dashboard\Ext.Dashboard.csproj", "{22B786F9-E467-4292-BECC-C56376114E90}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3367EFD0-4DCA-4BAC-906D-B2AD11926F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3367EFD0-4DCA-4BAC-906D-B2AD11926F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3367EFD0-4DCA-4BAC-906D-B2AD11926F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3367EFD0-4DCA-4BAC-906D-B2AD11926F33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D74BF53-D3A3-49EF-A563-65E8E4A7E3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D74BF53-D3A3-49EF-A563-65E8E4A7E3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D74BF53-D3A3-49EF-A563-65E8E4A7E3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D74BF53-D3A3-49EF-A563-65E8E4A7E3F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22B786F9-E467-4292-BECC-C56376114E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22B786F9-E467-4292-BECC-C56376114E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22B786F9-E467-4292-BECC-C56376114E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22B786F9-E467-4292-BECC-C56376114E90}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
