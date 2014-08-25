@@ -10,19 +10,99 @@ LiveChartOHLC.prototype.constructor = LiveChartOHLC;
 
 LiveChartOHLC.prototype.configure_series = function (chart_params)
 {
-	chart_params.chart.type = 'candlestick';
-	chart_params.series = [{
-		name: this.config.symbol,//.translated_display_name(),
-		data: [],
-		color: 'red',
-		upColor: 'green',
-		id: 'primary_series',
-		type: 'candlestick',
-	}];
+	switch (this.config.chartType) 
+	{
+		case 'closing':
+			{
+				chart_params.chart.type = 'line';
+				chart_params.series = 
+				[
+					{
+						name: this.config.symbol,
+						data: [],
+						color: 'red',
+						upColor: 'green',
+						id: 'primary_series',
+						type: 'line',
+					}
+				];
+				break;
+			}
+		case 'prices':
+			{
+				chart_params.chart.type = 'ohlc';
+				chart_params.series = [{
+					name: this.config.symbol,
+					data: [],
+					color: 'red',
+					upColor: 'green',
+					id: 'primary_series',
+					type: 'ohlc',
+				}];
+				break;
+			}
+		case 'candles':
+			{
+				chart_params.chart.type = 'candlestick';
+				chart_params.series = [{
+					name: this.config.symbol,
+					data: [],
+					color: 'red',
+					upColor: 'green',
+					id: 'primary_series',
+					type: 'candlestick',
+				}];
+				break;
+			}
+		case 'median':
+			{
+				chart_params.chart.type = 'line';
+				chart_params.series = [{
+					name: this.config.symbol,
+					data: [],
+					color: 'red',
+					upColor: 'green',
+					id: 'primary_series',
+					type: 'line',
+				}];
+				break;
+			}
+		case 'typical':
+			{
+				chart_params.chart.type = 'line';
+				chart_params.series = [{
+					name: this.config.symbol,
+					data: [],
+					color: 'red',
+					upColor: 'green',
+					id: 'primary_series',
+					type: 'line',
+				}];
+				break;
+			}
+		case 'weighted':
+			{
+				chart_params.chart.type = 'line';
+				chart_params.series = [{
+					name: this.config.symbol,
+					data: [],
+					color: 'red',
+					upColor: 'green',
+					id: 'primary_series',
+					type: 'line',
+				}];
+				break;
+			}
+		default:
+			{
+				alert('Undefined chartType');
+				break;
+			}
+	}	
 };
 
 LiveChartOHLC.prototype.process_data = function (point)
-{		
+{
 	if (point.candles)
 	{
 		this.process_ohlc(point.candles);
@@ -33,36 +113,6 @@ LiveChartOHLC.prototype.process_data = function (point)
 			this.process_tick(point);
 		}
 	}
-	//else if (type == 'corp_action')
-	//{
-	//	this.process_corp_action(point);
-	//} else if (type == 'contract')
-	//{
-	//	this.process_contract(point[0]);
-	//}
-};
-
-LiveChartOHLC.prototype.process_corp_action = function (action)
-{
-	//if (!this.flagSeries)
-	//{
-	//	this.flagSeries = this.chart.addSeries({
-	//		name: "Events",
-	//		type: "flags",
-	//		data: [],
-	//		shape: "flag"
-	//	}, false, false);
-	//}
-
-	//var epoch = 1000 * parseInt(action[0].epoch);
-	//var text = action[0].description;
-	//var point = {
-	//	x: epoch,
-	//	title: "CA",
-	//	text: text
-	//};
-
-	//this.flagSeries.addPoint(point, false, false, false);
 };
 
 LiveChartOHLC.prototype.process_ohlc = function (ohlc)
@@ -71,6 +121,7 @@ LiveChartOHLC.prototype.process_ohlc = function (ohlc)
 	{
 		var data_object = ohlc[i];
 		var epoch = parseInt(data_object.time);
+		
 		var ohlc_pt = {
 			x: epoch * 1000,
 			open: parseFloat(data_object.open),
@@ -79,10 +130,39 @@ LiveChartOHLC.prototype.process_ohlc = function (ohlc)
 			low: parseFloat(data_object.low),
 			close: parseFloat(data_object.close)
 		};
+		switch (this.config.chartType)
+		{
+			case 'closing':
+				{
+					ohlc_pt.y = parseFloat(data_object.close);
+					break;
+				}
+			case 'median':
+				{
+					ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low)) / 2;
+					break;
+				}
+			case 'typical':
+				{
+					ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close)) / 3;
+					break;
+				}
+			case 'weighted':
+				{
+					ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close)*2) / 4;
+					break;
+				}
+			default:
+				{
+					if (this.config.chartType != 'prices' && this.config.chartType != 'candles')
+						alert('Undefined chartType');
+					break;
+				}
+		}
 		this.chart.series[0].addPoint(ohlc_pt, false, false, false);
 		this.spot = ohlc_pt.close;
 		this.accept_ticks = true;
-	}	
+	}
 };
 
 LiveChartOHLC.prototype.process_tick = function (tickInput)
@@ -132,22 +212,55 @@ LiveChartOHLC.prototype.process_tick = function (tickInput)
 
 LiveChartOHLC.prototype.update_data = function (ohlc)
 {
-	if (ohlc.candles)
+	try
 	{
-		var data_object = ohlc.candles[ohlc.candles.length - 1];
-		var epoch = parseInt(data_object.time);
-		var ohlc_pt = {
-			x: epoch * 1000,
-			open: parseFloat(data_object.open),
-			y: parseFloat(data_object.open),
-			high: parseFloat(data_object.high),
-			low: parseFloat(data_object.low),
-			close: parseFloat(data_object.close)
-		};
-		this.chart.series[0].addPoint(ohlc_pt, true, false, false);
-		this.spot = ohlc_pt.close;
-		this.accept_ticks = true;
+		if (ohlc.candles)
+		{
+			var data_object = ohlc.candles[ohlc.candles.length - 1];
+			var epoch = parseInt(data_object.time);
+			var ohlc_pt = {
+				x: epoch * 1000,
+				open: parseFloat(data_object.open),
+				y: parseFloat(data_object.open),
+				high: parseFloat(data_object.high),
+				low: parseFloat(data_object.low),
+				close: parseFloat(data_object.close)
+			};
+			switch (this.config.chartType)
+			{
+				case 'closing':
+					{
+						ohlc_pt.y = parseFloat(data_object.close);
+						break;
+					}
+				case 'median':
+					{
+						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low)) / 2;
+						break;
+					}
+				case 'typical':
+					{
+						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close)) / 3;
+						break;
+					}
+				case 'weighted':
+					{
+						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close) * 2) / 4;
+						break;
+					}
+				default:
+					{
+						if (this.config.chartType != 'prices' && this.config.chartType != 'candles')
+							alert('Undefined chartType');
+						break;
+					}
+			};
+			this.chart.series[0].addPoint(ohlc_pt, true, false, false);
+			this.spot = ohlc_pt.close;
+			this.accept_ticks = true;
+		}
 	}
+	catch (e) { };
 };
 
 LiveChartOHLC.prototype.get_data = function (symbol, chartType)
@@ -158,5 +271,6 @@ LiveChartOHLC.prototype.get_data = function (symbol, chartType)
 		ChartOHLC.update_data(data);
 	},
 	Binary.Api.Intervals.Fast,
-	symbol, chartType);
+	symbol,
+	'candles');
 }

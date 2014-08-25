@@ -45,8 +45,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="RazorEngine">
-      <HintPath>..\packages\RazorEngine.3.3.0\lib\net40\RazorEngine.dll</HintPath>
+    <Reference Include="RazorEngine, Version=3.4.1.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\RazorEngine.3.4.1\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -109,17 +110,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WidgetController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="widget.html" />
     <Content Include="Widgets\AEXSymbol.html" />
+    <Content Include="Widgets\Chart.html" />
     <Content Include="Widgets\ChartBarrier.js" />
+    <Content Include="Widgets\Contracts.js" />
     <Content Include="Widgets\ForexMarket.html" />
-    <Content Include="Widgets\frxEURUSDChart.html" />
-    <Content Include="Widgets\frxEURUSDChartcandlestick.html" />
     <Content Include="Widgets\HistoricalCandlestickData.html" />
     <Content Include="Widgets\HistoricalTickData.html" />
     <Content Include="Widgets\Markets.html" />
@@ -129,14 +132,11 @@
     <Content Include="Widgets\Offerings.html" />
     <Content Include="Widgets\ForexContractCategories.html" />
     <Content Include="Widgets\SymbolsUSDJPYPrice.html" />
-    <Content Include="Widgets\frxAUDJPYChart.html" />
-    <Content Include="Widgets\frxAUDJPYChartcandlestick.html" />
     <Content Include="Widgets\LiveChartCommon.js" />
     <Content Include="Widgets\LiveChartTick.js" />
     <Content Include="Widgets\Localize.js" />
     <Content Include="Widgets\LiveChartCandles.js" />
-    <Content Include="Widgets\frxNZDUSDChart.html" />
-    <Content Include="Widgets\frxNZDUSDChartcandlestick.html" />
+    <Content Include="Widgets\ForexContractParametersForUSDJPY.html" />
     <None Include="..\..\Dashboard\Ext.Dashboard\Scripts\ext-all-debug-w-comments.js">
       <Link>Scripts\ext-all-debug-w-comments.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

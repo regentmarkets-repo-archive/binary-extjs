@@ -1,5 +1,4 @@
-﻿using Binary.Models;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Web.Mvc;
@@ -15,6 +14,7 @@ namespace Binary.OAuthProxy.Controllers
             return View();
         }
 
+		static readonly string ResponseTemplate = "{{ message: '{0}', code: {1} }}";
         public string APICall(string method, string token, string callback)
         {
             string url = "http://rmg-prod.apigee.net/v1/binary" + method;
@@ -26,10 +26,17 @@ namespace Binary.OAuthProxy.Controllers
             wr.ContentType = "application/x-www-form-urlencoded";
             wr.Method = "GET";
 
-            //wr.WritePOSTBody(string.Empty);
-
-            var response = wr.GetResponse() as HttpWebResponse;
-            var result = new StreamReader(response.GetResponseStream()).ReadToEnd();
+			string result = string.Format(HomeController.ResponseTemplate, "Server error occured", 401);
+			try
+			{
+				HttpWebResponse response = wr.GetResponse() as HttpWebResponse;
+				result = new StreamReader(response.GetResponseStream()).ReadToEnd();
+			}
+			catch (WebException ex)
+			{
+				HttpWebResponse response = ex.Response as HttpWebResponse;
+				result = string.Format(HomeController.ResponseTemplate, ex.Message, (int)response.StatusCode);
+			}
 
             return string.Format("{0}({1})", callback, result);
         }
@@ -52,13 +59,8 @@ namespace Binary.OAuthProxy.Controllers
 
                 authResult = HttpHelpers.GetPostResponse("http://rmg-prod.apigee.net/v1/binary/oauth/accesstoken_authcode", data);
             }
-            //Response.ContentType = "application/x-www-form-urlencoded";
-            var model = new oauth2CodeCallbackModel
-            {
-                Res = authResult
-            };
 
-            return View(model);
+			return View((object)authResult);
         }
     }
 }

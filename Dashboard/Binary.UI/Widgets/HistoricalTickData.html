@@ -3,14 +3,19 @@
 <head>
     <title></title>
 	<script src="../Scripts/jquery-1.9.1.js"></script>	
-	<script src="../Scripts/Binary.Api.Client.js"></script>
+    <script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
 </head>
 <body>
     <script>        
-        Binary.Api.Client.GetfrxAUDJPYSymbolTicks(function (data)
-            {
-                $("#result").html(new Date() + "<br/>" + JSON.stringify(data));
-            }, Binary.Api.Intervals.Fast);
+        Binary.Api.Client.symbols(function (data)
+        {
+            $("#result").html(JSON.stringify(data));
+        },
+	    Binary.Api.Intervals.Once,
+	    "frxAUDJPY",
+        "ticks");
 	</script>
 	<div id="result" style="font-size:10px; color:#666666"></div>    
 </body>

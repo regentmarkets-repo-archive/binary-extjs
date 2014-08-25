@@ -3,8 +3,9 @@
 }
 
 <script>
-    var binary = new BinaryClient("http://rmg-prod.apigee.net/v1/binary/", "gA6I9xiRgtW4xHBVK4sJ3T8aOomm99Pk");
-    if (!binary.IsAuthNeeded())
+	var binary = new BinaryClient("http://rmg-prod.apigee.net/v1/binary/", "gA6I9xiRgtW4xHBVK4sJ3T8aOomm99Pk");
+	@*
+    if (!binary.IsAuthNeeded() && window.location.hash.indexOf("force=true")<0)
     {
         top.postMessage(JSON.stringify(
         {
@@ -15,5 +16,7 @@
     else
     {
         binary.AuthorizeWebClient('@(Url.Action("oauth2CodeCallback", "Home", null, this.Request.Url.Scheme))', 'S110');
-    }
+	}
+	*@
+	binary.AuthorizeWebClient('@(Url.Action("oauth2CodeCallback", "Home", null, this.Request.Url.Scheme))', 'S110');
 </script>

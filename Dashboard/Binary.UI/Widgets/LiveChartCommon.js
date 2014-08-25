@@ -12,6 +12,164 @@
 	//}
 };
 
+LiveChartConfig = function (params)
+{
+	params = params || {};
+	this.renderTo = params['renderTo'] || 'live_chart_div';
+	this.renderHeight = params['renderHeight'] || 450;
+	this.shift = typeof params['shift'] !== 'undefined' ? params['shift'] : 1;
+	this.with_trades = typeof params['with_trades'] !== 'undefined' ? params['with_trades'] : 1;
+	this.ticktrade_chart = typeof params['ticktrade_chart'] !== 'undefined' ? params['ticktrade_chart'] : 0;
+	this.with_marker = typeof params['with_marker'] !== 'undefined' ? params['with_marker'] : 0;
+	this.contract_start_time = typeof params['contract_start_time'] !== 'undefined' ? params['contract_start_time'] : 0;
+	this.how_many_ticks = typeof params['how_many_ticks'] !== 'undefined' ? params['how_many_ticks'] : 0;
+	this.with_tick_config = typeof params['with_tick_config'] !== 'undefined' ? params['with_tick_config'] : 0;
+	this.with_entry_spot = typeof params['with_entry_spot'] !== 'undefined' ? params['with_entry_spot'] : 0;
+
+	this.indicators = [];
+	this.resolutions = {
+		'tick': { seconds: 0, interval: 3600 },
+		'M1': { seconds: 60, interval: 86400 },
+		'M5': { seconds: 300, interval: 7 * 86400 },
+		'M30': { seconds: 1800, interval: 31 * 86400 },
+		'H1': { seconds: 3600, interval: 62 * 86400 },
+		'H8': { seconds: 8 * 3600, interval: 183 * 86400 },
+		'D': { seconds: 86400, interval: 366 * 3 * 86400 }
+	};
+	this.resolution = 'tick';
+	this.with_markers = typeof params['with_markers'] !== 'undefined' ? params['with_markers'] : false;
+};
+
+LiveChartConfig.prototype = {
+	add_indicator: function (indicator)
+	{
+		this.indicators.push(indicator);
+	},
+	remove_indicator: function (name)
+	{
+		var deleted_indicator;
+		var indicator = this.indicators.length;
+		while (indicator--)
+		{
+			if (this.indicators[indicator].name == name)
+			{
+				deleted_indicator = this.indicators[indicator];
+				this.indicators.splice(indicator, 1);
+			}
+		}
+		return deleted_indicator;
+	},
+	has_indicator: function (name)
+	{
+		var indicator = this.indicators.length;
+		while (indicator--)
+		{
+			if (this.indicators[indicator].name == name)
+			{
+				return true;
+			}
+		}
+		return false;
+	},
+	repaint_indicators: function (chart)
+	{
+		var indicator = this.indicators.length;
+		while (indicator--)
+		{
+			this.indicators[indicator].repaint(chart);
+		}
+	},
+	calculate_from: function (len)
+	{
+		var now = new Date();
+		var epoch = Math.floor(now.getTime() / 1000);
+		var units = { min: 60, h: 3600, d: 86400, w: 86400 * 7, m: 86400 * 31, y: 86400 * 366 };
+		var res = len.match(/^([0-9]+)([hdwmy]|min)$/);
+
+		return res ? epoch - parseInt(res[1]) * units[res[2]] : undefined;
+	},
+	update: function (opts)
+	{
+		if (opts.interval)
+		{
+			var from = parseInt(opts.interval.from.getTime() / 1000);
+			var to = parseInt(opts.interval.to.getTime() / 1000);
+			var length = to - from;
+			this.resolution = this.best_resolution(from, to);
+			delete opts.interval;
+			this.from = from;
+			this.to = to;
+			delete this.live;
+		}
+		if (opts.live)
+		{
+			delete this.to;
+			LocalStore.remove('live_chart.to');
+			LocalStore.remove('live_chart.from');
+			this.from = this.calculate_from(opts.live);
+			this.live = opts.live;
+			LocalStore.set('live_chart.live', opts.live);
+			this.resolution = this.best_resolution(this.from, new Date().getTime() / 1000);
+		}
+		if (opts.symbol)
+		{
+			var symbol = markets.by_symbol(opts.symbol);
+			if (symbol)
+			{
+				this.symbol = symbol.underlying;
+				this.market = symbol.market;
+				LocalStore.set('live_chart.symbol', symbol.symbol);
+			}
+		}
+
+		if (opts.update_url)
+		{
+			var hash = "#";
+
+			if (this.from && this.to)
+			{
+				hash += this.symbol.symbol + ":" + this.from + "-" + this.to;
+			} else
+			{
+				hash += this.symbol.symbol + ":" + this.live;
+			}
+
+			var url = window.location.pathname + window.location.search + hash;
+			page.url.update(url);
+		}
+		if (opts.shift)
+		{
+			this.shift = opts.shift;
+		}
+		if (opts.with_trades)
+		{
+			this.with_trades = opts.with_trades;
+		}
+		if (opts.with_markers)
+		{
+			this.with_markers = opts.with_markers;
+		}
+	},
+	best_resolution: function (from, to)
+	{
+		var length = parseInt(to - from);
+		for (var resolution in this.resolutions)
+		{
+			if (this.resolutions[resolution].interval >= length)
+			{
+				return resolution;
+			}
+		}
+		return '1d';
+	},
+	resolution_seconds: function (resolution)
+	{
+		resolution = typeof resolution !== 'undefined' ? resolution : this.resolution;
+		return this.resolutions[resolution]['seconds'];
+
+	},
+};
+
 LiveChart.prototype = {
 	close_chart: function()
 	{
@@ -24,7 +182,7 @@ LiveChart.prototype = {
 	},
 	add_indicator: function (indicator)
 	{
-		//this.config.add_indicator(indicator);
+		this.config.add_indicator(indicator);
 		indicator.paint(this);
 	},
 	remove_indicator: function (indicator)
@@ -56,9 +214,6 @@ LiveChart.prototype = {
 
 		return menuItems;
 	},
-	connect_to_stream: function ()//changed to apigee response
-	{
-	},
 	process_contract: function (trade)
 	{
 	},
@@ -75,7 +230,7 @@ LiveChart.prototype = {
 				{
 					load: function ()
 					{
-						$self.get_data($self.config.symbol, $self.config.chartType);
+						$self.get_data($self.config.symbol, $self.config.chartType, $self.config.granularity);
 					}
 				}
 			},
@@ -113,10 +268,10 @@ LiveChart.prototype = {
 						},
 						turboThreshold: 3000
 					},
-					//marker: {
-					//    enabled: this.config.with_markers,
-					//    radius: 2,
-					//},
+					marker: {
+					    enabled: this.config.with_markers,
+					    radius: 2,
+					},
 				},
 				candlestick:
 				{
@@ -197,7 +352,8 @@ LiveChart.prototype = {
 
 		if (data_length > 0 && this.spot)
 		{
-			//this.repaint_indicators(this);//temp
+			if (this.config.chartType == "ticks" && this.config.repaint_indicators)
+				this.config.repaint_indicators(this);//temp
 			this.chart.redraw();
 			if (!this.config.ticktrade_chart && !this.navigator_initialized)
 			{
@@ -221,3 +377,360 @@ LiveChart.prototype = {
 		)
 	}
 };
+
+createChart = function (symbol_, chartType_, granularity_)
+{
+	var live_chart;
+	var chart_closed;
+	var ticks_array = [];
+
+	function updateLiveChart(config, data)//create new chart with data or update existing
+	{
+		if (live_chart)
+			live_chart.close_chart();//need this? ###
+		//if (live_chart)
+		//{
+		//    if (!chart_closed)
+		//    {
+		//        live_chart.close_chart();
+		//    }
+		//    live_chart = null;
+		//}
+		if (config.resolution == 'tick')
+		{
+			live_chart = new LiveChartTick(config);
+		} else
+		{
+			live_chart = new LiveChartOHLC(config);
+		}
+		live_chart.show_chart();
+
+		live_chart.process_message(data, live_chart);
+		$("#show_spot").show();
+		chart_closed = false;
+	}
+
+	var minDT = new Date();
+	minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
+	var liveChartsFromDT, liveChartsToDT, liveChartConfig = {};
+
+	$(function ()
+	{
+		updateDatesFromConfig = function (config)
+		{
+			live_chart.update_interval($("#min_time").val(), $("#max_time").val());
+		};
+	});
+
+	$(function ()
+	{
+		changeResolution = function (res)
+		{
+			Binary.Api.Client.unsubscribeAll();
+			globalConfig.granularity = res;
+			Binary.Api.Client.symbols(function (symbols_data)
+			{
+				init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+			},
+					Binary.Api.Intervals.Once,
+					globalConfig.symbol,
+					globalConfig.chartType,
+					Math.round(+new Date() / 1000) - globalConfig.resolutions[res].interval,
+					Math.round(+new Date() / 1000),
+					20000,
+					res);
+		};
+	});
+
+	var show_chart_for_instrument = function (data, symbol, chartType, granularity) //changed
+	{
+		var disp_symb;
+		//liveChartConfig = new LiveChartConfig({
+		//    //renderTo: 'live_chart_div',
+		//});
+		if (symbol && chartType)
+		{
+			liveChartConfig.chartType = chartType;
+			liveChartConfig.symbol = symbol;
+			liveChartConfig.granularity = granularity;
+			(liveChartConfig.chartType == 'ticks') ? liveChartConfig.resolution = 'tick' : liveChartConfig.resolution = 'ohlc';
+			liveChartConfig.renderTo = 'container';
+			liveChartConfig.renderHeight = 300;
+
+			liveChartConfig.live = 500;
+
+			liveChartConfig.resolution_seconds = 1000;// for ohlc only
+
+			updateLiveChart(liveChartConfig, data);
+		}
+	};
+
+	var build_market_select = function ()
+	{
+		var market_select = $("#market_select");
+		$.each(Binary.Markets, function ()
+		{
+			if (this.name)
+			market_select.append("<option id='opt_" + this.name + "' value='" + this.name + "'>" + this.name + "</option>");
+		});
+
+		
+
+		$("#market_select").change(function ()
+		{			
+			build_instrument_select();
+			build_contractCategory_select();
+		});
+	};
+
+	var build_instrument_select = function ()
+	{
+		var instrument_select = $("#instrument_select");
+		//var market = Binary.Markets['random'];//get($('#market_select').val());
+		$("#instrument_span").hide();
+		if (Binary.Markets)
+		{
+			$("#instrument_select option").remove();
+			instrument_select.append("<option class='deleteme'></option>");
+
+			if ($("#market_select").val() != "placeholder")
+				for ( var i in Binary.Markets)
+				{
+					if (Binary.Markets[i].name == $("#market_select").val())
+						//get symbols using API
+						Binary.Api.Client.markets.market(function (data)
+						{
+							if (data.symbols && data.symbols.length > 0) //clear later
+							{
+								//var m = data.symbols[0].exchange_name.toString().toLowerCase();
+								Binary.Markets[i].symbols = [];
+								for (var j in data.symbols)
+								{
+									Binary.Markets[i].symbols.push(data.symbols[j]);
+								}
+								$.each(Binary.Markets[i].symbols, function ()
+								{
+									if (this.symbol)
+										instrument_select.append("<option value='" + this.symbol + "'>" + this.display_name + "</option>");
+								});
+							}
+						},
+						Binary.Api.Intervals.Once,
+						Binary.Markets[i].name);						
+				};
+			
+			$("#instrument_span").show();
+			$("#instrument_select").change(function ()
+			{
+				globalConfig.symbol = $("#instrument_select").val();
+				Binary.Api.Client.symbols(function (symbols_data)
+				{
+					init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+				},
+				Binary.Api.Intervals.Once,
+				globalConfig.symbol,
+				globalConfig.chartType,
+				Math.round(+new Date() / 1000) - globalConfig.resolutions[globalConfig.granularity].interval,
+				Math.round(+new Date() / 1000),
+				5000);
+			});
+			//$("#instrument_select").val(globalConfig.symbol);
+
+			//Binary.Api.Client.symbols(function (symbols_data)
+			//{
+			//	init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+			//},
+			//Binary.Api.Intervals.Once,
+			//globalConfig.symbol,
+			//globalConfig.chartType);
+		}
+	};
+
+	var build_contractCategory_select = function ()
+	{
+		var contractCategory_select = $("#contractCategory_select");
+		//var market = Binary.Markets['random'];//get($('#market_select').val());
+		$("#contractCategory_spant").hide();
+		if (Binary.Markets)
+		{
+			$("#contractCategory_select option").remove();
+			contractCategory_select.append("<option class='deleteme'></option>");
+			$.each(Binary.Markets["0"].contract_categories, function (index, value)
+			{
+				//TODO: fix index to be a string value
+				if (this)
+					$.each(this, function ()
+					{
+						contractCategory_select.append("<option value='" + index + "'>" + index + ": " + this + "</option>");
+					});
+			});
+			$("#contractCategory_span").show();
+			$("#contractCategory_select").change(function ()
+			{
+				//globalConfig.symbol = $("#instrument_select").val();
+				//Binary.Api.Client.symbols(function (symbols_data)
+				//{
+				//	init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+				//},
+				//Binary.Api.Intervals.Once,
+				//globalConfig.symbol,
+				//globalConfig.chartType);
+			});			
+		}
+	};
+
+	var build_chartType_select = function ()
+	{
+		var usedChartType = 'ticks';
+		$("#chartType_select").change(function ()
+		{
+			globalConfig.chartType = $("#chartType_select").val();
+
+			if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
+				usedChartType = 'candles';
+			Binary.Api.Client.symbols(function (symbols_data)
+			{
+				init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+			},
+			Binary.Api.Intervals.Once,
+			globalConfig.symbol,
+			usedChartType);//usedChartType);
+		});
+	};
+
+	//var isSpot = false;
+
+	var init_live_chart = function (data, symbol, chartType, granularity) //changed
+	{
+
+		liveChartConfig = new LiveChartConfig({
+			//renderTo: 'live_chart_div',
+		});
+		configure_livechart();
+		//build_markets_select();
+
+		show_chart_for_instrument(data, symbol, chartType, granularity);
+		//updateDatesFromConfig(liveChartConfig);
+		//var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
+		//live_chart.add_indicator(barrier);
+		//setInterval(function ()
+		//{
+		//    live_chart.remove_indicator(barrier)
+		//}, 5000);  
+		$("#high_barrier").change(function ()
+		{
+			var val = $(this).val();
+			if (liveChartConfig.has_indicator('high') || !val)
+			{
+				//live_chart.remove_indicator('high');
+			}
+
+			if (val)
+			{
+				var barrier = new LiveChartIndicator.Barrier({ name: "high", value: val, color: 'green' });
+				live_chart.add_indicator(barrier);
+			}
+		});
+		$("#low_barrier").change(function ()
+		{
+			var val = $(this).val();
+			if (liveChartConfig.has_indicator('low') || !val)
+			{
+				//live_chart.remove_indicator('low');
+			}
+
+			if (val)
+			{
+				var barrier = new LiveChartIndicator.Barrier({ name: "low", value: val, color: 'red' });
+				live_chart.add_indicator(barrier);
+			}
+		});
+
+		var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
+		var init = false;
+		if (!init)
+			$("#show_spot").on('click', function (e)
+			{
+				init = true;
+				e.preventDefault();
+				//if (!isSpot)
+				// {                        
+				live_chart.add_indicator(barrier);
+				//isSpot = true;
+				//}
+				//else
+				//{
+				//    live_chart.remove_indicator(barrier);
+				//    isSpot = false;
+				//}
+				//$(this).hide();
+				//$('#live_charts_hide_spot').show();
+			});
+	};
+
+	var globalConfig = {};
+	globalConfig.symbol = symbol_;
+	globalConfig.chartType = chartType_;
+	globalConfig.granularity = granularity_;
+	globalConfig.resolutions = {
+		'tick': { seconds: 0, interval: 3600 },
+		'M1': { seconds: 60, interval: 86400 },
+		'M5': { seconds: 300, interval: 7 * 86400 },
+		'M30': { seconds: 1800, interval: 31 * 86400 },
+		'H1': { seconds: 3600, interval: 62 * 86400 },
+		'H8': { seconds: 8 * 3600, interval: 183 * 86400 },
+		'D': { seconds: 86400, interval: 366 * 3 * 86400 }
+	};
+
+
+	$("#show_spot").hide();
+	Binary.Api.Client.symbols(function (symbols_data)
+	{
+		init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+	},
+	Binary.Api.Intervals.Once,
+	globalConfig.symbol,
+	globalConfig.chartType,
+	Math.round(+new Date() / 1000) - globalConfig.resolutions[globalConfig.granularity].interval,
+	Math.round(+new Date() / 1000),
+	5000);
+
+	Binary.Markets = Binary.Markets || {};
+	//Binary.Markets['random'] = { name: 'random', symbols: [], contract_categories: [] };
+
+	Binary.Api.Client.markets(function (data_)
+	{
+		for (var k in data_.markets)
+		{
+			if (data_.markets[k] != 'prototype' && data_.markets[k] != 'futures')
+			{
+				Binary.Markets[k] = {};
+				Binary.Markets[k].name = data_.markets[k];
+				Binary.Markets[k].symbols = [];
+				Binary.Markets[k].contract_categories = [];
+			}
+		}
+		build_market_select();
+
+		//for (var i in Binary.Markets)
+		//{
+			
+
+		//	//get contract_category using API
+
+		//	Binary.Api.Client.markets.contract_categories(function (data)
+		//	{
+		//		for (var j in data)
+		//		{
+		//			Binary.Markets[Binary.Markets[i].name].contract_categories.push(data[j]);
+		//		}
+		//		build_contractCategory_select();
+		//	},
+		//	Binary.Api.Intervals.Once,
+		//	Binary.Markets[i].name);
+		//}
+	},
+		Binary.Api.Intervals.Once);
+
+	build_chartType_select();
+}

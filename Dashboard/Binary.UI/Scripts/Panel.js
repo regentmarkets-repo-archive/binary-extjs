@@ -30,7 +30,7 @@ Ext.define('Ext.app.DashboardPanel',
 					region: 'center',
 					flex: 1,
 					autoScroll: true,
-					bodyStyle: 'padding:0px 10px 10px 10px',
+					bodyStyle: 'padding:0px 0px 10px 5px',
 					tbar:
 					{
 						name: 'portalpanel-toolbar',

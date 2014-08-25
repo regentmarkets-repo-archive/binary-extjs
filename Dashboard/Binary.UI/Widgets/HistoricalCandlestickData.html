@@ -2,16 +2,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-	<script src="../Scripts/jquery-1.9.1.js"></script>
-	<script src="../Scripts/Binary.Api.Client.js"></script>
+	<script src="../Scripts/jquery-1.9.1.js"></script>	
+    <script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
 </head>
 <body>
     <script>
-        Binary.Api.Client.GetAEXSymbolCandles(function (data)
+        Binary.Api.Client.symbols(function (data)
         {
             $("#result").html(JSON.stringify(data));
-        });
+        },
+	    Binary.Api.Intervals.Once,
+	    "AEX",
+        "candles");
 	</script>
-	<div id="result" style="font-size:10px; color:#666666"></div>
+	<div id="result" style="font-size:10px; color:#666666"></div>    
 </body>
 </html>

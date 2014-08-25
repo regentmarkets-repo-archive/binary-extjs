@@ -1,5 +1,4 @@
-﻿@model Binary.Models.oauth2CodeCallbackModel
-
+﻿@model string
 @{
     ViewBag.Title = "Home Page";
 }
@@ -7,13 +6,13 @@
 <script>
     var authData = {};
 
-    @if (String.IsNullOrEmpty(Model.Res))
+    @if (String.IsNullOrEmpty(Model))
     {
     @:authData = getHashParams();
     }
     else
     {
-    @:authData = @Html.Raw(Model.Res);
+    @:authData = @Html.Raw(Model);
     }
 
     var binary = new BinaryClient();
@@ -22,7 +21,7 @@
     top.postMessage(JSON.stringify(
     {
         data: authData,
-        apiMethod: 'token'
+        apiMethod: 'Token'
     }), '*');
     //window.close();
 

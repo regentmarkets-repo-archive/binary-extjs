@@ -24,14 +24,14 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg("/markets/" + market, callback, interval);
 	};
 
-	this.markets.contact_categories = function (callback, interval, market)
+	this.markets.contract_categories = function (callback, interval, market)
 	{
 		postMsg(String.format("/markets/{0}/contract_categories", market), callback, interval);
 	};
 
-	this.markets.contact_categories.contact_category = function (callback, interval, market, contact_category, symbol)
+	this.markets.contract_categories.contract_category = function (callback, interval, market, contract_category, symbol)
 	{
-		postMsg(String.format("/markets/{0}/contract_category/{1}/symbol/{2}", market, contact_category, symbol), callback, interval);
+		postMsg(String.format("/markets/{0}/contract_category/{1}/symbol/{2}", market, contract_category, symbol), callback, interval);
 	};
 
 	this.symbols = function (callback, interval, symbol, chartType, start, end, count, granularity)
@@ -68,9 +68,9 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, Binary.Api.Intervals.Once);
 	};
 
-	this.call = function (callback, data)
+	this.unsubscribeAll = function ()
 	{
-
+		Binary.Api.Proxy.unsubscribeAll();
 	};
 	
 	this.stop = function ()

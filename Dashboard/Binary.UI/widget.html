@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+		<script src="Scripts/ext-all-debug-w-comments.js"></script>    
+	<script src="Scripts/ext-theme-neptune.js"></script>
+	<link href="Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+	<script src="Scripts/jquery-1.9.1.js"></script>
+
+</head>
+<body>
+<script>
+	Ext.onReady(function ()
+	{
+		var widgetEdit = new Ext.window.Window(
+		{
+			modal: true,
+			width: 600,
+			height: 500,
+			layout: 'fit',
+			items:
+			[
+				{
+					xtype: 'textarea'
+				}
+			],
+			buttons:
+			[
+				{
+					text: 'Update',
+					handler: function()
+					{
+						Ext.ajax(
+						{
+							url: "Widget/Save"
+						});
+					}
+				},
+				{
+					text: 'Cancel',
+					handler: function()
+					{
+						this.up("window").close();
+					}
+				}
+			]
+		}).show();
+	});
+</script>
+</body>
+</html>

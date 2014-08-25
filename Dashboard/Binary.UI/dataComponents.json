@@ -3,98 +3,18 @@
 		"DashboardID": 11,
 		"ComponentID": 12,
 		"DashletID": "column-1-order-1",
-		"ID": 30,
+		"ID": 23,
 		"Options":
 		{
-			"Height": "420px",
+			"Height": "640px",
 			"Collapsed": false,
-			"Title": "Forex chart(ticks) (AUD\JPY)",
+			"Title": "Chart",
 			"IFrame": true,
-			"Url": "/Widgets/frxAUDJPYChart.html",
+			"Url": "/Widgets/Chart.html",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/chart_line.png"
 		}
-	},
-	{
-		"DashboardID": 11,
-		"ComponentID": 13,
-		"DashletID": "column-1-order-1",
-		"ID": 31,
-		"Options":
-		{
-			"Height": "420px",
-			"Collapsed": false,
-			"Title": "Forex chart(candles) (AUD\JPY)",
-			"IFrame": true,
-			"Url": "/Widgets/frxAUDJPYChartCandlestick.html",
-			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_bar.png"
-		}
-	},
-	{
-		"DashboardID": 11,
-		"ComponentID": 14,
-		"DashletID": "column-1-order-1",
-		"ID": 28,
-		"Options":
-		{
-			"Height": "420px",
-			"Collapsed": false,
-			"Title": "Forex chart(ticks) (NZD\USD)",
-			"IFrame": true,
-			"Url": "/Widgets/frxNZDUSDChart.html",
-			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_line.png"
-		}
-	},
-	{
-		"DashboardID": 11,
-		"ComponentID": 15,
-		"DashletID": "column-1-order-1",
-		"ID": 29,
-		"Options":
-		{
-			"Height": "420px",
-			"Collapsed": false,
-			"Title": "Forex chart(candles) (NZD\USD)",
-			"IFrame": true,
-			"Url": "/Widgets/frxNZDUSDChartCandlestick.html",
-			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_bar.png"
-		}
-	},
-	{
-		"DashboardID": 11,
-		"ComponentID": 14,
-		"DashletID": "column-1-order-1",
-		"ID": 26,
-		"Options":
-		{
-			"Height": "420px",
-			"Collapsed": false,
-			"Title": "Forex chart(ticks) (EURUSD)",
-			"IFrame": true,
-			"Url": "/Widgets/frxEURUSDChart.html",
-			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_line.png"
-		}
-	},
-	{
-		"DashboardID": 11,
-		"ComponentID": 15,
-		"DashletID": "column-1-order-1",
-		"ID": 27,
-		"Options":
-		{
-			"Height": "420px",
-			"Collapsed": false,
-			"Title": "Forex chart(candles) (EURUSD)",
-			"IFrame": true,
-			"Url": "/Widgets/frxEURUSDChartCandlestick.html",
-			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_bar.png"
-		}
-	},
+	},	
 	{
 		"DashboardID": 11,
 		"ComponentID": 14,
@@ -120,7 +40,7 @@
 		{
 			"Height": "200px",
 			"Collapsed": false,
-			"Title": "Symbols",
+			"Title": "Symbol info (frxAUDJPY) ",
 			"IFrame": true,
 			"Url": "/Widgets/symbols.html",
 			"PreventExpandable": false,
@@ -184,7 +104,7 @@
 		{
 			"Height": "300px",
 			"Collapsed": false,
-			"Title": "AEXSymbol",
+			"Title": "Symbol info (AEX)",
 			"IFrame": true,
 			"Url": "/Widgets/AEXSymbol.html",
 			"PreventExpandable": false,
@@ -243,12 +163,12 @@
 		"DashboardID": 11,
 		"ComponentID": 20,
 		"DashletID": "column-1-order-1",
-		"ID": 42,
+		"ID": 43,
 		"Options":
 		{
 			"Height": "300px",
 			"Collapsed": false,
-			"Title": "ForexContractParametersForUSDJPY",
+			"Title": "ForexContractParameters for USDJPY",
 			"IFrame": true,
 			"Url": "/Widgets/ForexContractParametersForUSDJPY.html",
 			"PreventExpandable": false,
@@ -259,12 +179,12 @@
 		"DashboardID": 11,
 		"ComponentID": 21,
 		"DashletID": "column-1-order-1",
-		"ID": 43,
+		"ID": 44,
 		"Options":
 		{
 			"Height": "300px",
 			"Collapsed": false,
-			"Title": "USDJPY Price",
+			"Title": "Price for USDJPY(now)",
 			"IFrame": true,
 			"Url": "/Widgets/SymbolsUSDJPYPrice.html",
 			"PreventExpandable": false,

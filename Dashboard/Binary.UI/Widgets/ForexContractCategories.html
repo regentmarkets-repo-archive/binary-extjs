@@ -2,15 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-	<script src="../Scripts/jquery-1.9.1.js"></script>
-	<script src="../Scripts/Binary.Api.Client.js"></script>
+	<script src="../Scripts/jquery-1.9.1.js"></script>	
+    <script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
 </head>
 <body>
     <script>
-    	Binary.Api.Client.GetForexContractCategories(function (data)
-    	{
+        Binary.Api.Client.markets.contact_categories(function (data)
+        {
             $("#result").html(JSON.stringify(data));
-        });
+        },
+        Binary.Api.Intervals.Once,
+        'forex');
 	</script>
 	<div id="result" style="font-size:10px; color:#666666"></div>
 </body>

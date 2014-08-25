@@ -13,16 +13,44 @@ Binary.Api.DashboardProxy = function ()
 {
 	var me = this;
 	this.Listeners = {};
+	this.unsubscribeAll = function ()
+	{
+		for (var p in me.Listeners)
+		{
+			me.apiCall(p, null, Binary.Api.Intervals.Once, null);
+		}
+	};
 	this.apiCall = function (apiMethod, callback, interval, data)
 	{
-		me.Listeners[apiMethod] = callback;
+		if (data)
+		{
+			apiMethod += "?";
+			for (var p in data)
+			{
+				if (data[p])
+				{
+					apiMethod += String.format("{0}={1}&", p, data[p]);
+				}
+			}
+		}
+
 		var message =
 		{
-			data: data || {},
 			apiMethod: apiMethod,
 			widgetID: Binary.Gadget.id,
 			interval: interval
 		};
+
+		if (callback == null)
+		{
+			message.action = Binary.Api.Methods.Unsubscribe;
+			delete me.Listeners[apiMethod];
+		}
+		else
+		{
+			me.Listeners[apiMethod] = callback;
+		}
+
 		top.postMessage(JSON.stringify(message), "*");
 	};
 

@@ -52,11 +52,6 @@ LiveChartTick.prototype.process_data = function (point)
                 [tick.epoch * 1000, tick.quote], false, this.shift, false
             );
 			this.spot = tick.quote;
-			// for tick trade charting purposes
-			if (tick.epoch > this.config.contract_start_time && ticks_array.length < this.config.how_many_ticks)
-			{
-				ticks_array.push(tick);
-			}
 		}
 	}
 	//} else if (point[0] == 'contract')
@@ -70,7 +65,8 @@ LiveChartTick.prototype.update_data = function (point)
 	{
 		if (point.ticks)
 		{
-			var tick = {
+			var tick =
+			{
 				epoch: parseInt(point.ticks[point.ticks.length - 1].time),
 				quote: parseFloat(point.ticks[point.ticks.length - 1].price)
 			};
@@ -80,23 +76,24 @@ LiveChartTick.prototype.update_data = function (point)
                 [tick.epoch * 1000, tick.quote], true, this.shift, false
             );
 			this.spot = tick.quote;
-			if (tick.epoch > this.config.contract_start_time && ticks_array.length < this.config.how_many_ticks)
-			{
-				ticks_array.push(tick);
-			}
-			//}
+			this.config.repaint_indicators(this);//temp
+			this.chart.redraw();
 		}
 	}
 	catch (e) { };
 };
-LiveChartTick.prototype.get_data = function ( symbol, chartType )
+LiveChartTick.prototype.get_data = function (symbol, chartType, granularity)
 {
 	var me = this;
+	var res = this.config.resolutions[granularity].interval;
 	Binary.Api.Client.symbols(function (data)
 	{
 		me.update_data(data);
 	},
 	Binary.Api.Intervals.Fast,
 	symbol,
-	chartType);
+	'ticks',
+	Math.round(+new Date() / 1000) - res,
+	Math.round(+new Date() / 1000),
+	20000);
 }

@@ -39,12 +39,13 @@
 		Ext.onReady(function ()
 		{
 			Ext.Loader.setConfig({ enabled: true });
-			//'http://localhost:38139'
+			//'http://localhost:57842'
 			//"http://195.24.133.198"
-			Binary.Api.Manager = new window.Binary.Api.ManagerClass("http://localhost:38139");
-			Binary.Api.Manager.BeginProcessing();
 			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
 			Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
+
+			Binary.Api.Manager = new window.Binary.Api.ManagerClass("http://localhost:57842");
+			Binary.Api.Manager.BeginProcessing();
 
 			
 		});

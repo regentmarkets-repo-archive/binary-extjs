@@ -42,15 +42,15 @@ Binary.Api.Intervals =
 
 Binary.Api.Methods = function ()
 {
-	/// <field name="Token" type="Number" integer="true" static="true"></field>
-	/// <field name="Editor" type="Number" integer="true" static="true"></field>
+	/// <field name="Token" type="String" static="true"></field>
+	/// <field name="Editor" type="String" static="true"></field>
+	/// <field name="Unsubscribe" type="String" static="true"></field>
 };
-Binary.Api.Methods.prototype =
-{
-	Token: 1,
-	Editor: 2
-};
+Binary.Api.Methods.Token = "Token";
+Binary.Api.Methods.Editor = "Editor";
+Binary.Api.Methods.Unsubscribe = "Unsubscribe";
 Binary.Api.Methods.__enum = true;
+
 
 if (!String.format)
 {

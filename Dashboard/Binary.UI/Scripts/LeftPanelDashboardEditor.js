@@ -129,13 +129,13 @@
 									return record.get('Options').Title || "";
 								},
 								flex: 1
-							},
+							}
 						],
 						listeners:
 						{
-							selectionchange: function (view, selectedItems)
+							itemclick: function (grid, record, item, index, e, eOpts)
 							{
-								dashboard.addComponent(selectedItems[0]);
+								dashboard.addComponent(record);
 							}
 						}
 					},
