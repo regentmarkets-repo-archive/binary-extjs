@@ -15,42 +15,11 @@ Binary.Api.DashboardProxy = function ()
 	this.Listeners = {};
 	this.unsubscribeAll = function ()
 	{
-		for (var p in me.Listeners)
-		{
-			me.apiCall(p, null, Binary.Api.Intervals.Once, null);
-		}
+		this.Listeners = {};
 	};
-	this.apiCall = function (apiMethod, callback, interval, data)
+	this.apiCall = function (message, callback)
 	{
-		if (data)
-		{
-			apiMethod += "?";
-			for (var p in data)
-			{
-				if (data[p])
-				{
-					apiMethod += String.format("{0}={1}&", p, data[p]);
-				}
-			}
-		}
-
-		var message =
-		{
-			apiMethod: apiMethod,
-			widgetID: Binary.Gadget.id,
-			interval: interval
-		};
-
-		if (callback == null)
-		{
-			message.action = Binary.Api.Methods.Unsubscribe;
-			delete me.Listeners[apiMethod];
-		}
-		else
-		{
-			me.Listeners[apiMethod] = callback;
-		}
-
+		me.Listeners[message.apiMethod] = callback;
 		top.postMessage(JSON.stringify(message), "*");
 	};
 

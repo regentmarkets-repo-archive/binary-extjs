@@ -1,0 +1,54 @@
+﻿@model Binary.OAuthProxy.Controllers.ResouceModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Home/ResourcePartial.cshtml")
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script>
+        $(function ()
+        {
+            $("#datepicker").datepicker(
+            {
+                dateFormat: 'yy-mm-dd',
+                minDate: 0,
+                onSelect: function (dateText)
+                {
+                    var params = { date: this.value };
+                    setUrlParam(params);
+                }
+            });
+            if (parseParams(window.location.search).date)
+                $('#datepicker').datepicker("setDate", parseParams(window.location.search).date);
+            else
+                $('#datepicker').datepicker("setDate", new Date());
+        });
+    </script>
+</head>
+<body>
+    <div id="body_id"></div>
+    <div id="content-holder">
+        <div class="grd-container">
+            <div class="grd-grid-12">
+                <div id="asset-tabs" class="has-tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <p>
+                        Date:
+                            <input type="text" id="datepicker">
+                    </p>
+                    <div class="grd-row-padding">
+                        <div aria-labelledby="ui-id-9" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+                            @Html.Raw(Model.IndexHTML)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -6,15 +6,15 @@
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
-    <script src="../Scripts/Binary/Binary.Core.js"></script>
+    <script src="../Scripts/Binary/Binary.Core.js?v=3"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=3a"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js"></script>
-    <script src="../Widgets/LiveChartCommon.js"></script>
+    <script src="../Widgets/LiveChartCommon.js?v=5"></script>
     <script src="../Widgets/LiveChartTick.js"></script>
     <script src="../Widgets/LiveChartCandles.js"></script>
     <style>
@@ -22,14 +22,16 @@
         {
             background-color: white !important;
         }
+
         .binary_field
-        {            
-            height: 24px;
-            line-height: 0.8em;            
-            border-radius: 3px 5px 5px 3px;   
-            border-width: 1px; 
+        {
+            height: 20px;
+            line-height: 0.6em;
+            border-radius: 3px 4px 4px 3px;
+            border-width: 1px;
             margin: 5px;
         }
+
         button
         {
             background-color: Transparent;
@@ -49,16 +51,10 @@
             color: orange;
         }
 
-        .styled_select
+        .interval-buttons
         {
-            width: 180px;
-            height: 28px;
-            overflow: hidden;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 3px 5px 5px 3px;            
-	        line-height: 0.8em;            
-            margin: 5px;
+            display: table;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -68,14 +64,13 @@
     <input type="text" value="1406721740" id="max_time"  />
     <label for="max_time">End time (unix timestamp)</label>-->
     <div id="ext_daterange"></div>
-    <button style="display:none;" onclick="$(function() { updateDatesFromConfig();})">Show</button>
+    <button style="display: none;" onclick="$(function() { updateDatesFromConfig();})">Show</button>
 
     <script>
         Ext.onReady(function ()
         {
             Ext.create('Ext.container.Container',
             {
-                //bodyPadding: 2,
                 margin: '0px 0px 0px -5px',
                 renderTo: 'ext_daterange',
                 items:
@@ -87,9 +82,8 @@
                         [
                             {
                                 xtype: 'datefield',
-                                width: 80,
+                                flex: 5,
                                 margin: 0,
-                                //minDate: new Date(),
                                 labelWidth: 30,
                                 value: (new Date()).getDate() - 1,
                                 handler: function (obj, date)
@@ -97,25 +91,22 @@
                             },
                             {
                                 xtype: 'timefield',
-                                width: 80,
-                                //margin: 2,
+                                flex: 4,
+                                margin: 2,
                                 value: new Date().getHours().toString(),
                                 format: 'H:i:s',
-                                //minValue: '6:00 AM',
-                                //maxValue: '8:00 PM',
                                 increment: 30,
                                 handler: function (obj, date)
                                 { }
                             },
                             {
                                 xtype: 'label',
-                                text:' - '
+                                text: '-'
                             },
                             {
                                 xtype: 'datefield',
-                                width: 80,
-                                margin: 0,
-                                //minDate: new Date(),
+                                flex: 5,
+                                margin: '0px 0px 0px -8px',
                                 labelWidth: 15,
                                 value: new Date(),
                                 handler: function (obj, date)
@@ -123,20 +114,19 @@
                             },
                             {
                                 xtype: 'timefield',
-                                width: 80,
-                                margin: '2px 15px 2px 2px',
+                                flex: 4,
+                                margin: '2px 3px 2px 2px',
                                 value: new Date().getHours().toString(),
                                 format: 'H:i:s',
-                                //minValue: '6:00 AM',
-                                //maxValue: '8:00 PM',
                                 increment: 30,
                                 handler: function (obj, date)
                                 { }
                             },
+                            ' ',
                             {
                                 xtype: 'button',
-                                padding: '5 0',
-                                //style: 'background-color: green !important; color: white !important; border-radius: 3px !important; height: 26px !important; text-decoration: none;',
+                                flex: 2,
+                                style: 'margin-left: -10px; margin-right: 0px; padding: 3px 0px;',
                                 text: 'Show',
                                 handler: function (picker, date)
                                 { }
@@ -145,6 +135,25 @@
                     }
                 ]
             });
+            Ext.create('Ext.data.Store',
+            {
+                id: 'marketStore',
+                model: Ext.define('Market',
+                {
+                    extend: 'Ext.data.Model',
+                    fields: ['marketName', 'display_name']
+                })
+            })
+
+            Ext.create('Ext.data.Store',
+            {
+                id: 'symbolStore',
+                model: Ext.define('Symbol',
+                {
+                    extend: 'Ext.data.Model',
+                    fields: ['symbol', 'display_name']
+                })
+            })
         });
 
         $(function ()
@@ -166,27 +175,15 @@
 
     <button id="show_spot">Show spot</button><br />
 
-    <select id="chartType_select" class="styled_select" name="chartType" onchange="">
-        <option id="opt_tick" value="ticks">Ticks</option>
-        <option id="opt_candles" value="candles">Candles</option>
-        <option id="opt_prices" value="prices">Prices</option>
-        <option id="opt_closing" value="closing">Closing price</option>
-        <option id="opt_median" value="median">Median price</option>
-        <option id="opt_weigted" value="weighted">Weighted price</option>
-        <option id="opt_typical" value="typical">Typical price</option>
-    </select>
-    <label for="chartType">ChartType</label><br />
-    <select id="market_select" class="styled_select" name="market" onchange="">
-        <option id="opt_start" value="placeholder">Select market</option>
-    </select>
-    <label for="market">Market</label><br />
-    <select id="instrument_select" class="styled_select" name="symbol"></select>
-    <label for="symbol">Symbol</label>
+    <div id="ext_ChartType_div"></div>
+    <div id="ext_Market_div"></div>
+    <div id="ext_Symbol_div"></div>
+
     <div class="interval-buttons">
         <button data-val="tick">tick</button>
         <button data-val="M1">1min</button>
         <button data-val="M5">5min</button>
-        <button class="current_range" data-val="M30">30min</button>
+        <button data-val="M30" class="current_range">30min</button>
         <button data-val="H1">1hour</button>
         <button data-val="H8">8hour</button>
         <button data-val="D">1day</button>

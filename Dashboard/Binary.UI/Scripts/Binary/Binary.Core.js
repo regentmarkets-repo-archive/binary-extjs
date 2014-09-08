@@ -31,26 +31,68 @@ Binary.isDefined = function (value)
 
 Binary.Gadget = Binary.parseUrl();
 
+/*
 Binary.Api.Tick = 1000;
-Binary.Api.Intervals =
+Binary.Api.Intervals = function()
 {
-	Once: 0,
-	Fast: 3 * Binary.Api.Tick,
-	Medium: 10 * Binary.Api.Tick,
-	Slow: 60 * Binary.Api.Tick
-};
-
+	/// <field name="Once" type="Number" static="true">instant call</field>
+	/// <field name="Fast" type="String" static="true">frequent call (few seconds delay)</field>
+	/// <field name="Medium" type="String" static="true">medium frequency call (10 or more seconds)</field>
+	/// <field name="Slow" type="String" static="true">slow frequency call (minute or more)</field>
+}
+Binary.Api.Intervals.Once = 0;
+Binary.Api.Intervals.Fast = 3 * Binary.Api.Tick;
+Binary.Api.Intervals.Medium = 10 * Binary.Api.Tick;
+Binary.Api.Intervals.Slow = 60 * Binary.Api.Tick;
+Binary.Api.Intervals.__enum = true;
+*/
 Binary.Api.Methods = function ()
 {
 	/// <field name="Token" type="String" static="true"></field>
 	/// <field name="Editor" type="String" static="true"></field>
-	/// <field name="Unsubscribe" type="String" static="true"></field>
 };
 Binary.Api.Methods.Token = "Token";
 Binary.Api.Methods.Editor = "Editor";
-Binary.Api.Methods.Unsubscribe = "Unsubscribe";
 Binary.Api.Methods.__enum = true;
 
+Binary.Api.Granularities = function ()
+{
+	/// <field name="Tick" type="String" static="true"></field>
+	/// <field name="M1" type="String" static="true"></field>
+	/// <field name="M5" type="String" static="true"></field>
+	/// <field name="M30" type="String" static="true"></field>
+	/// <field name="H1" type="String" static="true"></field>
+	/// <field name="H8" type="String" static="true"></field>
+	/// <field name="D" type="String" static="true"></field>
+}
+Binary.Api.Granularities.Tick="tick";
+Binary.Api.Granularities.M1="M1";
+Binary.Api.Granularities.M5="M5";
+Binary.Api.Granularities.M30="M30";
+Binary.Api.Granularities.H1="H1";
+Binary.Api.Granularities.H8="H8";
+Binary.Api.Granularities.D="D";
+Binary.Api.Granularities.__enum=true;
+
+Binary.Api.getCountForGranularity = function (granularity)
+{
+	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].count;
+};
+Binary.Api.getIntervalForGranularity = function (granularity)
+{
+	if (granularity == 'tick') granularity = 'ticks';
+	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].interval;
+};
+Binary.Api.getCountForGranularity.GranularityConfig =
+{
+	'ticks': { seconds: 0, interval: 3600, count: 0 },
+	'M1': { seconds: 60, interval: 86400, count: 1200 },
+	'M5': { seconds: 300, interval: 7 * 86400, count: 800 },
+	'M30': { seconds: 1800, interval: 31 * 86400, count: 400 },
+	'H1': { seconds: 3600, interval: 62 * 86400, count: 160 },
+	'H8': { seconds: 8 * 3600, interval: 183 * 86400, count: 20 },
+	'D': { seconds: 86400, interval: 366 * 3 * 86400, count: 1 }
+};
 
 if (!String.format)
 {

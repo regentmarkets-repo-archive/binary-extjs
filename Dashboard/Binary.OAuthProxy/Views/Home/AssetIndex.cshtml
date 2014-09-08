@@ -1,0 +1,27 @@
+﻿@model Binary.OAuthProxy.Controllers.ResouceModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>   
+	@Html.Partial("~/Views/Home/ResourcePartial.cshtml")   
+</head>
+<body>
+    <div id="body_id"></div>
+    <div id="content-holder">
+        <div class="grd-container">
+            <div class="grd-grid-12">
+                <div id="asset-tabs" class="has-tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <div class="grd-row-padding" >
+                        <div aria-labelledby="ui-id-9" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+                            @Html.Raw(Model.IndexHTML)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

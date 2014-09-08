@@ -9,53 +9,99 @@ Binary.Api.ClientClass = function (autoStart)
 {
 	var me = this;
 	if (!Binary.isDefined(autoStart)) autoStart = true;
-	var postMsg = function (apiMethod, callback, interval, data)
+	var postMsg = function (apiMethod, callback, isCached, data)
 	{
-		Binary.Api.Proxy.apiCall(apiMethod, callback, interval, data);
-	};
-
-	this.markets = function (callback, interval)
-	{
-		postMsg("/markets", callback, interval);
-	};
-
-	this.markets.market = function (callback, interval, market)
-	{
-		postMsg("/markets/" + market, callback, interval);
-	};
-
-	this.markets.contract_categories = function (callback, interval, market)
-	{
-		postMsg(String.format("/markets/{0}/contract_categories", market), callback, interval);
-	};
-
-	this.markets.contract_categories.contract_category = function (callback, interval, market, contract_category, symbol)
-	{
-		postMsg(String.format("/markets/{0}/contract_category/{1}/symbol/{2}", market, contract_category, symbol), callback, interval);
-	};
-
-	this.symbols = function (callback, interval, symbol, chartType, start, end, count, granularity)
-	{
-		var url = "/symbols";
-		if (symbol)
+		if (data)
 		{
-			url += "/{0}";
+			apiMethod += "?";
+			for (var p in data)
+			{
+				if (data[p])
+				{
+					apiMethod += String.format("{0}={1}&", p, data[p]);
+				}
+			}
 		}
-		if (chartType)
+
+		var message =
 		{
-			url += "/{1}";
-		}
-		postMsg(String.format(url, symbol, chartType), callback, interval, { start: start, end: end, granularity: granularity, count: count });
+			apiMethod: apiMethod,
+			cached: isCached,
+			widgetID: Binary.Gadget.id
+		};
+		Binary.Api.Proxy.apiCall(message, callback);
 	};
 
-	this.symbols.price = function (callback, interval, symbol)
+	this.markets = function (callback)
 	{
-		postMsg(String.format("/symbols/{0}/price", symbol), callback, interval);
+		postMsg("/markets", callback);
+	};
+
+	this.markets.market = function (callback, market)
+	{
+		postMsg("/markets/" + market, callback);
+	};
+
+	this.markets.contract_categories = function (callback, market)
+	{
+		postMsg(String.format("/markets/{0}/contract_categories", market), callback);
+	};
+
+	this.markets.contract_categories.contract_category = function (callback, market, contract_category, symbol)
+	{
+		postMsg(String.format("/markets/{0}/contract_category/{1}/symbol/{2}", market, contract_category, symbol), callback);
+	};
+
+	this.symbolsFor = function (callback, symbol, chartType, start, end, count)
+	{
+
+	};
+	this.Intervals = {};
+	this.addInterval = function (data)
+	{
+		if (this.Intervals[data.apiMethod])
+		{
+			window.clearInterval(this.Intervals[data.apiMethod].timerID);
+			delete this.Intervals[data.apiMethod];
+		}
+		this.Intervals[data.apiMethod] = data;
+		data.timerID = window.setInterval(function () { data.intervalCallback(data) }, 3000);
+	};
+	this.symbols = function (callback, symbol, chartType, granularity)
+	{
+		var url = String.format("/symbols/{0}/{1}", symbol, chartType);
+		var data =
+		{
+			apiMethod: url,
+			granularity: granularity,
+			callback: callback,
+			chartType: chartType,
+			intervalCallback: function (params)
+			{
+				var callData = {};
+				if (params.chartType == 'candles')
+				{
+					callData.granularity = params.granularity;
+					callData.count = Binary.Api.getCountForGranularity(granularity);
+				}
+				else
+				{
+					callData.start = Math.floor(+new Date/1000) - Binary.Api.getIntervalForGranularity(params.granularity);
+				}
+				postMsg(params.apiMethod, params.callback, false, callData);
+			}
+		};
+		this.addInterval(data);
+	};
+
+	this.symbols.price = function (callback, symbol)
+	{
+		postMsg(String.format("/symbols/{0}/price", symbol), callback, false);
 	};
 
 	this.offerings = function (callback, interval, market, submarket, symbol, contract_category, contract_type, is_forward_starting, is_path_dependent, expiry_type, payout_time)
 	{
-		postMsg("/offerings", callback, interval, { market: market, submarket: submarket, symbol: symbol, contract_category: contract_category, contract_type: contract_type, is_forward_starting: is_forward_starting, is_path_dependent: is_path_dependent, expiry_type: expiry_type, payout_time: payout_time });
+		postMsg("/offerings", callback, false, { market: market, submarket: submarket, symbol: symbol, contract_category: contract_category, contract_type: contract_type, is_forward_starting: is_forward_starting, is_path_dependent: is_path_dependent, expiry_type: expiry_type, payout_time: payout_time });
 	};
 
 	this.payout_currencies = function (callback)
@@ -65,11 +111,16 @@ Binary.Api.ClientClass = function (autoStart)
 
 	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high)
 	{
-		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, Binary.Api.Intervals.Once);
+		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false);
 	};
 
 	this.unsubscribeAll = function ()
 	{
+		for(var p in this.Intervals)
+		{
+			window.clearInterval(this.Intervals[p].timerID);
+			delete this.Intervals[p];
+		}
 		Binary.Api.Proxy.unsubscribeAll();
 	};
 	

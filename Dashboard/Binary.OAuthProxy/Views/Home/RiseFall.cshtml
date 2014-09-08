@@ -1,0 +1,473 @@
+﻿@model Binary.OAuthProxy.Controllers.ResouceModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Home/ResourcePartial.cshtml")
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script>
+        
+    </script>
+</head>
+<body>
+    <div id="body_id"></div>
+    <div id="content-holder">
+        <div class="grd-container">
+            <div class="grd-grid-12">
+                <div id="pricing_table_form_div" class="has-tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <div class="grd-row-padding">
+                        <div aria-labelledby="ui-id-9" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+                            <form name="rise_fall" id="rise_fall_form" method="GET" action="http://localhost:57842/RiseFall?">
+                                <fieldset>
+                                    <div class="grd-parent grd-grid-4 grd-grid-mobile-12">
+                                        <span class="grd-grid-4 form_label">
+                                            <label style="margin-left:30px" for="atleast">Start time:</label>
+                                        </span>
+                                        <span class="grd-grid-4">
+                                            <select id="atleast" name="date_start" class="unbind_later">
+                                                <option value="now">Now</option>
+                                                <option value="1409764200">17:10</option>
+                                                <option value="1409764500">17:15</option>
+                                                <option value="1409764800">17:20</option>
+                                                <option value="1409765100">17:25</option>
+                                                <option value="1409765400">17:30</option>
+                                                <option value="1409765700">17:35</option>
+                                                <option value="1409766000">17:40</option>
+                                                <option value="1409766300">17:45</option>
+                                                <option value="1409766600">17:50</option>
+                                                <option value="1409766900">17:55</option>
+                                                <option value="1409767200">18:00</option>
+                                                <option value="1409767500">18:05</option>
+                                                <option value="1409767800">18:10</option>
+                                                <option value="1409768100">18:15</option>
+                                                <option value="1409768400">18:20</option>
+                                                <option value="1409768700">18:25</option>
+                                                <option value="1409769000">18:30</option>
+                                                <option value="1409769300">18:35</option>
+                                                <option value="1409769600">18:40</option>
+                                                <option value="1409769900">18:45</option>
+                                                <option value="1409770200">18:50</option>
+                                                <option value="1409770500">18:55</option>
+                                                <option value="1409770800">19:00</option>
+                                                <option value="1409771100">19:05</option>
+                                                <option value="1409771400">19:10</option>
+                                                <option value="1409771700">19:15</option>
+                                                <option value="1409772000">19:20</option>
+                                                <option value="1409772300">19:25</option>
+                                                <option value="1409772600">19:30</option>
+                                                <option value="1409772900">19:35</option>
+                                                <option value="1409773200">19:40</option>
+                                                <option value="1409773500">19:45</option>
+                                                <option value="1409773800">19:50</option>
+                                                <option value="1409774100">19:55</option>
+                                                <option value="1409774400">20:00</option>
+                                                <option value="1409774700">20:05</option>
+                                                <option value="1409775000">20:10</option>
+                                                <option value="1409775300">20:15</option>
+                                                <option value="1409775600">20:20</option>
+                                                <option value="1409775900">20:25</option>
+                                                <option value="1409776200">20:30</option>
+                                                <option value="1409776500">20:35</option>
+                                                <option value="1409776800">20:40</option>
+                                                <option value="1409777100">20:45</option>
+                                                <option value="1409777400">20:50</option>
+                                                <option value="1409777700">20:55</option>
+                                                <option value="1409778000">21:00</option>
+                                                <option value="1409778300">21:05</option>
+                                                <option value="1409778600">21:10</option>
+                                                <option value="1409778900">21:15</option>
+                                                <option value="1409779200">21:20</option>
+                                                <option value="1409779500">21:25</option>
+                                                <option value="1409779800">21:30</option>
+                                                <option value="1409780100">21:35</option>
+                                                <option value="1409780400">21:40</option>
+                                                <option value="1409780700">21:45</option>
+                                                <option value="1409781000">21:50</option>
+                                                <option value="1409781300">21:55</option>
+                                                <option value="1409781600">22:00</option>
+                                                <option value="1409781900">22:05</option>
+                                                <option value="1409782200">22:10</option>
+                                                <option value="1409782500">22:15</option>
+                                                <option value="1409782800">22:20</option>
+                                                <option value="1409783100">22:25</option>
+                                                <option value="1409783400">22:30</option>
+                                                <option value="1409783700">22:35</option>
+                                                <option value="1409784000">22:40</option>
+                                                <option value="1409784300">22:45</option>
+                                                <option value="1409784600">22:50</option>
+                                                <option value="1409784900">22:55</option>
+                                                <option value="1409785200">23:00</option>
+                                                <option value="1409785500">23:05</option>
+                                                <option value="1409785800">23:10</option>
+                                                <option value="1409786100">23:15</option>
+                                                <option value="1409786400">23:20</option>
+                                                <option value="1409786700">23:25</option>
+                                                <option value="1409787000">23:30</option>
+                                                <option value="1409787300">23:35</option>
+                                                <option value="1409787600">23:40</option>
+                                                <option value="1409787900">23:45</option>
+                                                <option value="1409788200">23:50</option>
+                                                <option value="1409788800">00:00 Thu</option>
+                                                <option value="1409789100">00:05 Thu</option>
+                                                <option value="1409789400">00:10 Thu</option>
+                                                <option value="1409789700">00:15 Thu</option>
+                                                <option value="1409790000">00:20 Thu</option>
+                                                <option value="1409790300">00:25 Thu</option>
+                                                <option value="1409790600">00:30 Thu</option>
+                                                <option value="1409790900">00:35 Thu</option>
+                                                <option value="1409791200">00:40 Thu</option>
+                                                <option value="1409791500">00:45 Thu</option>
+                                                <option value="1409791800">00:50 Thu</option>
+                                                <option value="1409792100">00:55 Thu</option>
+                                                <option value="1409792400">01:00 Thu</option>
+                                                <option value="1409792700">01:05 Thu</option>
+                                                <option value="1409793000">01:10 Thu</option>
+                                                <option value="1409793300">01:15 Thu</option>
+                                                <option value="1409793600">01:20 Thu</option>
+                                                <option value="1409793900">01:25 Thu</option>
+                                                <option value="1409794200">01:30 Thu</option>
+                                                <option value="1409794500">01:35 Thu</option>
+                                                <option value="1409794800">01:40 Thu</option>
+                                                <option value="1409795100">01:45 Thu</option>
+                                                <option value="1409795400">01:50 Thu</option>
+                                                <option value="1409795700">01:55 Thu</option>
+                                                <option value="1409796000">02:00 Thu</option>
+                                                <option value="1409796300">02:05 Thu</option>
+                                                <option value="1409796600">02:10 Thu</option>
+                                                <option value="1409796900">02:15 Thu</option>
+                                                <option value="1409797200">02:20 Thu</option>
+                                                <option value="1409797500">02:25 Thu</option>
+                                                <option value="1409797800">02:30 Thu</option>
+                                                <option value="1409798100">02:35 Thu</option>
+                                                <option value="1409798400">02:40 Thu</option>
+                                                <option value="1409798700">02:45 Thu</option>
+                                                <option value="1409799000">02:50 Thu</option>
+                                                <option value="1409799300">02:55 Thu</option>
+                                                <option value="1409799600">03:00 Thu</option>
+                                                <option value="1409799900">03:05 Thu</option>
+                                                <option value="1409800200">03:10 Thu</option>
+                                                <option value="1409800500">03:15 Thu</option>
+                                                <option value="1409800800">03:20 Thu</option>
+                                                <option value="1409801100">03:25 Thu</option>
+                                                <option value="1409801400">03:30 Thu</option>
+                                                <option value="1409801700">03:35 Thu</option>
+                                                <option value="1409802000">03:40 Thu</option>
+                                                <option value="1409802300">03:45 Thu</option>
+                                                <option value="1409802600">03:50 Thu</option>
+                                                <option value="1409802900">03:55 Thu</option>
+                                                <option value="1409803200">04:00 Thu</option>
+                                                <option value="1409803500">04:05 Thu</option>
+                                                <option value="1409803800">04:10 Thu</option>
+                                                <option value="1409804100">04:15 Thu</option>
+                                                <option value="1409804400">04:20 Thu</option>
+                                                <option value="1409804700">04:25 Thu</option>
+                                                <option value="1409805000">04:30 Thu</option>
+                                                <option value="1409805300">04:35 Thu</option>
+                                                <option value="1409805600">04:40 Thu</option>
+                                                <option value="1409805900">04:45 Thu</option>
+                                                <option value="1409806200">04:50 Thu</option>
+                                                <option value="1409806500">04:55 Thu</option>
+                                                <option value="1409806800">05:00 Thu</option>
+                                                <option value="1409807100">05:05 Thu</option>
+                                                <option value="1409807400">05:10 Thu</option>
+                                                <option value="1409807700">05:15 Thu</option>
+                                                <option value="1409808000">05:20 Thu</option>
+                                                <option value="1409808300">05:25 Thu</option>
+                                                <option value="1409808600">05:30 Thu</option>
+                                                <option value="1409808900">05:35 Thu</option>
+                                                <option value="1409809200">05:40 Thu</option>
+                                                <option value="1409809500">05:45 Thu</option>
+                                                <option value="1409809800">05:50 Thu</option>
+                                                <option value="1409810100">05:55 Thu</option>
+                                                <option value="1409810400">06:00 Thu</option>
+                                                <option value="1409810700">06:05 Thu</option>
+                                                <option value="1409811000">06:10 Thu</option>
+                                                <option value="1409811300">06:15 Thu</option>
+                                                <option value="1409811600">06:20 Thu</option>
+                                                <option value="1409811900">06:25 Thu</option>
+                                                <option value="1409812200">06:30 Thu</option>
+                                                <option value="1409812500">06:35 Thu</option>
+                                                <option value="1409812800">06:40 Thu</option>
+                                                <option value="1409813100">06:45 Thu</option>
+                                                <option value="1409813400">06:50 Thu</option>
+                                                <option value="1409813700">06:55 Thu</option>
+                                                <option value="1409814000">07:00 Thu</option>
+                                                <option value="1409814300">07:05 Thu</option>
+                                                <option value="1409814600">07:10 Thu</option>
+                                                <option value="1409814900">07:15 Thu</option>
+                                                <option value="1409815200">07:20 Thu</option>
+                                                <option value="1409815500">07:25 Thu</option>
+                                                <option value="1409815800">07:30 Thu</option>
+                                                <option value="1409816100">07:35 Thu</option>
+                                                <option value="1409816400">07:40 Thu</option>
+                                                <option value="1409816700">07:45 Thu</option>
+                                                <option value="1409817000">07:50 Thu</option>
+                                                <option value="1409817300">07:55 Thu</option>
+                                                <option value="1409817600">08:00 Thu</option>
+                                                <option value="1409817900">08:05 Thu</option>
+                                                <option value="1409818200">08:10 Thu</option>
+                                                <option value="1409818500">08:15 Thu</option>
+                                                <option value="1409818800">08:20 Thu</option>
+                                                <option value="1409819100">08:25 Thu</option>
+                                                <option value="1409819400">08:30 Thu</option>
+                                                <option value="1409819700">08:35 Thu</option>
+                                                <option value="1409820000">08:40 Thu</option>
+                                                <option value="1409820300">08:45 Thu</option>
+                                                <option value="1409820600">08:50 Thu</option>
+                                                <option value="1409820900">08:55 Thu</option>
+                                                <option value="1409821200">09:00 Thu</option>
+                                                <option value="1409821500">09:05 Thu</option>
+                                                <option value="1409821800">09:10 Thu</option>
+                                                <option value="1409822100">09:15 Thu</option>
+                                                <option value="1409822400">09:20 Thu</option>
+                                                <option value="1409822700">09:25 Thu</option>
+                                                <option value="1409823000">09:30 Thu</option>
+                                                <option value="1409823300">09:35 Thu</option>
+                                                <option value="1409823600">09:40 Thu</option>
+                                                <option value="1409823900">09:45 Thu</option>
+                                                <option value="1409824200">09:50 Thu</option>
+                                                <option value="1409824500">09:55 Thu</option>
+                                                <option value="1409824800">10:00 Thu</option>
+                                                <option value="1409825100">10:05 Thu</option>
+                                                <option value="1409825400">10:10 Thu</option>
+                                                <option value="1409825700">10:15 Thu</option>
+                                                <option value="1409826000">10:20 Thu</option>
+                                                <option value="1409826300">10:25 Thu</option>
+                                                <option value="1409826600">10:30 Thu</option>
+                                                <option value="1409826900">10:35 Thu</option>
+                                                <option value="1409827200">10:40 Thu</option>
+                                                <option value="1409827500">10:45 Thu</option>
+                                                <option value="1409827800">10:50 Thu</option>
+                                                <option value="1409828100">10:55 Thu</option>
+                                                <option value="1409828400">11:00 Thu</option>
+                                                <option value="1409828700">11:05 Thu</option>
+                                                <option value="1409829000">11:10 Thu</option>
+                                                <option value="1409829300">11:15 Thu</option>
+                                                <option value="1409829600">11:20 Thu</option>
+                                                <option value="1409829900">11:25 Thu</option>
+                                                <option value="1409830200">11:30 Thu</option>
+                                                <option value="1409830500">11:35 Thu</option>
+                                                <option value="1409830800">11:40 Thu</option>
+                                                <option value="1409831100">11:45 Thu</option>
+                                                <option value="1409831400">11:50 Thu</option>
+                                                <option value="1409831700">11:55 Thu</option>
+                                                <option value="1409832000">12:00 Thu</option>
+                                                <option value="1409832300">12:05 Thu</option>
+                                                <option value="1409832600">12:10 Thu</option>
+                                                <option value="1409832900">12:15 Thu</option>
+                                                <option value="1409833200">12:20 Thu</option>
+                                                <option value="1409833500">12:25 Thu</option>
+                                                <option value="1409833800">12:30 Thu</option>
+                                                <option value="1409834100">12:35 Thu</option>
+                                                <option value="1409834400">12:40 Thu</option>
+                                                <option value="1409834700">12:45 Thu</option>
+                                                <option value="1409835000">12:50 Thu</option>
+                                                <option value="1409835300">12:55 Thu</option>
+                                                <option value="1409835600">13:00 Thu</option>
+                                                <option value="1409835900">13:05 Thu</option>
+                                                <option value="1409836200">13:10 Thu</option>
+                                                <option value="1409836500">13:15 Thu</option>
+                                                <option value="1409836800">13:20 Thu</option>
+                                                <option value="1409837100">13:25 Thu</option>
+                                                <option value="1409837400">13:30 Thu</option>
+                                                <option value="1409837700">13:35 Thu</option>
+                                                <option value="1409838000">13:40 Thu</option>
+                                                <option value="1409838300">13:45 Thu</option>
+                                                <option value="1409838600">13:50 Thu</option>
+                                                <option value="1409838900">13:55 Thu</option>
+                                                <option value="1409839200">14:00 Thu</option>
+                                                <option value="1409839500">14:05 Thu</option>
+                                                <option value="1409839800">14:10 Thu</option>
+                                                <option value="1409840100">14:15 Thu</option>
+                                                <option value="1409840400">14:20 Thu</option>
+                                                <option value="1409840700">14:25 Thu</option>
+                                                <option value="1409841000">14:30 Thu</option>
+                                                <option value="1409841300">14:35 Thu</option>
+                                                <option value="1409841600">14:40 Thu</option>
+                                                <option value="1409841900">14:45 Thu</option>
+                                                <option value="1409842200">14:50 Thu</option>
+                                                <option value="1409842500">14:55 Thu</option>
+                                                <option value="1409842800">15:00 Thu</option>
+                                                <option value="1409843100">15:05 Thu</option>
+                                                <option value="1409843400">15:10 Thu</option>
+                                                <option value="1409843700">15:15 Thu</option>
+                                                <option value="1409844000">15:20 Thu</option>
+                                                <option value="1409844300">15:25 Thu</option>
+                                                <option value="1409844600">15:30 Thu</option>
+                                                <option value="1409844900">15:35 Thu</option>
+                                                <option value="1409845200">15:40 Thu</option>
+                                                <option value="1409845500">15:45 Thu</option>
+                                                <option value="1409845800">15:50 Thu</option>
+                                                <option value="1409846100">15:55 Thu</option>
+                                                <option value="1409846400">16:00 Thu</option>
+                                                <option value="1409846700">16:05 Thu</option>
+                                                <option value="1409847000">16:10 Thu</option>
+                                                <option value="1409847300">16:15 Thu</option>
+                                                <option value="1409847600">16:20 Thu</option>
+                                                <option value="1409847900">16:25 Thu</option>
+                                                <option value="1409848200">16:30 Thu</option>
+                                                <option value="1409848500">16:35 Thu</option>
+                                                <option value="1409848800">16:40 Thu</option>
+                                                <option value="1409849100">16:45 Thu</option>
+                                                <option value="1409849400">16:50 Thu</option>
+                                                <option value="1409849700">16:55 Thu</option>
+                                                <option value="1409850000">17:00 Thu</option>
+                                                <option value="1409850300">17:05 Thu</option>
+                                                <option value="1409850600">17:10 Thu</option>
+                                                <option value="1409850900">17:15 Thu</option>
+                                                <option value="1409851200">17:20 Thu</option>
+                                                <option value="1409851500">17:25 Thu</option>
+                                                <option value="1409851800">17:30 Thu</option>
+                                                <option value="1409852100">17:35 Thu</option>
+                                                <option value="1409852400">17:40 Thu</option>
+                                                <option value="1409852700">17:45 Thu</option>
+                                                <option value="1409853000">17:50 Thu</option>
+                                                <option value="1409853300">17:55 Thu</option>
+                                                <option value="1409853600">18:00 Thu</option>
+                                                <option value="1409853900">18:05 Thu</option>
+                                                <option value="1409854200">18:10 Thu</option>
+                                                <option value="1409854500">18:15 Thu</option>
+                                                <option value="1409854800">18:20 Thu</option>
+                                                <option value="1409855100">18:25 Thu</option>
+                                                <option value="1409855400">18:30 Thu</option>
+                                                <option value="1409855700">18:35 Thu</option>
+                                                <option value="1409856000">18:40 Thu</option>
+                                                <option value="1409856300">18:45 Thu</option>
+                                                <option value="1409856600">18:50 Thu</option>
+                                                <option value="1409856900">18:55 Thu</option>
+                                                <option value="1409857200">19:00 Thu</option>
+                                                <option value="1409857500">19:05 Thu</option>
+                                                <option value="1409857800">19:10 Thu</option>
+                                                <option value="1409858100">19:15 Thu</option>
+                                                <option value="1409858400">19:20 Thu</option>
+                                                <option value="1409858700">19:25 Thu</option>
+                                                <option value="1409859000">19:30 Thu</option>
+                                                <option value="1409859300">19:35 Thu</option>
+                                                <option value="1409859600">19:40 Thu</option>
+                                                <option value="1409859900">19:45 Thu</option>
+                                                <option value="1409860200">19:50 Thu</option>
+                                                <option value="1409860500">19:55 Thu</option>
+                                                <option value="1409860800">20:00 Thu</option>
+                                                <option value="1409861100">20:05 Thu</option>
+                                                <option value="1409861400">20:10 Thu</option>
+                                                <option value="1409861700">20:15 Thu</option>
+                                                <option value="1409862000">20:20 Thu</option>
+                                                <option value="1409862300">20:25 Thu</option>
+                                                <option value="1409862600">20:30 Thu</option>
+                                                <option value="1409862900">20:35 Thu</option>
+                                                <option value="1409863200">20:40 Thu</option>
+                                                <option value="1409863500">20:45 Thu</option>
+                                                <option value="1409863800">20:50 Thu</option>
+                                                <option value="1409864100">20:55 Thu</option>
+                                                <option value="1409864400">21:00 Thu</option>
+                                                <option value="1409864700">21:05 Thu</option>
+                                                <option value="1409865000">21:10 Thu</option>
+                                                <option value="1409865300">21:15 Thu</option>
+                                                <option value="1409865600">21:20 Thu</option>
+                                                <option value="1409865900">21:25 Thu</option>
+                                                <option value="1409866200">21:30 Thu</option>
+                                                <option value="1409866500">21:35 Thu</option>
+                                                <option value="1409866800">21:40 Thu</option>
+                                                <option value="1409867100">21:45 Thu</option>
+                                                <option value="1409867400">21:50 Thu</option>
+                                                <option value="1409867700">21:55 Thu</option>
+                                                <option value="1409868000">22:00 Thu</option>
+                                                <option value="1409868300">22:05 Thu</option>
+                                                <option value="1409868600">22:10 Thu</option>
+                                                <option value="1409868900">22:15 Thu</option>
+                                                <option value="1409869200">22:20 Thu</option>
+                                                <option value="1409869500">22:25 Thu</option>
+                                                <option value="1409869800">22:30 Thu</option>
+                                                <option value="1409870100">22:35 Thu</option>
+                                                <option value="1409870400">22:40 Thu</option>
+                                                <option value="1409870700">22:45 Thu</option>
+                                                <option value="1409871000">22:50 Thu</option>
+                                                <option value="1409871300">22:55 Thu</option>
+                                                <option value="1409871600">23:00 Thu</option>
+                                                <option value="1409871900">23:05 Thu</option>
+                                                <option value="1409872200">23:10 Thu</option>
+                                                <option value="1409872500">23:15 Thu</option>
+                                                <option value="1409872800">23:20 Thu</option>
+                                                <option value="1409873100">23:25 Thu</option>
+                                                <option value="1409873400">23:30 Thu</option>
+                                                <option value="1409873700">23:35 Thu</option>
+                                                <option value="1409874000">23:40 Thu</option>
+                                                <option value="1409874300">23:45 Thu</option>
+                                                <option value="1409874600">23:50 Thu</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                    <div id="duration_container" class="grd-parent grd-grid-5 grd-grid-mobile-12">
+                                        <span class="grd-grid-4 form_label">
+                                            <label for="duration_amount">Duration:</label>
+                                        </span>
+                                        <span id="expiry_type_duration" class="grd-grid-7 grd-parent">
+                                            <span class="grd-grid-4">
+                                                <input type="text"  style="width: 92px;" name="duration_amount" id="duration_amount" size="4" maxlength="5" value="15" class="unbind_later">
+                                            </span>
+                                            <span class="grd-grid-4">
+                                                <select id="duration_units" name="duration_units" class="unbind_later" style="margin-left:30px;">
+                                                    <option class="spot" value="d">days</option>
+                                                    <option class="spot" value="h">hours</option>
+                                                    <option class="spot" value="m">minutes</option>
+                                                    <option class="spot" value="s">seconds</option>
+                                                    <option class="spot" value="t">ticks</option>
+                                                </select>
+                                            </span>
+                                            <span class="grd-grid-5 grd-no-gutter" style="margin-left: 10px;">
+                                                <span class="forward_starting non_input h" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 1</span>
+                                                <span class="forward_starting non_input m" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 2</span>
+                                                <span class="non_input d" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 1</span>
+                                                <span class="non_input h" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 1</span>
+                                                <span class="non_input m" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 1</span>
+                                                <span class="non_input s" style="display: none;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 15</span>
+                                                <span class="non_input t" style="display: inline;">
+                                                    <abbr rel="tooltip" title="minimum available duration">min</abbr>: 5</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="grd-parent grd-grid-3 grd-grid-mobile-12">
+                                        <div class="grd-grid-4 right-aligned">
+                                            <label for="payout">Payout Currency:</label>
+                                        </div>
+                                        <div class="grd-grid-4">
+                                            <select id="bet_currency" name="currency">
+                                                <option value="USD">USD</option>
+                                                <option value="EUR">EUR</option>
+                                                <option value="GBP">GBP</option>
+                                                <option value="AUD">AUD</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="table_action" value="price">
+                                    <div id="submit" class="form_button grd-grid-12 grd-with-padding">
+                                        <span class="button">
+                                            <button id="rise_fall_calculate" class="button unbind_later" value="calculate" type="submit" style="display: inline-block;">Calculate</button>
+                                            <button style="display: none;" id="rise_fall_calculating" class="button" value="calculating" type="submit">Calculating</button>
+                                        </span>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="rise_fall_prices_div" class="table_div">
+                    @Html.Raw(Model.IndexHTML)
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

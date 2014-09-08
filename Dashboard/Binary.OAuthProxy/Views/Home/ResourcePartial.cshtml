@@ -1,0 +1,121 @@
+﻿<meta name="viewport" content="width=device-width" />
+<script src="../Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    function parseParams(query)
+    {
+        var re = /([^&=]+)=?([^&]*)/g;
+        var decodeParams = function (str) { return decodeURIComponent(str.replace(/\+/g, ' ')); };
+        var params = {}, e;
+        if (query)
+        {
+            if (query.substr(0, 1) == '?')
+            {
+                query = query.substr(1);
+            }
+
+            while (e = re.exec(query))
+            {
+                var k = decodeParams(e[1]);
+                var v = decodeParams(e[2]);
+                if (params[k] !== undefined)
+                {
+                    if (!$.isArray(params[k]))
+                    {
+                        params[k] = [params[k]];
+                    }
+                    params[k].push(v);
+                } else
+                {
+                    params[k] = v;
+                }
+            }
+        }
+        return params;
+    };
+    function setUrlParam(parameters)
+    {
+        var url = window.location.href;
+        var obj = parseParams(window.location.search);
+        var new_obj = [];
+        for (var index in parameters)
+        {
+            new_obj[index] = parameters[index];
+        };
+        $.extend(true, obj, new_obj);
+        var result = $.param(obj, true);
+        var new_url = url.substring(0, url.indexOf("?") + 1) + result;
+        window.location.href = new_url;
+    };
+
+    $(function ()
+    {
+        $("a").click(function (e)
+        {
+            e.preventDefault();
+        });
+    });
+</script>
+<link rel="stylesheet" href="https://static.binary.com/2.5.4/css/binary.min.css" />
+<style>
+    div.grd-row-padding
+    {
+        padding: 0px 0px 0px 0px;
+    }
+
+    div.grd-grid-12
+    {
+        padding: 0px 0px 0px 0px;
+    }
+
+    div.ui-widget-content
+    {
+        font-size: 13px !important;
+    }
+
+        div.ui-widget-content .grd-grid-2
+        {
+            padding: 0px 5px 0px 5px;
+        }
+
+    .table-header
+    {
+        font-weight: normal;
+        padding: 5px 0px;
+    }
+
+    .grd-no-gutter
+    {
+        margin-left: 5px;
+        margin-right: -5px;
+    }
+
+    .table_div
+    {
+        font-size: 13px !important;
+    }
+
+    label
+    {
+        width: 50px;
+        min-width: 50px;
+        display: inline;
+    }
+
+    input
+    {
+        width: 217px;
+        margin-bottom: 5px;
+    }
+    select
+    {
+        min-width: 100px;
+        margin-bottom: 5px;
+        display: inline;
+    }
+
+    button.button, button.submit_form
+    {
+        margin: 10px auto;
+    }
+
+</style>

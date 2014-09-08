@@ -75,6 +75,21 @@ namespace Binary
             return Convert.ToBase64String(plainTextBytes);
         }
 
+		public static string GetWebResponse(string url)
+		{
+			var wr = HttpWebRequest.Create(url) as HttpWebRequest;
+			string result = string.Empty;
+			try
+			{
+				var response = wr.GetResponse() as HttpWebResponse;
+				result = new StreamReader(response.GetResponseStream()).ReadToEnd();
+			}
+			catch
+			{
+			}
+			return result;
+		}
+
         public static string GetPostResponse(string url, string data)
         {
             var wr = HttpWebRequest.Create(url) as HttpWebRequest;

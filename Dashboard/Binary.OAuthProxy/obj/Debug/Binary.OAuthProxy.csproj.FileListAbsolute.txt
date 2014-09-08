@@ -25,3 +25,6 @@ E:\Override\My\OAuth\Binary.OAuthProxy\bin\System.Web.WebPages.Deployment.xml
 E:\Override\My\OAuth\Binary.OAuthProxy\bin\System.Web.WebPages.Razor.xml
 E:\Override\My\OAuth\Binary.OAuthProxy\obj\Debug\Binary.OAuthProxy.dll
 E:\Override\My\OAuth\Binary.OAuthProxy\obj\Debug\Binary.OAuthProxy.pdb
+E:\Override\My\OAuth\Binary.OAuthProxy\bin\HtmlAgilityPack.dll
+E:\Override\My\OAuth\Binary.OAuthProxy\bin\HtmlAgilityPack.pdb
+E:\Override\My\OAuth\Binary.OAuthProxy\bin\HtmlAgilityPack.xml

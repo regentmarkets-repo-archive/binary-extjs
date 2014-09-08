@@ -1,0 +1,339 @@
+﻿@model Binary.OAuthProxy.Controllers.ResouceModel
+@{
+	Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	@Html.Partial("~/Views/Home/ResourcePartial.cshtml")
+
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+	<script>
+		$(function ()
+		{
+			$("#pricingtable_bet_type").on("change", function ()
+			{
+				var val = $("#pricingtable_bet_type").val();
+				if (val && (val == 'RANGE' || val == 'UPORDOWN' || val == 'EXPIRYRANGE' || val == 'EXPIRYMISS'))
+					$("#lower_strike").css('display', 'inline');
+				else $("#lower_strike").css('display', 'none');
+			});
+			$("#strike_type").on("change", function ()
+			{
+				var val = $("#strike_type").val();
+				if (val && (val == 'Barrier terms'))
+				{
+					$("#from_strike_label").css('display', 'inline');
+					$("#from_strike_percent").css('display', 'none');
+				}
+				else
+				{
+					$("#from_strike_percent").css('display', 'inline');
+					$("#from_strike_label").css('display', 'none');
+				}
+			});
+			$("#pricing_table_tabs").tabs();
+		});
+	</script>
+</head>
+<body>
+	<div id="body_id"></div>
+	<div id="content-holder">
+		<div class="grd-container">
+			<div class="grd-grid-12">
+				<div id="pricing_table_form_div" class="has-tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+					<div class="grd-row-padding">
+						<div aria-labelledby="ui-id-9" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+							<form id="pricing_table_input" name="pricing_table_input" method="GET" action="http://localhost:57842/Pricingtable?">
+								<fieldset>
+									<div class='grd-parent grd-grid-12 grd-row-padding'>
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="pricingtable_bet_type">Contract Type:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<select id="pricingtable_bet_type" name="bet_type">
+												<option value="CALL" selected="selected">
+												Higher
+                                                <option value="PUT">
+												Lower
+                                                <option value="ONETOUCH">
+												Touches
+                                                <option value="NOTOUCH">
+												Does not touch
+                                                <option value="RANGE">
+												Stays between
+                                                <option value="UPORDOWN">
+												Goes outside
+                                                <option value="EXPIRYRANGE">
+												Ends between
+                                                <option value="EXPIRYMISS">
+												Ends outside
+											</select>
+										</div>
+									</div>
+									<div class="grd-parent grd-grid-12 grd-row-padding">
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="pricingtable_underlying">Market:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<span id="pricingtable_underlying_div">
+												<select id="pricingtable_underlying" name="underlying">
+													<optgroup label="Commodities">
+														<option class="" value="frxXAUUSD" selected="selected">
+														Gold/USD
+
+                                                        <option class="" value="frxXAGUSD">
+														Silver/USD
+
+													</optgroup>
+													<optgroup label="Randoms">
+														<option class="" value="R_100">
+														Random 100 Index
+
+                                                        <option class="" value="R_25">
+														Random 25 Index
+
+                                                        <option class="" value="R_50">
+														Random 50 Index
+
+                                                        <option class="" value="R_75">
+														Random 75 Index
+
+                                                        <option class="" value="RDBEAR">
+														Random Bear
+
+                                                        <option class="" value="RDBULL">
+														Random Bull
+
+                                                        <option class="" value="RDMARS">
+														Random Mars
+
+                                                        <option class="" value="RDMOON">
+														Random Moon
+
+                                                        <option class="" value="RDSUN">
+														Random Sun
+
+                                                        <option class="" value="RDVENUS">
+														Random Venus
+
+                                                        <option class="" value="RDYANG">
+														Random Yang
+
+                                                        <option class="" value="RDYIN">
+														Random Yin
+
+													</optgroup>
+													<optgroup label="Forex">
+														<option class="" value="frxAUDJPY">
+														AUD/JPY
+
+                                                        <option class="" value="frxAUDUSD">
+														AUD/USD
+
+                                                        <option class="" value="frxEURAUD">
+														EUR/AUD
+
+                                                        <option class="" value="frxEURCAD">
+														EUR/CAD
+
+                                                        <option class="" value="frxEURGBP">
+														EUR/GBP
+
+                                                        <option class="" value="frxEURJPY">
+														EUR/JPY
+
+                                                        <option class="" value="frxEURSEK" disabled="disabled">
+														EUR/SEK
+
+                                                        <option class="" value="frxEURUSD">
+														EUR/USD
+
+                                                        <option class="" value="frxGBPAUD">
+														GBP/AUD
+
+                                                        <option class="" value="frxGBPCAD">
+														GBP/CAD
+
+                                                        <option class="" value="frxGBPJPY">
+														GBP/JPY
+
+                                                        <option class="" value="frxGBPUSD">
+														GBP/USD
+
+                                                        <option class="" value="frxNZDUSD">
+														NZD/USD
+
+                                                        <option class="" value="frxUSDCAD">
+														USD/CAD
+
+                                                        <option class="" value="frxUSDJPY">
+														USD/JPY
+
+													</optgroup>
+													<optgroup label="Indices">
+														<option class="gray" value="AS51">
+														Australian Index
+
+                                                        <option class="gray" value="AEX">
+														Dutch Index
+
+                                                        <option class="gray" value="SX5E">
+														Euro 50 Index
+
+                                                        <option class="gray" value="FCHI">
+														French Index
+
+                                                        <option class="gray" value="GDAXI">
+														German Index
+
+                                                        <option class="gray" value="HSI">
+														Hong Kong Index
+
+                                                        <option class="gray" value="NIFTY" disabled="disabled">
+														Indian 50 Index
+
+                                                        <option class="gray" value="FTSEMIB">
+														Italian Index
+
+                                                        <option class="gray" value="N225">
+														Japanese Index
+
+                                                        <option class="gray" value="OMXS30" disabled="disabled">
+														Swedish Index
+
+                                                        <option class="gray" value="SSMI">
+														Swiss Index
+
+                                                        <option class="gray" value="FTSE">
+														UK Index
+
+                                                        <option class="" value="SPC">
+														US 500 Index
+
+                                                        <option class="" value="IXIC" disabled="disabled">
+														US Tech Composite Index
+
+                                                        <option class="" value="DJI">
+														Wall Street Index
+
+													</optgroup>
+												</select>
+											</span>
+										</div>
+									</div>
+									<div class="grd-parent grd-grid-12 grd-row-padding">
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="pricingtable_currency">Payout Currency:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<select id="pricingtable_currency" name="currency">
+												<option value="USD" selected="selected">
+												USD 
+                                                <option value="EUR">
+												EUR 
+                                                <option value="GBP">
+												GBP 
+                                                <option value="AUD">
+												AUD 
+											</select>
+										</div>
+									</div>
+									<div id="lower_strike" class="lower_strike grd-parent grd-grid-12 grd-row-padding " style="display: none;">
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="low_strike">Low barrier:</label>
+										</div>
+										<div class="grd-grid-4 grd-grid-mobile-8">
+											<input size="5" type="text" id="low_strike" name="low_strike" value="92.313">
+											<span style="padding-left: 10px;">(Absolute barrier)</span>
+										</div>
+									</div>
+									<div class='grd-parent grd-grid-12 grd-row-padding'>
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label>Horizontal:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<label id="strike_label">Barrier</label>
+											<label id="high_strike_label" style="display: none;">High barrier</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="strike_step">Step (%):</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<input size="13" type="text" name="strike_step" id="strike_step" value="1">
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<select id="strike_type" name="strike_type" style="margin-left: 130px; width: 225px;">
+												<option value="Moneyness terms" selected="selected">
+												Moneyness terms
+
+                                                <option value="Barrier terms">
+												Barrier terms
+
+											</select>
+										</div>
+										<div class="grd-parent grd-grid-12 grd-row-padding">
+											<div class="grd-grid-2 grd-grid-mobile-4">
+												<label for="from_strike" id="from_strike_percent">From (%):</label>
+												<label for="from_strike" id="from_strike_label" style="display: none;">From:</label>
+											</div>
+											<div class="grd-grid-2 grd-grid-mobile-8">
+												<input size="5" type="text" id="from_strike" name="from_strike" value="95">
+											</div>
+										</div>
+									</div>
+									<div class="grd-parent grd-grid-12 grd-row-padding">
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label>Vertical:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<label>Expiry</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="expiry_step">Step:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<select name="expiry_step" id="expiry_step">
+												<option value="Daily" selected="selected">
+												Daily 
+                                                <option value="Weekly">
+												Weekly 
+                                                <option value="Monthly">
+												Monthly 
+                                                <option value="Standard expiry">
+												Standard expiry 
+											</select>
+										</div>
+									</div>
+									<div class="grd-parent grd-grid-12 grd-row-padding">
+										<div class="grd-grid-2 grd-grid-mobile-4">
+											<label for="from_expiry" id="from_expiry_label">From:</label>
+										</div>
+										<div class="grd-grid-2 grd-grid-mobile-8">
+											<input size="9" type="text" id="from_expiry" name="from_expiry" value="2014-09-02">
+										</div>
+									</div>
+									<div class="grd-grid-12 center-aligned">
+										<input type="hidden" value="price" name="action">
+										<input type="hidden" id="calculating" value="Calculating">
+										<span class="button">
+											<button id="pricingtable_calculate" class="button submit_form" value="calculate" type="submit">Calculate</button>
+											<button style="display: none;" disabled="disabled" id="pricingtable_calculating" class="button" value="calculating" type="submit">Calculating</button>
+										</span>
+									</div>
+								</fieldset>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div id="pricing_table_prices_div" class="table_div">
+					@Html.Raw(Model.IndexHTML)
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

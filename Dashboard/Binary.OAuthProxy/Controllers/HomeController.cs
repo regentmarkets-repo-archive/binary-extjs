@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Web.Mvc;
@@ -62,5 +63,35 @@ namespace Binary.OAuthProxy.Controllers
 
 			return View((object)authResult);
         }
-    }
+
+		public ActionResult AssetIndex(string language, string market, string[] markets)
+		{
+			return View(Controllers.ResouceModel.GetAssetIndex(language, market, markets));
+		}
+		public ActionResult TradingTimes(string language, string market, string[] markets, DateTime? date)
+		{
+			return View(Controllers.ResouceModel.GetTradingTimes(language, market, markets, date ?? DateTime.Now));
+		}
+
+		public ActionResult RiseFall(string language,
+			string date_start, string duration_amount, string duration_units, string currency,
+			string table_action)
+		{
+			return View(Controllers.ResouceModel.GetRiseFall(language,
+				date_start,
+				duration_amount,
+				duration_units,
+				currency,
+				table_action));
+		}
+
+		public ActionResult PricingTable(string language,
+			string bet_type, string underlying, string currency, string low_strike,
+			string strike_step, string strike_type, string from_strike, string expiry_step,
+			string from_expiry, string action)
+		{
+			return View(Controllers.ResouceModel.GetPricingTable(language,
+				bet_type, underlying, currency, low_strike, strike_step, strike_type, from_strike, expiry_step, from_expiry, action));
+		}
+	}
 }

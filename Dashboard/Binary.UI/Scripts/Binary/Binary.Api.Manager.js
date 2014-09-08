@@ -21,54 +21,30 @@ Binary.Api.ManagerClass=function(proxyUrl)
 	};
 	me.EventBus = new Ext.util.MixedCollection();
 
-	var getComponentFrame = function (id)
+	var fireApiResult = function (listener)
 	{
-		return $("iframe[src*='id=" + id + "']");
-	};
-	var fireApiResult = function (methodName, data)
-	{
-		var listener = me.EventBus.getByKey(methodName);
 		listener.each(function (widget)
 		{
-			var mustFire = false;
-			do
+			var frame = $("iframe[src*='id=" + widget.widgetID + "']");
+			if (frame.length > 0)
 			{
-				if (widget.interval == Binary.Api.Intervals.Once && widget.fired)
-				{
-					break;
-				}
-
-				if (widget.interval != Binary.Api.Intervals.Once && widget.interval > widget.tick)
-				{
-					break;
-				}
-
-				mustFire = true;
-			}
-			while (false);
-
-			if (mustFire)
-			{
-				var frame = getComponentFrame(widget.widgetID);
-				if (frame.length > 0)
-				{
-					frame[0].contentWindow.postMessage(JSON.stringify({ data: data, apiMethod: methodName }), "*");
-					widget.fired = true;
-					widget.tick = 0;
-				}
-			}
+				frame[0].contentWindow.postMessage(JSON.stringify({ data: listener.result, apiMethod: listener.apiMethod }), "*");
+			};
 		});
-		listener.firing = false;
 	};
 
 	var tokenRequestVisible = false;
-	var callMethod = function (methodName, listener)
+	var callMethod = function (listener)
 	{
+		if (listener.cached && listener.result)
+		{
+			fireApiResult(listener);
+		}
 		listener.firing = true;
 		$.ajax(
 		{
 			type: 'GET',
-			url: proxyUrl + "/APICall?method=" + methodName,
+			url: proxyUrl + "/APICall?method=" + listener.apiMethod,
 			dataType: 'jsonp',
 			crossDomain: true,
 			data: { token: me.getToken().access_token },
@@ -86,47 +62,18 @@ Binary.Api.ManagerClass=function(proxyUrl)
 				}
 				else
 				{
-					fireApiResult(methodName, response);
+					listener.result = response;
+					fireApiResult(listener);
+					listener.clear();
+					if (!listener.cached)
+					{
+						me.EventBus.removeAtKey(listener.apiMethod);
+					}
+					listener.firing = false;
 				}
 			},
 			contentType: 'application/json'
 		});
-	};
-
-	var processEvents = function ()
-	{
-		if (me.getToken() != null)
-		{
-			me.EventBus.each(function (listener)
-			{
-				if (!listener.firing)
-				{
-					var mustFire = false;
-					listener.each(function (widget, index)
-					{
-						do
-						{
-							if (widget.interval == Binary.Api.Intervals.Once && widget.fired)
-							{
-								break;
-							}
-
-							if (widget.interval > widget.tick)
-							{
-								widget.tick += window.Binary.Tick;
-								break;
-							}
-							mustFire = true;
-						}
-						while (false);
-					});
-					if (mustFire)
-					{
-						callMethod(listener.method, listener);
-					}
-				}
-			});
-		}
 	};
 
 	var tokenRequestWindow = new Ext.window.Window(
@@ -156,31 +103,13 @@ Binary.Api.ManagerClass=function(proxyUrl)
 	var processing = false;
 	this.BeginProcessing = function ()
 	{
+		if (!me.getToken())
+		{
+			tokenRequestWindow.show();
+		}
 		if (!processing)
 		{
 			processing = true;
-			intervalId = window.setInterval(processEvents, Binary.Api.Intervals.Fast);
-
-			Ext.app.Mediator.on("componentRemoved", function (cmp)
-			{
-				me.EventBus.each(function (widgets)
-				{
-					widgets.each(function (item)
-					{
-						if (item.widgetID == cmp.component.data.id)
-						{
-							widgets.remove(item);
-						}
-					});
-				});
-				var s = "";
-			});
-
-			if (!me.getToken())
-			{
-				tokenRequestWindow.show();
-			}
-
 			$(window).bind("message", function (e)
 			{
 				var data = $.parseJSON(e.originalEvent.data);
@@ -191,43 +120,29 @@ Binary.Api.ManagerClass=function(proxyUrl)
 					return;
 				}
 
-				var widgets = me.EventBus.getByKey(data.apiMethod);
-				if (data.action == Binary.Api.Methods.Unsubscribe)
+				var listener = me.EventBus.getByKey(data.apiMethod);
+				if (!listener)
 				{
-					if (widgets)
-					{
-						widgets.removeAtKey(data.widgetID);
-					}
-					if (widgets.getCount()==0)
-					{
-						me.EventBus.removeAtKey(data.apiMethod);
-					}
-					return;
-				}
-
-				var interval = data.interval;
-				if (interval !== Binary.Api.Intervals.Once &&
-					interval !== Binary.Api.Intervals.Fast &&
-					interval !== Binary.Api.Intervals.Medium &&
-					interval !== Binary.Api.Intervals.Slow)
-				{
-					interval = Binary.Api.Intervals.Once;
-				};
-				
-				if (!widgets)
-				{
-					widgets = me.EventBus.add(data.apiMethod, new Ext.util.MixedCollection(
+					listener = me.EventBus.add(data.apiMethod, new Ext.util.MixedCollection(
 					{
 						firing: false,
-						method: data.apiMethod
+						result: null,
+						cached: data.cached,
+						apiMethod: data.apiMethod
 					}));
 				}
 
-				var widget = widgets.getByKey(data.widgetID) || widgets.add(data.widgetID, {});
-				widget.interval = interval;
-				widget.fired = false;
+				var widget = listener.getByKey(data.widgetID) || listener.add(data.widgetID, {});
 				widget.widgetID = data.widgetID;
-				widget.tick = Binary.Api.Tick;
+
+				if (!me.getToken())
+				{
+					return;
+				}
+				if (!listener.firing)
+				{
+					callMethod(listener);
+				}
 			});
 		}
 	};

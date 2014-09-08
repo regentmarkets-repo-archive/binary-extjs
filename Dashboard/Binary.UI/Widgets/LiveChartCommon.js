@@ -15,6 +15,7 @@
 LiveChartConfig = function (params)
 {
 	params = params || {};
+	this.painted = false;
 	this.renderTo = params['renderTo'] || 'live_chart_div';
 	this.renderHeight = params['renderHeight'] || 450;
 	this.shift = typeof params['shift'] !== 'undefined' ? params['shift'] : 1;
@@ -171,7 +172,7 @@ LiveChartConfig.prototype = {
 };
 
 LiveChart.prototype = {
-	close_chart: function()
+	close_chart: function ()
 	{
 		this.chart.destroy();
 	},
@@ -190,7 +191,7 @@ LiveChart.prototype = {
 		//var indicator = this.config.remove_indicator(name);
 		//if (indicator)
 		//{
-			indicator.remove(this);
+		indicator.remove(this);
 		//}
 	},
 	repaint_indicator: function (name)
@@ -223,14 +224,15 @@ LiveChart.prototype = {
 		var chart_params =
 		{
 			chart:
-			{
+			{				
 				height: this.config.renderHeight,
 				renderTo: this.config.renderTo,
 				events:
 				{
 					load: function ()
 					{
-						$self.get_data($self.config.symbol, $self.config.chartType, $self.config.granularity);
+						window.chartCreated = true;
+						//if (window.chartCreated) window.chartCreated(this);
 					}
 				}
 			},
@@ -253,6 +255,7 @@ LiveChart.prototype = {
 			{
 				series:
 				{
+					animation: false,
 					dataGrouping:
 					{
 						dateTimeLabelFormats:
@@ -269,8 +272,8 @@ LiveChart.prototype = {
 						turboThreshold: 3000
 					},
 					marker: {
-					    enabled: this.config.with_markers,
-					    radius: 2,
+						enabled: this.config.with_markers,
+						radius: 2,
 					},
 				},
 				candlestick:
@@ -366,10 +369,11 @@ LiveChart.prototype = {
 				}
 			}
 			this.chart.hideLoading();
+			this.config.painted = true;
 			this.shift = this.config.shift == 1 ? true : false;
 		}
 	},
-	update_interval: function (min,max)
+	update_interval: function (min, max)
 	{
 		this.chart.xAxis[0].setExtremes(
 			min || minDT,
@@ -378,6 +382,7 @@ LiveChart.prototype = {
 	}
 };
 
+window.CurrentChart =
 createChart = function (symbol_, chartType_, granularity_)
 {
 	var live_chart;
@@ -387,25 +392,30 @@ createChart = function (symbol_, chartType_, granularity_)
 	function updateLiveChart(config, data)//create new chart with data or update existing
 	{
 		if (live_chart)
-			live_chart.close_chart();//need this? ###
-		//if (live_chart)
-		//{
-		//    if (!chart_closed)
-		//    {
-		//        live_chart.close_chart();
-		//    }
-		//    live_chart = null;
-		//}
-		if (config.resolution == 'tick')
 		{
-			live_chart = new LiveChartTick(config);
-		} else
-		{
-			live_chart = new LiveChartOHLC(config);
-		}
-		live_chart.show_chart();
+			//if (!chart_closed)
+			//{
+			live_chart.close_chart();
+			//}
+			live_chart = null;
 
-		live_chart.process_message(data, live_chart);
+		}
+		if (!config.painted)
+		{
+			if (config.resolution == 'tick')
+			{
+				window.CurrentChart = live_chart = new LiveChartTick(config);
+			}
+			else
+			{
+				window.CurrentChart = live_chart = new LiveChartOHLC(config);
+			}
+			live_chart.show_chart();
+
+			live_chart.process_message(data, live_chart);
+		}
+		else live_chart.process_message(data, live_chart);
+
 		$("#show_spot").show();
 		chart_closed = false;
 	}
@@ -426,28 +436,64 @@ createChart = function (symbol_, chartType_, granularity_)
 	{
 		changeResolution = function (res)
 		{
+			liveChartConfig.painted = false;
 			Binary.Api.Client.unsubscribeAll();
 			globalConfig.granularity = res;
-			Binary.Api.Client.symbols(function (symbols_data)
-			{
-				init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-			},
-					Binary.Api.Intervals.Once,
-					globalConfig.symbol,
-					globalConfig.chartType,
-					Math.round(+new Date() / 1000) - globalConfig.resolutions[res].interval,
-					Math.round(+new Date() / 1000),
-					20000,
-					res);
+			window.chartCreated = false;
+			Binary.Api.Client.symbols(
+				function (symbols_data)
+				{
+					if (window.chartCreated)
+					{
+						var data = symbols_data;
+						var chart = window.CurrentChart;
+						
+						if (!(data[0] instanceof Array))
+						{
+							data = [data];
+						}
+
+						var data_length = data.length;
+						for (var i = 0; i < data_length; i++)
+						{
+							chart.process_data(data[i]);
+						}
+
+						if (data_length > 0 && chart.spot)
+						{
+							if (chart.config.chartType == "ticks" && chart.config.repaint_indicators)
+								chart.config.repaint_indicators(chart);//temp
+							chart.chart.redraw();
+							if (!chart.config.ticktrade_chart && !chart.navigator_initialized)
+							{
+								chart.navigator_initialized = true;
+								var xData = chart.chart.series[0].xData;
+								var xDataLen = xData.length;
+								if (xDataLen)
+								{
+									chart.chart.xAxis[0].setExtremes(xData[0], xData[xDataLen - 1], true, false);
+								}
+							}
+							chart.chart.hideLoading();
+							chart.config.painted = true;
+							chart.shift = chart.config.shift == 1 ? true : false;
+						}
+					}
+					else
+					{
+						init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+						window.chartCreated = true;
+					}
+				},
+				globalConfig.symbol,
+				globalConfig.chartType,
+				res);
 		};
 	});
 
 	var show_chart_for_instrument = function (data, symbol, chartType, granularity) //changed
 	{
 		var disp_symb;
-		//liveChartConfig = new LiveChartConfig({
-		//    //renderTo: 'live_chart_div',
-		//});
 		if (symbol && chartType)
 		{
 			liveChartConfig.chartType = chartType;
@@ -467,82 +513,104 @@ createChart = function (symbol_, chartType_, granularity_)
 
 	var build_market_select = function ()
 	{
-		var market_select = $("#market_select");
 		$.each(Binary.Markets, function ()
 		{
 			if (this.name)
-			market_select.append("<option id='opt_" + this.name + "' value='" + this.name + "'>" + this.name + "</option>");
+			{
+				Ext.data.StoreManager.lookup('marketStore').add({ marketName: this.name, display_name: this.name.charAt(0).toUpperCase() + this.name.slice(1) });
+			}
 		});
-
-		
-
-		$("#market_select").change(function ()
-		{			
-			build_instrument_select();
-			build_contractCategory_select();
+		Ext.create('Ext.form.field.ComboBox',
+		{
+			id: 'ext_Market_market',
+			renderTo: 'ext_Market_div',
+			valueField: 'marketName',
+			displayField: 'display_name',
+			emptyText: 'Select market',
+			store: 'marketStore',
+			queryMode: 'local',
+			labelWidth: 70,
+			padding: 5,
+			editable: false,
+			listeners:
+			{
+				change: function ()
+				{
+					build_instrument_select();
+					build_contractCategory_select();
+				}
+			}
 		});
 	};
 
 	var build_instrument_select = function ()
 	{
-		var instrument_select = $("#instrument_select");
-		//var market = Binary.Markets['random'];//get($('#market_select').val());
-		$("#instrument_span").hide();
+		Ext.data.StoreManager.lookup('symbolStore').removeAll();
+		var instrumentExtCombo = Ext.getCmp('ext_Symbol_market');
+		
+		if (!instrumentExtCombo)
+		{
+			Ext.create('Ext.form.field.ComboBox',
+				{
+					id: 'ext_Symbol_market',
+					renderTo: 'ext_Symbol_div',
+					displayField: 'display_name',
+					valueField: 'symbol',
+					emptyText: 'Select symbol',
+					store: 'symbolStore',
+					queryMode: 'local',
+					labelWidth: 70,
+					padding: 5,
+					editable: false,
+					listeners:
+					{
+						change: function ()
+						{
+							globalConfig.symbol = this.getValue();
+							Binary.Api.Client.unsubscribeAll();
+							Binary.Api.Client.symbols(function (symbols_data)
+							{
+								init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+							},
+							globalConfig.symbol,
+							globalConfig.chartType,
+							globalConfig.granularity);
+						}
+					}
+				});
+			Ext.getCmp('ext_Symbol_market').setLoading();
+		}
+		else
+		{
+			instrumentExtCombo.clearValue();
+			instrumentExtCombo.setLoading();
+		}
+
 		if (Binary.Markets)
 		{
-			$("#instrument_select option").remove();
-			instrument_select.append("<option class='deleteme'></option>");
-
-			if ($("#market_select").val() != "placeholder")
-				for ( var i in Binary.Markets)
-				{
-					if (Binary.Markets[i].name == $("#market_select").val())
-						//get symbols using API
-						Binary.Api.Client.markets.market(function (data)
-						{
-							if (data.symbols && data.symbols.length > 0) //clear later
-							{
-								//var m = data.symbols[0].exchange_name.toString().toLowerCase();
-								Binary.Markets[i].symbols = [];
-								for (var j in data.symbols)
-								{
-									Binary.Markets[i].symbols.push(data.symbols[j]);
-								}
-								$.each(Binary.Markets[i].symbols, function ()
-								{
-									if (this.symbol)
-										instrument_select.append("<option value='" + this.symbol + "'>" + this.display_name + "</option>");
-								});
-							}
-						},
-						Binary.Api.Intervals.Once,
-						Binary.Markets[i].name);						
-				};
-			
-			$("#instrument_span").show();
-			$("#instrument_select").change(function ()
+			for (var i in Binary.Markets)
 			{
-				globalConfig.symbol = $("#instrument_select").val();
-				Binary.Api.Client.symbols(function (symbols_data)
-				{
-					init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-				},
-				Binary.Api.Intervals.Once,
-				globalConfig.symbol,
-				globalConfig.chartType,
-				Math.round(+new Date() / 1000) - globalConfig.resolutions[globalConfig.granularity].interval,
-				Math.round(+new Date() / 1000),
-				5000);
-			});
-			//$("#instrument_select").val(globalConfig.symbol);
-
-			//Binary.Api.Client.symbols(function (symbols_data)
-			//{
-			//	init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
-			//},
-			//Binary.Api.Intervals.Once,
-			//globalConfig.symbol,
-			//globalConfig.chartType);
+				if (Binary.Markets[i].name == Ext.getCmp('ext_Market_market').getValue())
+					//get symbols using API
+					Binary.Api.Client.markets.market(function (data)
+					{
+						if (data.symbols && data.symbols.length > 0)
+						{
+							Binary.Markets[i].symbols = [];
+							for (var j in data.symbols)
+							{
+								Binary.Markets[i].symbols.push(data.symbols[j]);
+							}
+							$.each(Binary.Markets[i].symbols, function ()
+							{
+								if (this.symbol)
+									Ext.data.StoreManager.lookup('symbolStore').add({ symbol: this.symbol, display_name: this.display_name });
+							});
+							Ext.getCmp('ext_Symbol_market').setLoading(false);							
+						}
+					},
+					Binary.Markets[i].name);
+			};
 		}
 	};
 
@@ -575,30 +643,58 @@ createChart = function (symbol_, chartType_, granularity_)
 				//Binary.Api.Intervals.Once,
 				//globalConfig.symbol,
 				//globalConfig.chartType);
-			});			
+			});
 		}
 	};
 
 	var build_chartType_select = function ()
 	{
 		var usedChartType = 'ticks';
-		$("#chartType_select").change(function ()
+		Ext.create('Ext.form.field.ComboBox',
 		{
-			globalConfig.chartType = $("#chartType_select").val();
-
-			if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
-				usedChartType = 'candles';
-			Binary.Api.Client.symbols(function (symbols_data)
+			id: 'ext_ChartType_market',
+			renderTo: 'ext_ChartType_div',
+			emptyText: 'Select type',
+			displayField: 'chartType_name',
+			valueField: 'chartType_abb',
+			queryMode: 'local',
+			labelWidth: 70,
+			padding: 5,
+			editable: false,
+			store:
 			{
-				init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType);
+				fields: ['chartType_name', 'chartType_abb'],
+				data:
+				[
+					 { chartType_name: 'Ticks', chartType_abb: 'ticks' },
+					 { chartType_name: 'Candles', chartType_abb: 'candles' },
+					 { chartType_name: 'Prices', chartType_abb: 'prices' },
+					 { chartType_name: 'Closing price', chartType_abb: 'closing' },
+					 { chartType_name: 'Median price', chartType_abb: 'median' },
+					 { chartType_name: 'Weighted price', chartType_abb: 'weighted' },
+					 { chartType_name: 'Typical price', chartType_abb: 'typical' }
+				]
 			},
-			Binary.Api.Intervals.Once,
-			globalConfig.symbol,
-			usedChartType);//usedChartType);
+			listeners:
+			{
+				change: function (combo)
+				{
+					var usedChartType = 'ticks';
+					globalConfig.chartType = combo.getValue();
+					if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
+						usedChartType = 'candles';
+					Binary.Api.Client.unsubscribeAll();
+					Binary.Api.Client.symbols(function (symbols_data)
+					{
+						init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+					},
+					globalConfig.symbol,
+					usedChartType,
+					globalConfig.granularity);
+				}
+			}
 		});
 	};
-
-	//var isSpot = false;
 
 	var init_live_chart = function (data, symbol, chartType, granularity) //changed
 	{
@@ -607,8 +703,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			//renderTo: 'live_chart_div',
 		});
 		configure_livechart();
-		//build_markets_select();
-
 		show_chart_for_instrument(data, symbol, chartType, granularity);
 		//updateDatesFromConfig(liveChartConfig);
 		//var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
@@ -624,7 +718,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				//live_chart.remove_indicator('high');
 			}
-
 			if (val)
 			{
 				var barrier = new LiveChartIndicator.Barrier({ name: "high", value: val, color: 'green' });
@@ -638,7 +731,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				//live_chart.remove_indicator('low');
 			}
-
 			if (val)
 			{
 				var barrier = new LiveChartIndicator.Barrier({ name: "low", value: val, color: 'red' });
@@ -653,18 +745,7 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				init = true;
 				e.preventDefault();
-				//if (!isSpot)
-				// {                        
 				live_chart.add_indicator(barrier);
-				//isSpot = true;
-				//}
-				//else
-				//{
-				//    live_chart.remove_indicator(barrier);
-				//    isSpot = false;
-				//}
-				//$(this).hide();
-				//$('#live_charts_hide_spot').show();
 			});
 	};
 
@@ -682,21 +763,16 @@ createChart = function (symbol_, chartType_, granularity_)
 		'D': { seconds: 86400, interval: 366 * 3 * 86400 }
 	};
 
-
 	$("#show_spot").hide();
 	Binary.Api.Client.symbols(function (symbols_data)
 	{
 		init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
 	},
-	Binary.Api.Intervals.Once,
 	globalConfig.symbol,
 	globalConfig.chartType,
-	Math.round(+new Date() / 1000) - globalConfig.resolutions[globalConfig.granularity].interval,
-	Math.round(+new Date() / 1000),
-	5000);
+	'M30');
 
 	Binary.Markets = Binary.Markets || {};
-	//Binary.Markets['random'] = { name: 'random', symbols: [], contract_categories: [] };
 
 	Binary.Api.Client.markets(function (data_)
 	{
@@ -711,26 +787,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			}
 		}
 		build_market_select();
-
-		//for (var i in Binary.Markets)
-		//{
-			
-
-		//	//get contract_category using API
-
-		//	Binary.Api.Client.markets.contract_categories(function (data)
-		//	{
-		//		for (var j in data)
-		//		{
-		//			Binary.Markets[Binary.Markets[i].name].contract_categories.push(data[j]);
-		//		}
-		//		build_contractCategory_select();
-		//	},
-		//	Binary.Api.Intervals.Once,
-		//	Binary.Markets[i].name);
-		//}
-	},
-		Binary.Api.Intervals.Once);
-
-	build_chartType_select();
+		build_chartType_select();
+	});
 }

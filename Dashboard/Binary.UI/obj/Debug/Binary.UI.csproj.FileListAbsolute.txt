@@ -42,3 +42,6 @@ E:\Override\My\OAuth\Binary.UI\obj\Debug\Binary.UI.pdb
 E:\Override\My\OAuth\Binary.UI\bin\RazorEngine.dll
 E:\Override\My\OAuth\Binary.UI\bin\RazorEngine.pdb
 E:\Override\My\OAuth\Binary.UI\bin\RazorEngine.xml
+E:\Override\My\OAuth\Binary.UI\bin\HtmlAgilityPack.dll
+E:\Override\My\OAuth\Binary.UI\bin\HtmlAgilityPack.pdb
+E:\Override\My\OAuth\Binary.UI\bin\HtmlAgilityPack.xml

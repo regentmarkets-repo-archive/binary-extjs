@@ -12,183 +12,202 @@
 			"IFrame": true,
 			"Url": "/Widgets/Chart.html",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/chart_line.png"
+			"IconUrl": "/Widgets/chart_curve.png"
 		}
 	},	
 	{
-		"DashboardID": 11,
-		"ComponentID": 14,
-		"DashletID": "column-0-order-0",
-		"ID": 32,
+		"ID": 45,
 		"Options":
 		{
-			"Height": "200px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "Markets",
+			"Title": "Resources: Asset Index - Forex",
 			"IFrame": true,
-			"Url": "/Widgets/markets.html",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget1_icon.png"
+			"IconUrl": "/Widgets/asset_index.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 14,
-		"DashletID": "column-1-order-0",
-		"ID": 33,
+		"ID": 46,
 		"Options":
 		{
-			"Height": "200px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "Symbol info (frxAUDJPY) ",
+			"Title": "Resources: Asset Index - Indices",
 			"IFrame": true,
-			"Url": "/Widgets/symbols.html",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget2_icon.png"
+			"IconUrl": "/Widgets/asset_index.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 14,
-		"DashletID": "column-0-order-0",
-		"ID": 35,
+		"ID": 47,
 		"Options":
 		{
-			"Height": "200px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "Offerings",
+			"Title": "Resources: Asset Index - Stocks",
 			"IFrame": true,
-			"Url": "/Widgets/offerings.html",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=stocks&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget3_icon.png"
+			"IconUrl": "/Widgets/asset_index.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 15,
-		"DashletID": "column-1-order-0",
-		"ID": 36,
+		"ID": 48,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "PayoutCurrencies",
+			"Title": "Resources: Asset Index - Commodities",
 			"IFrame": true,
-			"Url": "/Widgets/PayoutCurrencies.html",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=commodities&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget4_icon.png"
+			"IconUrl": "/Widgets/asset_index.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 16,
-		"DashletID": "column-1-order-1",
-		"ID": 38,
+		"ID": 49,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "ForexMarket",
+			"Title": "Resources: Asset Index - Sectors",
 			"IFrame": true,
-			"Url": "/Widgets/ForexMarket.html",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget5_icon.png"
+			"IconUrl": "/Widgets/asset_index.png"
+		}
+	},	
+	{
+		"ID": 50,
+		"Options":
+		{
+			"Height": "600px",
+			"Collapsed": false,
+			"Title": "Resources: Asset Index - Randoms",
+			"IFrame": true,
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/asset_index.png"
+		}
+	},	
+	{
+		"ID": 51,
+		"Options":
+		{
+			"Height": "600px",
+			"Collapsed": false,
+			"Title": "Resources: Asset Index - Smarties",
+			"IFrame": true,
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=smarties&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/asset_index.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 17,
-		"DashletID": "column-1-order-1",
-		"ID": 39,
+		"ID": 52,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "Symbol info (AEX)",
+			"Title": "Resources: Trading Times - Forex",
 			"IFrame": true,
-			"Url": "/Widgets/AEXSymbol.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget1_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 18,
-		"DashletID": "column-1-order-1",
-		"ID": 40,
+		"ID": 53,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "HistoricalTickData for frxAUDJPY",
+			"Title": "Resources: Trading Times - Indices",
 			"IFrame": true,
-			"Url": "/Widgets/HistoricalTickData.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget2_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 19,
-		"DashletID": "column-1-order-1",
-		"ID": 41,
+		"ID": 54,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "HistoricalCandlesTickData for AEX",
+			"Title": "Resources: Trading Times - Commodities",
 			"IFrame": true,
-			"Url": "/Widgets/HistoricalCandlestickData.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget3_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 20,
-		"DashletID": "column-1-order-1",
-		"ID": 42,
+		"ID": 55,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "ForexContractCategories",
+			"Title": "Resources: Trading Times - Sectors",
 			"IFrame": true,
-			"Url": "/Widgets/ForexContractCategories.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget4_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 20,
-		"DashletID": "column-1-order-1",
-		"ID": 43,
+		"ID": 56,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "ForexContractParameters for USDJPY",
+			"Title": "Resources: Trading Times - Randoms",
 			"IFrame": true,
-			"Url": "/Widgets/ForexContractParametersForUSDJPY.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget5_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
 		}
 	},
 	{
-		"DashboardID": 11,
-		"ComponentID": 21,
-		"DashletID": "column-1-order-1",
-		"ID": 44,
+		"ID": 57,
 		"Options":
 		{
-			"Height": "300px",
+			"Height": "600px",
 			"Collapsed": false,
-			"Title": "Price for USDJPY(now)",
+			"Title": "Resources: Trading Times - Smarties",
 			"IFrame": true,
-			"Url": "/Widgets/SymbolsUSDJPYPrice.html",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&date=2014-09-03&",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/widget1_icon.png"
+			"IconUrl": "/Widgets/trading_times.png"
+		}
+	},
+	{
+		"ID": 58,
+		"Options":
+		{
+			"Height": "600px",
+			"Collapsed": false,
+			"Title": "Resources: Pricing Table",
+			"IFrame": true,
+			"Url": "http://localhost:57842/Pricingtable?language=en&bet_type=CALL&underlying=frxXAUUSD&currency=USD&low_strike=92.313&strike_step=1&strike_type=Moneyness terms&from_strike=95&expiry_step=Daily&from_expiry=2014-09-02&action=price&",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/pricing_table.png"
+		}
+	},
+	{
+		"ID": 59,
+		"Options":
+		{
+			"Height": "600px",
+			"Collapsed": false,
+			"Title": "Resources: Rise/Fall",
+			"IFrame": true,
+			"Url": "http://localhost:57842/RiseFall?language=en&date_start=now&duration_amount=5&duration_units=t&currency=USD&table_action=price&",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/pricing_table.png"
 		}
 	}
 ]
