@@ -81,17 +81,17 @@ Binary.Api.getCountForGranularity = function (granularity)
 Binary.Api.getIntervalForGranularity = function (granularity)
 {
 	if (granularity == 'tick') granularity = 'ticks';
-	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].interval;
+	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].seconds;
 };
 Binary.Api.getCountForGranularity.GranularityConfig =
 {
-	'ticks': { seconds: 0, interval: 3600, count: 0 },
-	'M1': { seconds: 60, interval: 86400, count: 1200 },
-	'M5': { seconds: 300, interval: 7 * 86400, count: 800 },
-	'M30': { seconds: 1800, interval: 31 * 86400, count: 400 },
-	'H1': { seconds: 3600, interval: 62 * 86400, count: 160 },
-	'H8': { seconds: 8 * 3600, interval: 183 * 86400, count: 20 },
-	'D': { seconds: 86400, interval: 366 * 3 * 86400, count: 1 }
+	'ticks': { seconds: 0, interval: 3600, count: 0, chartType: 'ticks' },
+	'M1': { seconds: 60, interval: 86400, count: 30, chartType: 'ticks' },
+	'M5': { seconds: 300, interval: 7 * 86400, count: 150, chartType: 'ticks' },
+	'M30': { seconds: 1800, interval: 31 * 86400, count: 30, chartType: 'candles' },
+	'H1': { seconds: 3600, interval: 62 * 86400, count: 60, chartType: 'candles' },
+	'H8': { seconds: 8 * 3600, interval: 183 * 86400, count: 480, chartType: 'candles' },
+	'D': { seconds: 86400, interval: 366 * 3 * 86400, count: 3 * 480, chartType: 'candles' }
 };
 
 if (!String.format)
