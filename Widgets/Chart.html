@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="../Scripts/ext-all-debug-w-comments.js"></script>
+    <script src="../Scripts/ext-theme-neptune.js"></script>
+    <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.9.1.js"></script>
+    <script src="../Scripts/Binary/Binary.Core.js?v=3"></script>
+    <script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=3a"></script>
+    <script src="../Widgets/highstock.js"></script>
+    <script src="../Widgets/exporting_stocks.js"></script>
+    <script src="../Widgets/ChartBarrier.js"></script>
+    <script src="../Widgets/Localize.js"></script>
+    <script src="../Widgets/Contracts.js"></script>
+    <script src="../Widgets/LiveChart.js?v=1"></script>
+    <style>
+        body
+        {
+            background-color: white !important;
+        }
+
+        .binary_field
+        {
+            height: 20px;
+            line-height: 0.6em;
+            border-radius: 3px 4px 4px 3px;
+            border-width: 1px;
+            margin: 5px;
+        }
+
+        button
+        {
+            background-color: Transparent;
+            background-repeat: no-repeat;
+            border: none;
+            text-decoration: underline;
+            display: inline-block;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
+            margin: 4px;
+        }
+
+        .current_range
+        {
+            color: orange;
+        }
+
+        .interval-buttons
+        {
+            display: table;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- <input type="text" value="1406701740" id="min_time"  />
+     <label for="min_time">Start time (unix timestamp)</label>
+    <input type="text" value="1406721740" id="max_time"  />
+    <label for="max_time">End time (unix timestamp)</label>-->
+    <div id="ext_daterange"></div>
+    <button style="display: none;" onclick="$(function() { updateDatesFromConfig();})">Show</button>
+
+    <script>
+        Ext.onReady(function ()
+        {
+            Ext.create('Ext.container.Container',
+            {
+                margin: '0px 0px 0px -5px',
+                renderTo: 'ext_daterange',
+                items:
+                [
+                    {
+                        xtype: 'panel',
+                        layout: 'hbox',
+                        tbar:
+                        [
+                            {
+                                xtype: 'datefield',
+                                flex: 5,
+                                margin: 0,
+                                labelWidth: 30,
+                                value: (new Date()).getDate() - 1,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'timefield',
+                                flex: 4,
+                                margin: 2,
+                                value: new Date().getHours().toString(),
+                                format: 'H:i:s',
+                                increment: 30,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'label',
+                                text: '-'
+                            },
+                            {
+                                xtype: 'datefield',
+                                flex: 5,
+                                margin: '0px 0px 0px -8px',
+                                labelWidth: 15,
+                                value: new Date(),
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'timefield',
+                                flex: 4,
+                                margin: '2px 3px 2px 2px',
+                                value: new Date().getHours().toString(),
+                                format: 'H:i:s',
+                                increment: 30,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            ' ',
+                            {
+                                xtype: 'button',
+                                flex: 2,
+                                style: 'margin-left: -10px; margin-right: 0px; padding: 3px 0px;',
+                                text: 'Show',
+                                handler: function (picker, date)
+                                { }
+                            }
+                        ]
+                    }
+                ]
+            });
+            Ext.create('Ext.data.Store',
+            {
+                id: 'marketStore',
+                model: Ext.define('Market',
+                {
+                    extend: 'Ext.data.Model',
+                    fields: ['marketName', 'display_name']
+                })
+            })
+
+            Ext.create('Ext.data.Store',
+            {
+                id: 'symbolStore',
+                model: Ext.define('Symbol',
+                {
+                    extend: 'Ext.data.Model',
+                    fields: ['symbol', 'display_name']
+                })
+            })
+        });
+
+        $(function ()
+        {
+            createChart('R_50', 'ticks', 'M30');
+            $(".interval-buttons button").click(function ()
+            {
+                $(".interval-buttons button").removeClass('current_range');
+                changeResolution($(this).attr("data-val"));
+                $(this).toggleClass('current_range');
+            });
+        });
+    </script>
+    <br />
+    <input type="text" value="" class="binary_field" id="high_barrier" />
+    <label for="high_barrier">High barrier</label><br />
+    <input type="text" value="" class="binary_field" id="low_barrier" />
+    <label for="low_barrier">Low barrier</label>
+
+    <button id="show_spot">Show spot</button><br />
+
+    <div id="ext_ChartType_div"></div>
+    <div id="ext_Market_div"></div>
+    <div id="ext_Symbol_div"></div>
+
+    <div class="interval-buttons">
+        <button data-val="tick">tick</button>
+        <button data-val="M1">1min</button>
+        <button data-val="M5">5min</button>
+        <button data-val="M30" class="current_range">30min</button>
+        <button data-val="H1">1hour</button>
+        <button data-val="H8">8hour</button>
+        <button data-val="D">1day</button>
+    </div>
+    <div id="container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
+
+    <fieldset style="display: none;">
+        <legend>Contract negotiation</legend>
+        <select id="subMarket_select" name="submarket"></select>
+        <label for="submarket">Submarket</label><br />
+        <select id="contractCategory_select" name="contractCategory"></select>
+        <label for="contractCategory">Contract Category</label><br />
+        <br />
+        <input type="text" id="start_time" name="start_time" style="width: 50px;" />
+        <label for="start_time">start time</label><br />
+        <input type="text" id="pip_size" name="pip_size" style="width: 50px;" />
+        <label for="pip_size">pip_size</label>
+        <input type="text" id="duration_amount" name="duration_amount" style="width: 50px;" />
+        <label for="duration_amount">duration_amount</label><br />
+        <input type="text" id="duration_units" name="duration_units" style="width: 50px;" />
+        <label for="duration_units">duration_units</label>
+        <input type="text" id="currency" name="currency" style="width: 50px;" />
+        <label for="currency">currency</label><br />
+        <input type="text" id="amount" name="amount" style="width: 50px;" />
+        <label for="amount">amount</label>
+        <input type="text" id="amount_type" name="amount_type" style="width: 50px;" />
+        <label for="amount_type">amount_type</label><br />
+        <button id="contract_table" style="color: blue">Contract table</button>
+        <button id="contract_chart" style="color: blue">Contract chart</button>
+    </fieldset>
+
+</body>
+</html>

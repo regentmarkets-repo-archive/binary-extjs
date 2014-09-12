@@ -182,6 +182,7 @@ Ext.app.Dashboard.LayoutFactory = function (dashboard)
 		var componentUrl = component.Options.Url;
 		if (componentUrl.indexOf('?') == -1) componentUrl += '?';
 		componentUrl += Ext.Object.toQueryString(Ext.applyIf({ Options: null }, component.data));
+		componentUrl += ("&_dc=" + new Date().getTime());
 
 		if (component.Options.IFrame)
 		{

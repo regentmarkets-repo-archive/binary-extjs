@@ -1,6 +1,6 @@
 ﻿/// <reference path="Mediator.js" />
 /// <reference path="Panel.js" />
-Ext.app.Dashboard = function (id, currentUserID, mode)
+Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 {
 	mode = mode || "server";
 	/// <signature>
@@ -149,7 +149,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode)
 			{
 				read: 'GET'
 			},
-			url: 'dataComponents.json'
+			url: componentsUrl
 		}		
 	}
 
