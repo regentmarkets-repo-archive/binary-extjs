@@ -272,7 +272,7 @@ LiveChart.prototype = {
 							month: ['%B %Y', '%B', '-%B %Y'],
 							year: ['%Y', '%Y', '-%Y']
 						},
-						turboThreshold: 3000
+						turboThreshold: 5000
 					},
 					marker: {
 						enabled: this.config.with_markers,
@@ -449,65 +449,26 @@ createChart = function (symbol_, chartType_, granularity_)
 			globalConfig.granularity = res;
 			window.chartCreated = false;
 			var displayChartType = globalConfig.chartType;
-			var requestChartType = globalConfig.chartType;
+			//var requestChartType = globalConfig.chartType;
 
-			//if (res == 'H8' || res == 'D')
-			//{
-			//	displayChartType = 'closing';
-			//	var requestChartType = 'candles';
-			//}
-			//else
-			//{
-			//	displayChartType = globalConfig.chartType;
-			//	globalConfig.granularity = 'M1';
-			//	var requestChartType = 'ticks';
-			//}
+			if ((res != 'M10' && res != 'M30') && (globalConfig.chartType == 'ticks'))
+			{
+				displayChartType = 'closing';
+				var requestChartType = 'candles';
+			}
+			else
+			{
+				displayChartType = globalConfig.chartType;
+				//globalConfig.granularity = 'M1';
+				if (globalConfig.chartType == 'ticks')
+					var requestChartType = 'ticks';
+				else var requestChartType = 'candles';
+			}
 
 			Binary.Api.Client.symbols(
 				function (symbols_data)
 				{
-					if (window.chartCreated)
-					{
-						var data = symbols_data;
-						var chart = window.CurrentChart;
-
-						if (!(data[0] instanceof Array))
-						{
-							data = [data];
-						}
-
-						var data_length = data.length;
-						for (var i = 0; i < data_length; i++)
-						{
-							chart.process_data(data[i]);
-						}
-
-						if (data_length > 0 && chart.spot)
-						{
-							if (chart.config.chartType == "ticks" && chart.config.repaint_indicators)
-								chart.config.repaint_indicators(chart);//temp
-							chart.chart.redraw();
-							if (!chart.config.ticktrade_chart && !chart.navigator_initialized)
-							{
-								chart.navigator_initialized = true;
-								var xData = chart.chart.series[0].xData;
-								var xDataLen = xData.length;
-								if (xDataLen)
-								{
-									chart.chart.xAxis[0].setExtremes(xData[0], xData[xDataLen - 1], true, false);
-								}
-							}
-							chart.chart.hideLoading();
-							chart.config.painted = true;
-							chart.shift = chart.config.shift == 1 ? true : false;
-						}
-					}
-					else
-					{
-						init_live_chart(symbols_data, globalConfig.symbol, displayChartType, globalConfig.granularity);
-						
-						window.chartCreated = true;
-					}
+					init_live_chart(symbols_data, globalConfig.symbol, displayChartType, globalConfig.granularity);
 				},
 				globalConfig.symbol,
 				requestChartType,
@@ -590,7 +551,9 @@ createChart = function (symbol_, chartType_, granularity_)
 					{
 						change: function ()
 						{
-							chartToShow.chart.showLoading();
+							var gr = globalConfig.granularity;
+							try { chartToShow.chart.showLoading(); } catch (e) { };
+							changeResolution('M30');
 							globalConfig.symbol = this.getValue();
 							Binary.Api.Client.unsubscribeAll();
 							Binary.Api.Client.symbols(function (symbols_data)
@@ -601,6 +564,7 @@ createChart = function (symbol_, chartType_, granularity_)
 							globalConfig.symbol,
 							globalConfig.chartType,
 							globalConfig.granularity);
+							changeResolution(gr);
 						}
 					}
 				});
@@ -707,8 +671,10 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				change: function (combo)
 				{
+					var gr = globalConfig.granularity;
 					var me = this;
-					me.chartToShow.chart.showLoading();
+					try { me.chartToShow.chart.showLoading(); } catch (e) { };
+					changeResolution('M30');
 					var usedChartType = 'ticks';
 					globalConfig.chartType = combo.getValue();
 					if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
@@ -716,12 +682,13 @@ createChart = function (symbol_, chartType_, granularity_)
 					Binary.Api.Client.unsubscribeAll();
 					Binary.Api.Client.symbols(function (symbols_data)
 					{
-						me.chartToShow.chart.hideLoading();
+						me.chartToShow.chart.hideLoading(); 
 						init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
 					},
 					globalConfig.symbol,
 					usedChartType,
-					globalConfig.granularity);
+					globalConfig.granularity);					
+					changeResolution(gr);
 				}
 			}
 		});
@@ -800,16 +767,18 @@ createChart = function (symbol_, chartType_, granularity_)
 	{
 		
 	});
-
-	Binary.Api.Client.symbols(function (symbols_data)
+	Ext.onReady(function ()
 	{
-		init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-		Ext.getCmp('ext_ChartType_market').enable();
-		Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
-	},
-	globalConfig.symbol,
-	globalConfig.chartType,
-	'M30');
+		Binary.Api.Client.symbols(function (symbols_data)
+		{
+			init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+			Ext.getCmp('ext_ChartType_market').enable();
+			Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
+		},
+		globalConfig.symbol,
+		globalConfig.chartType,
+		'M10');
+	});
 
 	Binary.Markets = Binary.Markets || {};
 
@@ -1087,6 +1056,13 @@ LiveChartOHLC.prototype.update_data = function (ohlc)
 						break;
 					}
 			};
+			if (this.config.chartType == 'closing')
+			{
+				delete ohlc_pt.open;
+				delete ohlc_pt.close;
+				delete ohlc_pt.high;
+				delete ohlc_pt.close;
+			}
 			this.chart.series[0].addPoint(ohlc_pt, true, false, false);
 			this.spot = ohlc_pt.close;
 			this.accept_ticks = true;

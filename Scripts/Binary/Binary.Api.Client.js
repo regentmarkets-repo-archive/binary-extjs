@@ -69,25 +69,27 @@ Binary.Api.ClientClass = function (autoStart)
 	};
 	this.symbols = function (callback, symbol, chartType, granularity)
 	{
-		var url = String.format("/symbols/{0}/{1}", symbol, chartType);
+		//if ((granularity) && (granularity != 'M10' && granularity != 'M30')) chartType = 'candles';
+		var shortInterval = (granularity.indexOf('M') > -1);
+		var cType = shortInterval ? chartType : Binary.Api.GranularityConfig[granularity].chartType;
+		var url = String.format("/symbols/{0}/{1}", symbol, cType);
 		var data =
 		{
 			apiMethod: url,
-			granularity: granularity,
+			granularity: Binary.Api.GranularityConfig[granularity].timeframe || granularity,
 			callback: callback,
-			chartType: chartType,
+			og: granularity,
+			chartType: cType,
 			intervalCallback: function (params)
 			{
 				var callData = {};
-				if (params.chartType == 'candles')
+				var cfg = Binary.Api.GranularityConfig[params.og];// Binary.Api.getConfigForTimeFrame(params.granularity);
+				callData.start = Math.floor(+new Date / 1000) - cfg.seconds;
+				if (params.chartType == 'candles' )
 				{
-					callData.granularity = params.granularity;
-					callData.count = Binary.Api.getCountForGranularity(granularity);
-				}
-				else
-				{
-					callData.start = Math.floor(+new Date/1000) - Binary.Api.getIntervalForGranularity(params.granularity);
-				}
+					callData.count = 4000;
+					callData.granularity = params.granularity;//Binary.Api.getTimeframeForGranularity(params.granularity);
+				}				
 				postMsg(params.apiMethod, params.callback, false, callData);
 			}
 		};
