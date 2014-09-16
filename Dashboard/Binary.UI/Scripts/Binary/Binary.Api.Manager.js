@@ -44,7 +44,7 @@ Binary.Api.ManagerClass=function(proxyUrl)
 		$.ajax(
 		{
 			type: 'GET',
-			url: proxyUrl + "/APICall?method=" + listener.apiMethod,
+			url: proxyUrl + "/APICall?method=" + encodeURIComponent(listener.apiMethod),
 			dataType: 'jsonp',
 			crossDomain: true,
 			data: { token: me.getToken().access_token },

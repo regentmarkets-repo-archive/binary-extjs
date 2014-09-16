@@ -26,7 +26,10 @@ Binary.Api.DashboardProxy = function ()
 	var processCallback = function (e)
 	{
 		var data = JSON.parse(e.originalEvent.data);
-		me.Listeners[data.apiMethod](data.data);
+		if (me.Listeners[data.apiMethod])
+		{
+			me.Listeners[data.apiMethod](data.data);
+		}
 	}
 
 	this.start = function ()

@@ -6,15 +6,15 @@
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
-    <script src="../Scripts/Binary/Binary.Core.js?v=3"></script>
-    <script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js?v=3a"></script>
+    <script src="../Scripts/Binary/Binary.Core.js?v=4e"></script>
+    <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=4b"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js"></script>
-    <script src="../Widgets/LiveChart.js?v=1"></script>
+    <script src="../Widgets/LiveChart.js?v=2"></script>
     <style>
         body
         {
@@ -53,6 +53,12 @@
         {
             display: table;
             margin: 0 auto;
+        }
+
+        button[data-val]
+        {            
+            padding-left: 0px;
+            padding-right: 0px;
         }
     </style>
 </head>
@@ -178,13 +184,18 @@
     <div id="ext_Symbol_div"></div>
 
     <div class="interval-buttons">
-        <button data-val="tick">tick</button>
-        <button data-val="M1">1min</button>
-        <button data-val="M5">5min</button>
-        <button data-val="M30" class="current_range">30min</button>
-        <button data-val="H1">1hour</button>
-        <button data-val="H8">8hour</button>
-        <button data-val="D">1day</button>
+        <button data-val="M10" class="current_range">10min</button>
+        <button data-val="H1">1h</button>
+        <button data-val="H6">6h</button>
+        <button data-val="H12">12h</button>
+        <button data-val="D">1d</button>
+        <button data-val="D2">2d</button>        
+        <button data-val="D5">5d</button>
+        <button data-val="W">1w</button>
+        <button data-val="W2">2w</button>
+        <button data-val="M">1m</button>
+        <button data-val="M3">3m</button>
+        <button data-val="Y">1y</button>
     </div>
     <div id="container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 

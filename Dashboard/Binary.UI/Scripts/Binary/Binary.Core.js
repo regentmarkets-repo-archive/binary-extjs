@@ -74,24 +74,42 @@ Binary.Api.Granularities.H8="H8";
 Binary.Api.Granularities.D="D";
 Binary.Api.Granularities.__enum=true;
 
-Binary.Api.getCountForGranularity = function (granularity)
-{
-	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].count;
-};
+/*
 Binary.Api.getIntervalForGranularity = function (granularity)
 {
-	if (granularity == 'tick') granularity = 'ticks';
-	return Binary.Api.getCountForGranularity.GranularityConfig[granularity].seconds;
+	return Binary.Api.GranularityConfig[granularity].seconds;
 };
-Binary.Api.getCountForGranularity.GranularityConfig =
+
+Binary.Api.getTimeframeForGranularity = function (granularity)
 {
-	'ticks': { seconds: 0, interval: 3600, count: 0, chartType: 'ticks' },
-	'M1': { seconds: 60, interval: 86400, count: 30, chartType: 'ticks' },
-	'M5': { seconds: 300, interval: 7 * 86400, count: 150, chartType: 'ticks' },
-	'M30': { seconds: 1800, interval: 31 * 86400, count: 30, chartType: 'candles' },
-	'H1': { seconds: 3600, interval: 62 * 86400, count: 60, chartType: 'candles' },
-	'H8': { seconds: 8 * 3600, interval: 183 * 86400, count: 480, chartType: 'candles' },
-	'D': { seconds: 86400, interval: 366 * 3 * 86400, count: 3 * 480, chartType: 'candles' }
+	return Binary.Api.GranularityConfig[granularity].timeframe;
+};
+*/
+Binary.Api.getConfigForTimeFrame = function (timeFrame)
+{
+	var c=Binary.Api.GranularityConfig;
+	for (var p in c)
+	{
+		if (c[p].timeframe == timeFrame) return c[p];
+	}
+	return null;
+};
+Binary.Api.GranularityConfig =
+{	
+	'M10': { seconds: 600, timeframe: 'M1', chartType: 'ticks' },
+	'M30': { seconds: 1800, timeframe: 'M1', chartType: 'ticks' },
+	'H1': { seconds: 3600, timeframe: 'M5', chartType: 'candles' },
+	//'H2': { seconds: 2*3600, timeframe: 'M5', chartType: 'candles' },
+	'H6': { seconds: 21600, timeframe: 'M10', chartType: 'candles' },
+	'H12': { seconds: 43200, timeframe: 'M30', chartType: 'candles' },
+	'D': { seconds: 86400, timeframe: 'H1', chartType: 'candles' },
+	'D2': { seconds: 2 * 86400, timeframe: 'H2', chartType: 'candles' },
+	'D5': { seconds: 5 * 86400, timeframe: 'H4', chartType: 'candles' },
+	'W': { seconds: 7 * 86400, timeframe: 'H8', chartType: 'candles' },
+	'W2': { seconds: 21 * 86400, timeframe: 'H8', chartType: 'candles' },
+	'M': { seconds: 31 * 86400, timeframe: 'D', chartType: 'candles' },
+	'M3': { seconds: 93 * 86400, timeframe: 'D', chartType: 'candles' },
+	'Y': { seconds: 93 * 12 * 86400, timeframe: 'D', chartType: 'candles' },
 };
 
 if (!String.format)
