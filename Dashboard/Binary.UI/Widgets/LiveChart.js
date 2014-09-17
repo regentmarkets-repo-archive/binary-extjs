@@ -772,8 +772,13 @@ createChart = function (symbol_, chartType_, granularity_)
 		Binary.Api.Client.symbols(function (symbols_data)
 		{
 			init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-			Ext.getCmp('ext_ChartType_market').enable();
-			Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
+			if (!Ext.getCmp('ext_ChartType_market'))
+				build_chartType_select();
+			//if (Ext.getCmp('ext_ChartType_market'))
+			//{
+				Ext.getCmp('ext_ChartType_market').enable();
+				Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
+			//}
 		},
 		globalConfig.symbol,
 		globalConfig.chartType,
@@ -795,7 +800,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			}
 		}
 		build_market_select();
-		build_chartType_select();
 	});
 }
 //Charts (OHLC)
