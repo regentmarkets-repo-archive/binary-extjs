@@ -19,13 +19,18 @@ namespace Binary.OAuthProxy.Controllers
         public string APICall(string method, string token, string callback)
         {
             string url = "http://rmg-prod.apigee.net/v1/binary" + method;
-
+			string requestMethod="GET";
+			if (method.IndexOf("callType=buy")>0)
+			{
+				requestMethod="POST";
+			}
             var wr = HttpWebRequest.Create(url) as HttpWebRequest;
 
             wr.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             wr.Headers.Add("Authorization", "Bearer " + token);
             wr.ContentType = "application/x-www-form-urlencoded";
-            wr.Method = "GET";
+			wr.ContentLength = 0;
+            wr.Method = requestMethod;
 
 			string result = string.Format(HomeController.ResponseTemplate, "Server error occured", 401);
 			try

@@ -97,7 +97,6 @@ Binary.Api.getConfigForTimeFrame = function (timeFrame)
 Binary.Api.GranularityConfig =
 {	
 	'M10': { seconds: 600, timeframe: 'M1', chartType: 'ticks' },
-	'M30': { seconds: 1800, timeframe: 'M1', chartType: 'ticks' },
 	'H1': { seconds: 3600, timeframe: 'M1', chartType: 'candles' },
 	//'H2': { seconds: 2*3600, timeframe: 'M5', chartType: 'candles' },
 	'H6': { seconds: 21600, timeframe: 'M1', chartType: 'candles' },

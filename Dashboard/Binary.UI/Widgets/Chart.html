@@ -6,21 +6,21 @@
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
-    <script src="../Scripts/Binary/Binary.Core.js?v=4e"></script>
+    <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js?v=4b"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=5b"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js"></script>
-    <script src="../Widgets/LiveChart.js?v=2"></script>
+    <script src="../Widgets/LiveChart.js?v=3"></script>
     <style>
         body
         {
             background-color: white !important;
         }
-
+        .hidden { display: none; }
         .binary_field
         {
             height: 20px;
@@ -73,6 +73,12 @@
     <script>
         Ext.onReady(function ()
         {
+            Ext.create('Ext.container.Container',
+            {
+                id: 'ext_LiveChart_container',
+                renderTo: 'LiveChart_container'
+            });
+
             Ext.create('Ext.container.Container',
             {
                 margin: '0px 0px 0px -5px',
@@ -162,12 +168,26 @@
 
         $(function ()
         {
-            createChart('R_50', 'ticks', 'M30');
+            createChart('R_50', 'ticks', 'M10');
             $(".interval-buttons button").click(function ()
             {
                 $(".interval-buttons button").removeClass('current_range');
                 changeResolution($(this).attr("data-val"));
                 $(this).toggleClass('current_range');
+            });
+            $("#contract_table").click(function ()
+            {
+                var data =
+                {
+                    contract_type: $("#contractCategory_select").val(),
+                    symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : "R_50",
+                    duration_unit: $("#duration_unit").val(),
+                    duration: parseInt($("#duration").val()),
+                    payout_currency: $("#payout_currency").val(),
+                    payout: parseInt($("#payout").val()),
+                    start_time: parseInt($("#start_time").val())
+                };
+                getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time);
             });
         });
     </script>
@@ -197,27 +217,28 @@
         <button data-val="M3">3m</button>
         <button data-val="Y">1y</button>
     </div>
-    <div id="container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
+    <div id="LiveChart_loading" class="hidden" style="min-width: 310px; height: 310px; margin: 0 auto">loading...</div>
+    <div id="LiveChart_container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 
-    <fieldset style="display: none;">
+    <fieldset>
         <legend>Contract negotiation</legend>
         <select id="subMarket_select" name="submarket"></select>
         <label for="submarket">Submarket</label><br />
-        <select id="contractCategory_select" name="contractCategory"></select>
+        <select id="contractCategory_select" name="contractCategory" ><option value="FLASHD" selected="selected">FLASHD</option></select>
         <label for="contractCategory">Contract Category</label><br />
         <br />
-        <input type="text" id="start_time" name="start_time" style="width: 50px;" />
+        <input type="text" id="start_time" name="start_time" style="width: 50px;" value="0"/>
         <label for="start_time">start time</label><br />
         <input type="text" id="pip_size" name="pip_size" style="width: 50px;" />
         <label for="pip_size">pip_size</label>
-        <input type="text" id="duration_amount" name="duration_amount" style="width: 50px;" />
-        <label for="duration_amount">duration_amount</label><br />
-        <input type="text" id="duration_units" name="duration_units" style="width: 50px;" />
-        <label for="duration_units">duration_units</label>
-        <input type="text" id="currency" name="currency" style="width: 50px;" />
-        <label for="currency">currency</label><br />
-        <input type="text" id="amount" name="amount" style="width: 50px;" />
-        <label for="amount">amount</label>
+        <input type="text" id="duration" name="duration" style="width: 50px;"  value="3600" />
+        <label for="duration">duration</label><br />
+        <input type="text" id="duration_unit" name="duration_unit" style="width: 50px;" value="sec"/>
+        <label for="duration_unit">duration_unit</label>
+        <input type="text" id="payout_currency" name="payout_currency" style="width: 50px;" value="USD"/>
+        <label for="payout_currency">payout_currency</label><br />
+        <input type="text" id="payout" name="payout" style="width: 50px;" value="2"/>
+        <label for="payout">payout</label>
         <input type="text" id="amount_type" name="amount_type" style="width: 50px;" />
         <label for="amount_type">amount_type</label><br />
         <button id="contract_table" style="color: blue">Contract table</button>

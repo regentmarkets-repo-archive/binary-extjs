@@ -393,7 +393,7 @@ createChart = function (symbol_, chartType_, granularity_)
 	var ticks_array = [];
 
 	function updateLiveChart(config, data)//create new chart with data or update existing
-	{		
+	{
 		if (live_chart)
 		{
 			if ((live_chart.config.chartType != config.chartType) || (live_chart.config.granularity != config.granularity) || (live_chart.config.resolution != config.resolution) || (live_chart.config.symbol != config.symbol))
@@ -444,14 +444,15 @@ createChart = function (symbol_, chartType_, granularity_)
 	{
 		changeResolution = function (res)
 		{
+			var chartToShow = live_chart;
+			chartToShow.chart.showLoading();
 			liveChartConfig.painted = false;
 			Binary.Api.Client.unsubscribeAll();
 			globalConfig.granularity = res;
 			window.chartCreated = false;
 			var displayChartType = globalConfig.chartType;
-			//var requestChartType = globalConfig.chartType;
 
-			if ((res != 'M10' && res != 'M30') && (globalConfig.chartType == 'ticks'))
+			if ((res != 'M10' && res != 'M30' && res != 'M60') && (globalConfig.chartType == 'ticks'))
 			{
 				displayChartType = 'closing';
 				var requestChartType = 'candles';
@@ -459,7 +460,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			else
 			{
 				displayChartType = globalConfig.chartType;
-				//globalConfig.granularity = 'M1';
 				if (globalConfig.chartType == 'ticks')
 					var requestChartType = 'ticks';
 				else var requestChartType = 'candles';
@@ -469,6 +469,7 @@ createChart = function (symbol_, chartType_, granularity_)
 				function (symbols_data)
 				{
 					init_live_chart(symbols_data, globalConfig.symbol, displayChartType, globalConfig.granularity);
+					chartToShow.chart.hideLoading();
 				},
 				globalConfig.symbol,
 				requestChartType,
@@ -485,7 +486,7 @@ createChart = function (symbol_, chartType_, granularity_)
 			liveChartConfig.symbol = symbol;
 			liveChartConfig.granularity = granularity;
 			(liveChartConfig.chartType == 'ticks') ? liveChartConfig.resolution = 'tick' : liveChartConfig.resolution = 'ohlc';
-			liveChartConfig.renderTo = 'container';
+			liveChartConfig.renderTo = 'LiveChart_container';
 			liveChartConfig.renderHeight = 300;
 
 			liveChartConfig.live = 500;
@@ -527,12 +528,44 @@ createChart = function (symbol_, chartType_, granularity_)
 			}
 		});
 	};
+	function updateInstrument(value)
+	{
+
+		var chartToShow = live_chart;
+		try { chartToShow.chart.showLoading(); } catch (e) { };
+		liveChartConfig.painted = false;
+		window.chartCreated = false;
+		var displayChartType = globalConfig.chartType;
+
+		if ((globalConfig.granularity != 'M10' && globalConfig.granularity != 'M30' && globalConfig.granularity != 'M60') && (globalConfig.chartType == 'ticks'))
+		{
+			displayChartType = 'closing';
+			var requestChartType = 'candles';
+		}
+		else
+		{
+			displayChartType = globalConfig.chartType;
+			if (globalConfig.chartType == 'ticks')
+				var requestChartType = 'ticks';
+			else var requestChartType = 'candles';
+		}
+
+		globalConfig.symbol = value;
+		Binary.Api.Client.unsubscribeAll();
+		Binary.Api.Client.symbols(function (symbols_data)
+		{
+			chartToShow.chart.hideLoading();
+			init_live_chart(symbols_data, globalConfig.symbol, displayChartType, globalConfig.granularity);
+		},
+		globalConfig.symbol,
+		requestChartType,
+		globalConfig.granularity);
+	}
 
 	var build_instrument_select = function ()
 	{
 		Ext.data.StoreManager.lookup('symbolStore').removeAll();
 		var instrumentExtCombo = Ext.getCmp('ext_Symbol_market');
-		var chartToShow = live_chart;
 		if (!instrumentExtCombo)
 		{
 			Ext.create('Ext.form.field.ComboBox',
@@ -551,20 +584,7 @@ createChart = function (symbol_, chartType_, granularity_)
 					{
 						change: function ()
 						{
-							var gr = globalConfig.granularity;
-							try { chartToShow.chart.showLoading(); } catch (e) { };
-							changeResolution('M30');
-							globalConfig.symbol = this.getValue();
-							Binary.Api.Client.unsubscribeAll();
-							Binary.Api.Client.symbols(function (symbols_data)
-							{
-								chartToShow.chart.hideLoading();
-								init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-							},
-							globalConfig.symbol,
-							globalConfig.chartType,
-							globalConfig.granularity);
-							changeResolution(gr);
+							updateInstrument(this.getValue());
 						}
 					}
 				});
@@ -636,6 +656,46 @@ createChart = function (symbol_, chartType_, granularity_)
 			});
 		}
 	};
+	function updateChartType(value)
+	{
+		var chartToShow = live_chart;
+		var needHideLoading = true;
+		try { chartToShow.chart.showLoading(); } catch (e) { };
+		liveChartConfig.painted = false;
+		window.chartCreated = false;
+
+		var usedChartType = 'ticks';
+		globalConfig.chartType = value;
+		if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
+			usedChartType = 'candles';
+
+		var displayChartType = globalConfig.chartType;
+
+		if ((globalConfig.granularity != 'M10' && globalConfig.granularity != 'M30' && globalConfig.granularity != 'M60') && (globalConfig.chartType == 'ticks'))
+		{
+			displayChartType = 'closing';
+			var usedChartType = 'candles';
+		}
+		else
+		{
+			displayChartType = globalConfig.chartType;
+			if (globalConfig.chartType == 'ticks')
+				var usedChartType = 'ticks';
+			else var usedChartType = 'candles';
+		}
+
+		Binary.Api.Client.unsubscribeAll();
+		Binary.Api.Client.symbols(function (symbols_data)
+		{
+			if (needHideLoading) chartToShow.chart.hideLoading();
+			needHideLoading = false;
+			init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
+
+		},
+		globalConfig.symbol,
+		usedChartType,
+		globalConfig.granularity);
+	}
 
 	var build_chartType_select = function ()
 	{
@@ -671,24 +731,7 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				change: function (combo)
 				{
-					var gr = globalConfig.granularity;
-					var me = this;
-					try { me.chartToShow.chart.showLoading(); } catch (e) { };
-					changeResolution('M30');
-					var usedChartType = 'ticks';
-					globalConfig.chartType = combo.getValue();
-					if (globalConfig.chartType != 'ticks' && globalConfig.chartType)
-						usedChartType = 'candles';
-					Binary.Api.Client.unsubscribeAll();
-					Binary.Api.Client.symbols(function (symbols_data)
-					{
-						me.chartToShow.chart.hideLoading(); 
-						init_live_chart(symbols_data, globalConfig.symbol, globalConfig.chartType, globalConfig.granularity);
-					},
-					globalConfig.symbol,
-					usedChartType,
-					globalConfig.granularity);					
-					changeResolution(gr);
+					updateChartType(combo.getValue());
 				}
 			}
 		});
@@ -765,7 +808,7 @@ createChart = function (symbol_, chartType_, granularity_)
 
 	Binary.Api.Client.account.statement(function (statement_data)
 	{
-		
+
 	});
 	Ext.onReady(function ()
 	{
@@ -776,8 +819,8 @@ createChart = function (symbol_, chartType_, granularity_)
 				build_chartType_select();
 			//if (Ext.getCmp('ext_ChartType_market'))
 			//{
-				Ext.getCmp('ext_ChartType_market').enable();
-				Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
+			Ext.getCmp('ext_ChartType_market').enable();
+			Ext.getCmp('ext_ChartType_market').chartToShow = live_chart;
 			//}
 		},
 		globalConfig.symbol,
@@ -825,8 +868,6 @@ LiveChartOHLC.prototype.configure_series = function (chart_params)
 					{
 						name: this.config.symbol,
 						data: [],
-						color: 'red',
-						upColor: 'green',
 						id: 'primary_series',
 						type: 'line',
 					}
@@ -865,8 +906,6 @@ LiveChartOHLC.prototype.configure_series = function (chart_params)
 				chart_params.series = [{
 					name: this.config.symbol,
 					data: [],
-					color: 'red',
-					upColor: 'green',
 					id: 'primary_series',
 					type: 'line',
 				}];
@@ -878,8 +917,6 @@ LiveChartOHLC.prototype.configure_series = function (chart_params)
 				chart_params.series = [{
 					name: this.config.symbol,
 					data: [],
-					color: 'red',
-					upColor: 'green',
 					id: 'primary_series',
 					type: 'line',
 				}];
@@ -891,8 +928,6 @@ LiveChartOHLC.prototype.configure_series = function (chart_params)
 				chart_params.series = [{
 					name: this.config.symbol,
 					data: [],
-					color: 'red',
-					upColor: 'green',
 					id: 'primary_series',
 					type: 'line',
 				}];
@@ -1186,3 +1221,22 @@ LiveChartTick.prototype.get_data = function (symbol, chartType, granularity)
 	Math.round(+new Date() / 1000),
 	20000);
 }
+
+$(function ()
+{
+	getPrice = function (contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time)
+	{
+		Binary.Api.Client.contract(function (data)
+		{
+			var d = data;
+			var html = "";
+			for (var item in data)
+			{
+				var data_str = "<p>" + item.toString() + ":" + data[item].toString() + "</p>";
+				html = html.concat(data_str);
+			};
+			Ext.create('Ext.window.Window', { items: [{ width: 400, height: 350, html: html }] }).show();
+			
+		}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, "buy");
+	}
+});
