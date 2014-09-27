@@ -8,7 +8,7 @@
 		{
 			"Height": "640px",
 			"Collapsed": false,
-			"Title": "Chart",
+			"Title": "Trade",
 			"IFrame": true,
 			"Url": "/Widgets/Chart.html",
 			"PreventExpandable": false,

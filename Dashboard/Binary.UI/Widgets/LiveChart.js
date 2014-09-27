@@ -306,7 +306,7 @@ LiveChart.prototype = {
 			},
 			title:
 			{
-				text: this.config.symbol,// TODO: add real symbol name as translated_display_name()
+				//text: this.config.symbol,// TODO: add real symbol name as translated_display_name()
 			}
 		};
 
@@ -506,10 +506,545 @@ createChart = function (symbol_, chartType_, granularity_)
 				Ext.data.StoreManager.lookup('marketStore').add({ marketName: this.name, display_name: this.name.charAt(0).toUpperCase() + this.name.slice(1) });
 			}
 		});
+
+		Binary.Api.Client.offerings(function (offerings_data)
+		{
+			var dat = offerings_data.offerings;
+			var submarket_array = [];
+			//$.each(dat, function (records)
+			//{
+			//	var m_store = Ext.data.StoreManager.lookup('marketStore');
+			//	for (var item in dat[records])
+			//		if (item == 'market')
+			//		{
+			//			var ext_submarket_renderTo = dat[records].market;
+			//			for (var str_item in dat[records].available)
+			//			{
+			//				submarket_array.push({ name: dat[records].available[str_item].submarket, symbols: [] });
+			//				var symbols_array = dat[records].available[str_item].available;
+			//				for (var symbol_item in symbols_array)
+			//				{
+			//					symbols_array.push({ name: symbols_array[symbol_item].symbol, contract_categories: [] });
+			//					var contract_category_array = symbols_array[symbol_item].available;
+			//					for (var contract_category_item in contract_category_array)
+			//					{
+			//						Ext.data.StoreManager.lookup('offeringsStore').add({ market: dat[records].market, submarket: dat[records].available[str_item].submarket, symbol: symbols_array[symbol_item].symbol, contract_category: contract_category_array[contract_category_item].contract_category, });
+			//						contract_category_array.push({ name: contract_category_array[contract_category_item].contract_category, details: contract_category_array[contract_category_item].available });
+			//					}
+			//				}
+			//			};
+			//			//alert('ext_submarket_div_' + ext_submarket_renderTo);
+			//			//var add_cmp = Ext.create('Ext.form.field.ComboBox', {
+			//			//	//xtype: 'combo',
+			//			//	//id: 'ext_submarket',
+			//			//	padding: 50,
+			//			//	//renderTo: id,
+			//			//	valueField: 'name',
+			//			//	displayField: 'name',
+			//			//	emptyText: 'Select submarket',
+			//			//	store: ),
+			//			//	//fields: ['name'],
+			//			//	//data: [{ 'name': 'a' }],//submarket_array,
+			//			//	queryMode: 'local',
+			//			//	labelWidth: 70,
+			//			//	//padding: 5,
+			//			//	editable: false,
+			//			//	listeners:
+			//			//	{
+			//			//	}
+			//			//});
+
+			//			//Ext.getCmp('ext_tab_Forex').add(add_cmp);
+			//			//Ext.getCmp('ext_tab_Forex').doLayout();
+
+			//			//$.each(Binary.Markets, function (obj)
+			//			//{
+			//			//	var cmp = '';
+			//			//	(records.raw.market == "Randoms") ? cmp = 'random' : cmp = records.raw.market;
+			//			//	if (records.raw.market.toLowerCase() == Binary.Markets[obj].name)
+			//			//	{
+			//			//		Binary.Markets[obj].submarket_array = submarket_array;
+			//			//	}
+			//			//});
+			//		};
+			//});
+			//var response = offerings_data.offerings;
+
+		});
+		function configureDuration(obj)
+		{
+			var submit_duration_unit = Ext.ComponentQuery.query('[name=duration_units]')[0].getValue();
+			switch (submit_duration_unit)
+			{
+				case 'days':
+					{
+						obj.duration_unit = 'day',
+						obj.duration = parseInt(Ext.ComponentQuery.query('[name=duration_amount]')[0].getValue());
+						break;
+					}
+				case 'hours':
+					{
+						obj.duration_unit = 'sec',
+						obj.duration = parseInt(Ext.ComponentQuery.query('[name=duration_amount]')[0].getValue()) * 3600;
+						break;
+					}
+				case 'minutes':
+					{
+						obj.duration_unit = 'sec',
+						obj.duration = parseInt(Ext.ComponentQuery.query('[name=duration_amount]')[0].getValue()) * 60;
+						break;
+					}
+				case 'seconds':
+					{
+						obj.duration_unit = 'sec',
+						obj.duration = parseInt(Ext.ComponentQuery.query('[name=duration_amount]')[0].getValue());
+						break;
+					}
+				default:
+					{
+						//alert('Undefined chartType');
+						break;
+					}
+			}
+		};
+		function doPurchase(obj)
+		{
+			configureDuration(obj);
+			var data =
+			{
+				contract_type: obj.contractType,
+				symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
+				duration_unit: obj.duration_unit,
+				duration: obj.duration,
+				payout_currency: 'USD',
+				payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
+				start_time: 0//parseInt($("#start_time").val())
+			};
+			getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "buy");
+		};
+
+		function setTabs(store, tabpanel)
+		{
+			// Init the singleton.  Any tag-based quick tips will start working.
+			Ext.tip.QuickTipManager.init();
+
+			// Apply a set of config properties to the singleton
+			Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
+				maxWidth: 200,
+				minWidth: 100,
+				showDelay: 50      // Show 50ms after entering target
+			});
+			store.each(function (records)
+			{
+				var id = 'ext_tab_' + records.get('display_name');
+				var inner_tab =
+				{
+					padding: 40,
+					//name: 'ext_trade_tab',
+					title: records.get('display_name'),
+					items: [
+					{
+						xtype: 'timefield',
+						name: 'start_time',
+						fieldLabel: 'Start time:',
+						labelWidth: 30,
+						minValue: new Date().getHours().toString() + ':' + new Date().getMinutes().toString(),
+						//value: new Date().getHours().toString(),
+						format: 'H:i',
+						increment: 5,
+						width: 130,
+						margin: '5px 10px',
+						handler: function (obj, date)
+						{ },
+						listeners:
+							{
+								render: function ()
+								{
+									this.setRawValue('Now');
+								},
+								change: function (obj, val)
+								{
+									if (this.getRawValue() != 'Now')
+									{
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'INTRADU';
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'INTRADD';
+									}
+									else
+									{
+
+									}
+								}
+							}
+					},
+					{
+						layout: 'hbox',
+						defaults: { width: 130, margin: '5px 10px' },
+						items: [
+						{
+							xtype: 'combo',
+							name: 'duration',
+							queryMode: 'local',
+							store: ['Duration'],//, 'End time'],
+							displayField: 'duration',
+							autoSelect: true,
+							forceSelection: true,
+							value: 'Duration'
+						},
+						{
+							xtype: 'field',
+							name: 'duration_amount',
+							value: '1'
+						},
+						{
+							xtype: 'combo',
+							name: 'duration_units',
+							queryMode: 'local',
+							store: ['days', 'hours', 'minutes', 'seconds'],
+							displayField: 'duration_units',
+							autoSelect: true,
+							forceSelection: true,
+							value: 'days',
+							listeners:
+							{
+								change: function (obj, val)
+								{
+									if (val == 'days')
+									{
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'DOUBLEUP';
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'DOUBLEDOWN';
+									}
+									else
+									{
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'FLASHU';
+										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'FLASHD';
+									}
+								}
+							}
+						}]
+					},
+					{
+						xtype: 'field',
+						name: 'spot',
+						fieldLabel: 'Spot:',
+						labelWidth: 30,
+						width: 130,
+						margin: '5px 10px',
+						disabled: true
+					},
+					{
+						layout: 'hbox',
+						style: 'margin-bottom: 60px !important;',
+						defaults: { width: 130, margin: '5px 10px' },
+						items: [
+						{
+							xtype: 'combo',
+							name: 'payout',
+							queryMode: 'local',
+							store: ['Payout'],//, 'Stake'],
+							displayField: 'payout',
+							autoSelect: true,
+							forceSelection: true,
+							value: 'Payout',
+						},
+						{
+							xtype: 'combo',
+							name: 'payout_units',
+							queryMode: 'local',
+							store: ['USD'],
+							displayField: 'payout_units',
+							autoSelect: true,
+							forceSelection: true,
+							value: 'USD'
+						},
+						{
+							xtype: 'field',
+							name: 'amount',
+							value: '2'
+						}]
+					},
+					{
+						xtype: 'button',
+						text: 'Get Prices',
+						style: 'margin-left: 10px;',
+						baseCls: 'binary_submit_button',
+						handler: function ()
+						{
+							Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].setLoading(true);
+							Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].setLoading(true);
+							Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[0]);
+							Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[1]);
+						}
+					}],
+					listeners:
+					{
+						activate: function ()
+						{
+
+						}
+					}
+				};
+
+				//else
+				//{
+				//	var inner_tab =
+				//	  {
+				//	  	title: records.get('display_name'),
+				//	  	listeners:
+				//		{
+				//			activate: function ()
+				//			{
+				//				Ext.Msg.alert('Hello', "You selected " + this.text);
+				//			}
+				//		}
+				//	  }
+				//}
+				tabpanel.add(inner_tab);
+			});
+			tabpanel.doLayout();
+			Ext.tip.QuickTipManager.register({
+				target: 'ext_contract_startTime',
+				title: 'Rise/Fall contracts of less than 5 minutes duration are only available when you select &quot;Now&quot; as the start time.',
+				width: 100,
+				dismissDelay: 10000 // Hide after 10 seconds hover
+			});
+		};
+
+		Ext.create('Ext.container.Container',
+		{
+			height: 400,
+			flex: 1,
+			name: 'tradePanel_container',
+			renderTo: document.body,
+			layout:
+			{
+				type: 'hbox',
+				align: 'stretch',
+				padding: 5
+			},
+			items: [
+			{
+				xtype: 'tabpanel',
+				flex: 1,
+				//baseCls: 'contract-panel',
+				//frame: true,
+				plain: true,
+				items: [],
+				cloneStore: function (originStore, newStore)
+				{
+
+					if (!newStore)
+					{
+						newStore = Ext.create('Ext.data.Store', {
+							model: originStore.model
+						});
+					} else
+					{
+						newStore.removeAll(true);
+					}
+
+					var records = [], originRecords = originStore.getRange(), i, newRecordData;
+					for (i = 0; i < originRecords.length; i++)
+					{
+						newRecordData = Ext.ux.clone(originRecords[i].copy().data);
+						newStore.add(new newStore.model(newRecordData, newRecordData.id));
+					}
+
+					newStore.fireEvent('load', newStore);
+
+					return newStore;
+				},
+				listeners: {
+					render: function (tabpanel)
+					{
+						if (tabpanel.items.length == 0)
+						{
+							var st = Ext.create('Ext.data.Store',
+							{
+								id: 'contract_categories_StoreTmp',
+								model: Ext.define('Market',
+								{
+									extend: 'Ext.data.Model',
+									fields: ['display_name']
+								}),
+								proxy:
+								{
+									type: 'memory',
+									reader: { type: 'array' }
+								}
+							});
+							//setTabs(Ext.data.StoreManager.lookup('marketStore'), tabpanel);
+							//Ext.data.StoreManager.lookup('marketStore').removeAll();
+							st.add([{ display_name: 'Rise/Fall' }, { display_name: 'Higher/Lower' }, { display_name: 'Touch/No Touch' }]);
+							setTabs(st, tabpanel);
+							tabpanel.doLayout();
+						}
+						tabpanel.setActiveTab(0);
+					},
+					afterrender: function (tabpanel)
+					{
+						//if (tabpanel.items.length != 0)
+						//	for (var it in tabpanel.items.items)
+						//	{
+						//		if (tabpanel.items.items[it].title == 'Rise/Fall')
+						//			tabpanel.items.items[it].tab.activate();
+						//	}
+					},
+
+				}
+			},
+			{
+				xtype: 'splitter'
+			},
+			{
+				items: [
+				{
+					xtype: 'panel',
+					name: 'contract_buy_panel',
+					frame: true,
+					cmpCls: 'contract-panel',
+					title: 'Rise',
+					layout: 'vbox',
+					bodyPadding: 5,
+					items: [
+					Ext.create('Ext.Img',
+					{
+						src: 'https://static.binary.com/images/pages/trade/rise_1.png',
+						renderTo: Ext.getBody()
+					}),
+					{
+						layout: 'hbox',
+						items:
+						[
+							{
+								xtype: 'label', width: 40, name: 'currency_label', text: 'USD'
+							},
+							{
+								xtype: 'label', width: 50, name: 'price_label'
+							},
+							{
+								xtype: 'label', width: 200, name: 'longcode_label'
+							}
+						]
+					},
+					{
+						xtype: 'button',
+						text: 'Purchase',
+						contractType: 'DOUBLEUP',
+						duration_unit: 'day',
+						duration: 1,
+						style: 'margin-left: 10px;',
+						baseCls: 'binary_submit_button',
+						listeners: {
+							click: function (obj) { doPurchase(obj); }
+						}
+					}],
+					listeners:
+						{
+							render: function (panel)
+							{
+
+								var obj = panel.query('button')[0];
+								configureDuration(obj);
+								var data =
+								{
+									contract_type: obj.contractType,
+									symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
+									duration_unit: obj.duration_unit,
+									duration: obj.duration,
+									payout_currency: 'USD',
+									payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
+									start_time: 0//parseInt($("#start_time").val())
+								};
+								getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
+							}
+						},
+					dockedItems: [{
+						xtype: 'panel',
+						height: 10,
+						baseCls: 'purchase_docked_panel',
+						dock: 'bottom'
+					}],
+					flex: 2
+				},
+				{
+					xtype: 'splitter'
+				},
+				{
+					xtype: 'panel',
+					name: 'contract_buy_panel',
+					frame: true,
+					cmpCls: 'contract-panel',
+					title: 'Fall',
+					layout: 'vbox',
+					bodyPadding: 5,
+					items: [
+					Ext.create('Ext.Img',
+					{
+						src: 'https://static.binary.com/images/pages/trade/fall_1.png',
+						renderTo: Ext.getBody()
+					}),
+					{
+						layout: 'hbox',
+						items:
+						[
+							{
+								xtype: 'label', width: 40, name: 'currency_label', text: 'USD'
+							},
+							{
+								xtype: 'label', width: 50, name: 'price_label'
+							},
+							{
+								xtype: 'label', width: 200, name: 'longcode_label'
+							}
+						]
+					},
+					{
+						xtype: 'button',
+						text: 'Purchase',
+						contractType: 'DOUBLEDOWN',
+						duration_unit: 'day',
+						duration: 1,
+						style: 'margin-left: 10px;',
+						baseCls: 'binary_submit_button',
+						listeners: {
+							click: function (obj) { doPurchase(obj); }
+						}
+					}],
+					listeners:
+						{
+							render: function (panel)
+							{
+								var obj = panel.query('button')[0];
+								configureDuration(obj);
+								var data =
+								{
+									contract_type: obj.contractType,
+									symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
+									duration_unit: obj.duration_unit,
+									duration: obj.duration,
+									payout_currency: 'USD',
+									payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
+									start_time: 0//parseInt($("#start_time").val())
+								};
+								getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
+							}
+						},
+					dockedItems: [{
+						xtype: 'panel',
+						height: 10,
+						baseCls: 'purchase_docked_panel',
+						dock: 'bottom'
+					}],
+					flex: 2
+				}]
+			}]
+		});
+
 		Ext.create('Ext.form.field.ComboBox',
 		{
 			id: 'ext_Market_market',
 			renderTo: 'ext_Market_div',
+			value: 'random',
 			valueField: 'marketName',
 			displayField: 'display_name',
 			emptyText: 'Select market',
@@ -520,6 +1055,10 @@ createChart = function (symbol_, chartType_, granularity_)
 			editable: false,
 			listeners:
 			{
+				afterrender: function ()
+				{
+					build_instrument_select();
+				},
 				change: function ()
 				{
 					build_instrument_select();
@@ -572,6 +1111,7 @@ createChart = function (symbol_, chartType_, granularity_)
 				{
 					id: 'ext_Symbol_market',
 					renderTo: 'ext_Symbol_div',
+					value: 'Random 50 Index',
 					displayField: 'display_name',
 					valueField: 'symbol',
 					emptyText: 'Select symbol',
@@ -705,6 +1245,7 @@ createChart = function (symbol_, chartType_, granularity_)
 			id: 'ext_ChartType_market',
 			renderTo: 'ext_ChartType_div',
 			emptyText: 'Select type',
+			value: 'ticks',
 			displayField: 'chartType_name',
 			valueField: 'chartType_abb',
 			queryMode: 'local',
@@ -1013,7 +1554,6 @@ LiveChartOHLC.prototype.process_tick = function (tickInput)
 		squote: tickInput[1]
 	};
 	this.spot = tick.quote;
-
 	if (this.chart.series)
 	{
 		Rollbar.error("this.chart.series is not initialized");
@@ -1176,6 +1716,8 @@ LiveChartTick.prototype.process_data = function (point)
                 [tick.epoch * 1000, tick.quote], false, this.shift, false
             );
 			this.spot = tick.quote;
+			var spot_field = Ext.ComponentQuery.query('[name=tradePanel_container]')[0].down('[name=spot]');
+			spot_field.setValue(this.spot);
 		}
 	}
 	//} else if (point[0] == 'contract')
@@ -1199,9 +1741,24 @@ LiveChartTick.prototype.update_data = function (point)
 			this.chart.series[0].addPoint(
                 [tick.epoch * 1000, tick.quote], true, this.shift, false
             );
-			this.spot = tick.quote;
+
 			this.config.repaint_indicators(this);//temp
 			this.chart.redraw();
+
+			var spot_field = Ext.ComponentQuery.query('[name=tradePanel_container]')[0].down('[name=spot]');
+			if (this.spot > tick.quote)
+			{
+				spot_field.inputEl.addCls('red_field');
+				spot_field.inputEl.removeCls('blue_field');
+			}
+			else
+			{
+				spot_field.inputEl.addCls('blue_field');
+				spot_field.inputEl.removeCls('red_field');
+			}
+
+			this.spot = tick.quote;
+			spot_field.setValue(this.spot);
 		}
 	}
 	catch (e) { };
@@ -1224,19 +1781,49 @@ LiveChartTick.prototype.get_data = function (symbol, chartType, granularity)
 
 $(function ()
 {
-	getPrice = function (contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time)
+	getPrice = function (contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action, panel)
 	{
-		Binary.Api.Client.contract(function (data)
+		if (action == "buy")
 		{
-			var d = data;
-			var html = "";
-			for (var item in data)
+			Binary.Api.Client.contract(function (data)
 			{
-				var data_str = "<p>" + item.toString() + ":" + data[item].toString() + "</p>";
-				html = html.concat(data_str);
-			};
-			Ext.create('Ext.window.Window', { items: [{ width: 400, height: 350, html: html }] }).show();
-			
-		}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, "buy");
+				var d = data;
+				var html = "";
+				if (!data.fault)
+				{
+					for (var item in data)
+					{
+						var data_str = "<p>" + item.toString() + ":" + data[item].toString() + "</p>";
+						html = html.concat(data_str);
+					};
+					Ext.create('Ext.window.Window', { items: [{ width: 400, height: 350, html: html }] }).show();
+				}
+				else
+				{
+					if (!Ext.getCmp('error_window'))
+						Ext.create('Ext.window.Window', { id: 'error_window', items: [{ width: 400, height: 350, html: data.fault.details[0].toString() }] }).show();
+				}
+			}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action);
+		}
+		else
+		{
+			//setInterval(function ()
+			//{
+			Binary.Api.Client.contract(function (data)
+			{
+				if (!data.fault)
+				{
+					panel.query('label[name=longcode_label]')[0].setText(data.longcode.toString());
+					panel.query('label[name=price_label]')[0].setText(data.ask.toString());
+					panel.setLoading(false);
+				}
+				else
+				{
+					if (!Ext.getCmp('error_window'))
+						Ext.create('Ext.window.Window', { id: 'error_window', items: [{ width: 400, height: 350, html: data.fault.details[0].toString() }] }).show();
+				}
+			}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action);
+			//}, 2000);
+		}
 	}
 });

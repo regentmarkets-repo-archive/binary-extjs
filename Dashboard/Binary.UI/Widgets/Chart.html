@@ -14,13 +14,18 @@
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js"></script>
-    <script src="../Widgets/LiveChart.js?v=3"></script>
+    <script src="../Widgets/LiveChart.js?v=4"></script>
     <style>
         body
         {
             background-color: white !important;
         }
-        .hidden { display: none; }
+
+        .hidden
+        {
+            display: none;
+        }
+
         .binary_field
         {
             height: 20px;
@@ -56,9 +61,46 @@
         }
 
         button[data-val]
-        {            
+        {
             padding-left: 0px;
             padding-right: 0px;
+        }
+
+        .contract-panel
+        {
+            border: 2px solid #157fcc;
+            border-radius: 3px 3px;
+            margin-bottom: 0px;
+        }
+
+        .red_field
+        {
+            background-color: red;
+            opacity: 0.7 !important;
+            color: white;
+        }
+
+        .blue_field
+        {
+            background-color: blue;
+            opacity: 0.7 !important;
+            color: white;
+        }
+
+        .binary_submit_button
+        {
+            border: none;
+            border-radius: 3px 3px;
+            background-color: #2e8836;
+            padding: 5px 20px !important;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .purchase_docked_panel
+        {
+            background-color: grey;
         }
     </style>
 </head>
@@ -151,9 +193,14 @@
                 model: Ext.define('Market',
                 {
                     extend: 'Ext.data.Model',
-                    fields: ['marketName', 'display_name']
-                })
-            })
+                    fields: ['marketName', 'display_name', { name: 'submarkets', type: 'string' }, { name: 'symbols', type: 'string' }, { name: 'contract_categories', type: 'string' }]
+                }),
+                proxy:
+                {
+                    type: 'memory',
+                    reader: { type: 'array' }
+                }
+            });
 
             Ext.create('Ext.data.Store',
             {
@@ -163,7 +210,19 @@
                     extend: 'Ext.data.Model',
                     fields: ['symbol', 'display_name']
                 })
-            })
+            });
+            Ext.create('Ext.data.Store', {
+                id: 'offeringsStore',
+                model: Ext.define('Offerings',
+                {
+                    extend: 'Ext.data.Model',
+                    fields: ['market', { name: 'submarket', type: 'string' }, { name: 'symbol', type: 'string' }, { name: 'contract_category', type: 'string' }]
+                }),
+                proxy: {
+                    type: 'memory',
+                    reader: { type: 'array', root: 'offerings' }
+                }
+            });
         });
 
         $(function ()
@@ -175,33 +234,22 @@
                 changeResolution($(this).attr("data-val"));
                 $(this).toggleClass('current_range');
             });
-            $("#contract_table").click(function ()
-            {
-                var data =
-                {
-                    contract_type: $("#contractCategory_select").val(),
-                    symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : "R_50",
-                    duration_unit: $("#duration_unit").val(),
-                    duration: parseInt($("#duration").val()),
-                    payout_currency: $("#payout_currency").val(),
-                    payout: parseInt($("#payout").val()),
-                    start_time: parseInt($("#start_time").val())
-                };
-                getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time);
-            });
         });
     </script>
     <br />
-    <input type="text" value="" class="binary_field" id="high_barrier" />
-    <label for="high_barrier">High barrier</label><br />
-    <input type="text" value="" class="binary_field" id="low_barrier" />
-    <label for="low_barrier">Low barrier</label>
+    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier"/>
+    <br />
+    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier"/>
 
     <button id="show_spot">Show spot</button><br />
 
-    <div id="ext_ChartType_div"></div>
-    <div id="ext_Market_div"></div>
-    <div id="ext_Symbol_div"></div>
+    <table>
+        <tr>
+            <td id="ext_ChartType_div"></td>
+            <td id="ext_Market_div"></td>
+            <td id="ext_Symbol_div"></td>
+        </tr>
+    </table>
 
     <div class="interval-buttons">
         <button data-val="M10" class="current_range">10min</button>
@@ -209,7 +257,7 @@
         <button data-val="H6">6h</button>
         <button data-val="H12">12h</button>
         <button data-val="D">1d</button>
-        <button data-val="D2">2d</button>        
+        <button data-val="D2">2d</button>
         <button data-val="D5">5d</button>
         <button data-val="W">1w</button>
         <button data-val="W2">2w</button>
@@ -220,30 +268,33 @@
     <div id="LiveChart_loading" class="hidden" style="min-width: 310px; height: 310px; margin: 0 auto">loading...</div>
     <div id="LiveChart_container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 
-    <fieldset>
+    <!--<fieldset>
         <legend>Contract negotiation</legend>
         <select id="subMarket_select" name="submarket"></select>
         <label for="submarket">Submarket</label><br />
-        <select id="contractCategory_select" name="contractCategory" ><option value="FLASHD" selected="selected">FLASHD</option></select>
+        <select id="contractCategory_select" name="contractCategory">
+            <option value="FLASHD" selected="selected">FLASHD</option>
+        </select>
         <label for="contractCategory">Contract Category</label><br />
         <br />
-        <input type="text" id="start_time" name="start_time" style="width: 50px;" value="0"/>
+        <input type="text" id="start_time" name="start_time" style="width: 50px;" value="0" />
         <label for="start_time">start time</label><br />
         <input type="text" id="pip_size" name="pip_size" style="width: 50px;" />
         <label for="pip_size">pip_size</label>
-        <input type="text" id="duration" name="duration" style="width: 50px;"  value="3600" />
+        <input type="text" id="duration" name="duration" style="width: 50px;" value="3600" />
         <label for="duration">duration</label><br />
-        <input type="text" id="duration_unit" name="duration_unit" style="width: 50px;" value="sec"/>
+        <input type="text" id="duration_unit" name="duration_unit" style="width: 50px;" value="sec" />
         <label for="duration_unit">duration_unit</label>
-        <input type="text" id="payout_currency" name="payout_currency" style="width: 50px;" value="USD"/>
+        <input type="text" id="payout_currency" name="payout_currency" style="width: 50px;" value="USD" />
         <label for="payout_currency">payout_currency</label><br />
-        <input type="text" id="payout" name="payout" style="width: 50px;" value="2"/>
+        <input type="text" id="payout" name="payout" style="width: 50px;" value="2" />
         <label for="payout">payout</label>
         <input type="text" id="amount_type" name="amount_type" style="width: 50px;" />
         <label for="amount_type">amount_type</label><br />
-        <button id="contract_table" style="color: blue">Contract table</button>
-        <button id="contract_chart" style="color: blue">Contract chart</button>
-    </fieldset>
+        <button id="purchase_btn" style="color: green">Purchase</button>
+        <button id="contract_table">Contract table</button>
+        <button id="contract_chart">Contract chart</button>
+    </fieldset>-->
 
 </body>
 </html>
