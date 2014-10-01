@@ -511,7 +511,7 @@ createChart = function (symbol_, chartType_, granularity_)
 		{
 			var dat = offerings_data.offerings;
 			var submarket_array = [];
-			//$.each(dat, function (records)
+			//$.each(dat, function (records) selectors.contract_category = {...}
 			//{
 			//	var m_store = Ext.data.StoreManager.lookup('marketStore');
 			//	for (var item in dat[records])
@@ -623,6 +623,7 @@ createChart = function (symbol_, chartType_, granularity_)
 			getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "buy");
 		};
 
+		
 		function setTabs(store, tabpanel)
 		{
 			// Init the singleton.  Any tag-based quick tips will start working.
@@ -694,7 +695,7 @@ createChart = function (symbol_, chartType_, granularity_)
 							xtype: 'field',
 							name: 'duration_amount',
 							value: '1'
-						},
+						},						
 						{
 							xtype: 'combo',
 							name: 'duration_units',
@@ -726,6 +727,28 @@ createChart = function (symbol_, chartType_, granularity_)
 						xtype: 'field',
 						name: 'spot',
 						fieldLabel: 'Spot:',
+						labelWidth: 30,
+						width: 130,
+						margin: '5px 10px',
+						disabled: true,
+						listeners: {
+							change: function ()
+							{
+								var s_o = this.up().down('[name=spot_offset]');
+								var b_o = this.up().down('[name=barrier_offset]');
+								s_o.setValue(this.getValue() + b_o.getValue());
+							}
+						}
+					},
+					{
+						xtype: 'field',
+						fieldLabel: 'Barrier:',
+						name: 'barrier_offset',
+						value: 0.000
+					},
+					{
+						xtype: 'field',
+						name: 'spot_offset',
 						labelWidth: 30,
 						width: 130,
 						margin: '5px 10px',
@@ -774,7 +797,8 @@ createChart = function (symbol_, chartType_, granularity_)
 							Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[0]);
 							Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[1]);
 						}
-					}],
+					},
+					],
 					listeners:
 					{
 						activate: function ()
@@ -854,6 +878,10 @@ createChart = function (symbol_, chartType_, granularity_)
 					return newStore;
 				},
 				listeners: {
+					tabchange: function()
+					{
+						Ext.data.StoreMgr.lookup('contract_categories_StoreTmp').findRecord('display_name', this.getActiveTab().title);
+					},
 					render: function (tabpanel)
 					{
 						if (tabpanel.items.length == 0)
@@ -864,7 +892,7 @@ createChart = function (symbol_, chartType_, granularity_)
 								model: Ext.define('Market',
 								{
 									extend: 'Ext.data.Model',
-									fields: ['display_name']
+									fields: ['display_name', 'used_name', 'contract_up', 'contract_up_name', 'contract_down', 'contract_down_name']
 								}),
 								proxy:
 								{
@@ -874,7 +902,14 @@ createChart = function (symbol_, chartType_, granularity_)
 							});
 							//setTabs(Ext.data.StoreManager.lookup('marketStore'), tabpanel);
 							//Ext.data.StoreManager.lookup('marketStore').removeAll();
-							st.add([{ display_name: 'Rise/Fall' }, { display_name: 'Higher/Lower' }, { display_name: 'Touch/No Touch' }]);
+							st.add([{ display_name: 'Rise/Fall', used_name: 'risefall'},
+								{ display_name: 'Higher/Lower', used_name: 'higherlower', contract_up: 'CALL', contract_up_name: 'Higher', contract_down: 'PUT', contract_down_name: 'Lower'  },
+								{ display_name: 'Touch/No Touch', used_name: 'touchnotouch', contract_up: 'NOTOUCH', contract_up_name: 'Does Not Touch', contract_down: 'ONETOUCH', contract_down_name: 'Touches' },
+								{ display_name: 'Asian Up/Down', used_name: 'asian', contract_up: 'ASIANU', contract_up_name: 'Asian Up', contract_down: 'ASIAND', contract_down_name: 'Asian down' },
+								{ display_name: 'Digit Match/Differ', used_name: 'digits', contract_up: 'DIGITDIFF', contract_up_name: 'Digit Differ', contract_down: 'DIGITMATCH', contract_down_name: 'Digit Match' },
+								{ display_name: 'Ends Between/Outside', used_name: 'endsinout', contract_up: 'EXPIRYRANGE', contract_up_name: 'Ends Between', contract_down: 'EXPIRYMISS', contract_down_name: 'Ends Outside' },
+								{ display_name: 'Stays Between/Goes Outside', used_name: 'staysinout', contract_up: 'RANGE', contract_up_name: 'Stays Between', contract_down: 'UPORDOWN', contract_down_name: 'Goes Outside' },
+							]);
 							setTabs(st, tabpanel);
 							tabpanel.doLayout();
 						}
