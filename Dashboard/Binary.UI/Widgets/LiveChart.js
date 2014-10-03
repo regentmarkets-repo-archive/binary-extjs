@@ -5,11 +5,6 @@
 
 	this.config = config;
 	this.shift = false;
-	//if (!config.trade_visualization)
-	//{
-	//    this.on_duration_change();
-	//    this.highlight_duration();
-	//}
 };
 
 window.chartCreated = false;
@@ -607,9 +602,11 @@ createChart = function (symbol_, chartType_, granularity_)
 					}
 			}
 		};
-		function doPurchase(obj)
+
+		function doPurchase(obj, title, sentiment, contractType)
 		{
 			configureDuration(obj);
+			if (title != "Rise/Fall") obj.contractType = contractType;
 			var data =
 			{
 				contract_type: obj.contractType,
@@ -623,7 +620,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "buy");
 		};
 
-		
 		function setTabs(store, tabpanel)
 		{
 			// Init the singleton.  Any tag-based quick tips will start working.
@@ -640,164 +636,472 @@ createChart = function (symbol_, chartType_, granularity_)
 				var id = 'ext_tab_' + records.get('display_name');
 				var inner_tab =
 				{
-					padding: 40,
-					//name: 'ext_trade_tab',
 					title: records.get('display_name'),
-					items: [
-					{
-						xtype: 'timefield',
-						name: 'start_time',
-						fieldLabel: 'Start time:',
-						labelWidth: 30,
-						minValue: new Date().getHours().toString() + ':' + new Date().getMinutes().toString(),
-						//value: new Date().getHours().toString(),
-						format: 'H:i',
-						increment: 5,
-						width: 130,
-						margin: '5px 10px',
-						handler: function (obj, date)
-						{ },
-						listeners:
-							{
-								render: function ()
+					items:
+					[
+						{
+							layout: 'hbox',
+							items:
+							[
 								{
-									this.setRawValue('Now');
-								},
-								change: function (obj, val)
-								{
-									if (this.getRawValue() != 'Now')
-									{
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'INTRADU';
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'INTRADD';
-									}
-									else
-									{
+									layout: 'vbox',
+									items:
+									[
+										{
+											xtype: 'timefield',
+											name: 'start_time',
+											fieldLabel: 'Start time:',
+											labelWidth: 85,
+											minValue: new Date().getHours().toString() + ':' + new Date().getMinutes().toString(),
+											format: 'H:i',
+											increment: 5,
+											width: 160,
+											margin: '5px 5px',
+											hidden: true,
+											handler: function (obj, date)
+											{ },
+											listeners:
+											{
+												render: function ()
+												{
+													this.setRawValue('Now');
+												},
+												change: function (obj, val)
+												{
+													if (this.getRawValue() != 'Now')
+													{
+														Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'INTRADU';
+														Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'INTRADD';
+													}
+													else
+													{
 
-									}
-								}
-							}
-					},
-					{
-						layout: 'hbox',
-						defaults: { width: 130, margin: '5px 10px' },
-						items: [
-						{
-							xtype: 'combo',
-							name: 'duration',
-							queryMode: 'local',
-							store: ['Duration'],//, 'End time'],
-							displayField: 'duration',
-							autoSelect: true,
-							forceSelection: true,
-							value: 'Duration'
-						},
-						{
-							xtype: 'field',
-							name: 'duration_amount',
-							value: '1'
-						},						
-						{
-							xtype: 'combo',
-							name: 'duration_units',
-							queryMode: 'local',
-							store: ['days', 'hours', 'minutes', 'seconds'],
-							displayField: 'duration_units',
-							autoSelect: true,
-							forceSelection: true,
-							value: 'days',
-							listeners:
-							{
-								change: function (obj, val)
+													}
+												}
+											}
+										},
+										{
+											layout: 'hbox',
+											defaults: { width: 70, margin: '5px 5px' },
+											items: [
+											{
+												xtype: 'combo',
+												name: 'duration',
+												width: 80,
+												queryMode: 'local',
+												store: ['Duration'],//, 'End time'],
+												displayField: 'duration',
+												autoSelect: true,
+												forceSelection: true,
+												value: 'Duration'
+											},
+											{
+												xtype: 'field',
+												name: 'duration_amount',
+												value: '1'
+											},
+											{
+												xtype: 'combo',
+												name: 'duration_units',
+												queryMode: 'local',
+												store: ['days', 'hours', 'minutes', 'seconds'],
+												displayField: 'duration_units',
+												autoSelect: true,
+												forceSelection: true,
+												value: 'days',
+												listeners:
+												{
+													change: function (obj, val)
+													{
+														if (val == 'days')
+														{
+															Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'DOUBLEUP';
+															Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'DOUBLEDOWN';
+														}
+														else
+														{
+															Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'FLASHU';
+															Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'FLASHD';
+														}
+													}
+												}
+											}]
+										},
+										{
+											xtype: 'field',
+											name: 'spot',
+											fieldLabel: 'Spot:',
+											labelWidth: 85,
+											width: 160,
+											margin: '5px 5px',
+											disabled: true,
+											listeners: {
+												change: function ()
+												{
+													var s_o = this.up().down('[name=spot_offset]');
+													var b_o = this.up().down('[name=barrier_offset]');
+													s_o.setRawValue(Ext.util.Format.currency(parseFloat(this.getValue()) + parseFloat(b_o.getValue()), ' ', 4));
+												}
+											}
+										},
+										{
+											layout: 'hbox',
+											name: 'offset',
+											defaults: {
+												width: 160,
+												margin: '5px 5px'
+											},
+											items: [
+											{
+												xtype: 'precisionNumberfield',
+												fieldLabel: 'Barrier:',
+												name: 'barrier_offset',
+												labelWidth: 85,
+												value: '0.0000',
+												decimalPrecision: 4,
+												step: 0.0001,
+												listeners: {
+													change: function ()
+													{
+														var s_o = this.up().down('[name=spot_offset]');
+														var spot = this.up().up().down('[name=spot]');
+														s_o.setRawValue(Ext.util.Format.currency(parseFloat(spot.getValue()) + parseFloat(this.getValue()), ' ', 4));
+													}
+												}
+											},
+											{
+												xtype: 'field',
+												name: 'spot_offset',
+												width: 70,
+												disabled: true
+											}]
+										},
+										{
+											name: 'barriers',
+											defaults: {
+												width: 160,
+												margin: '5px 5px',
+												decimalPrecision: 4,
+												step: 0.0001
+											},
+											items: [
+											{
+												xtype: 'precisionNumberfield',
+												fieldLabel: 'High barrier:',
+												name: 'barrier_high',
+												labelWidth: 85,
+												value: '0.0000'
+											},
+											{
+												xtype: 'precisionNumberfield',
+												fieldLabel: 'Low barrier:',
+												name: 'barrier_low',
+												labelWidth: 85,
+												value: '0.0000'
+											}]
+										},
+										{
+											xtype: 'combo',
+											name: 'last_digit_prediction',
+											queryMode: 'local',
+											fieldLabel: 'Last Digit Prediction:',
+											labelWidth: 85,
+											width: 160,
+											margin: '5px 5px',
+											store: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+											displayField: 'last_digit_prediction',
+											autoSelect: true,
+											forceSelection: true,
+											value: 4,
+											hidden: true
+										},
+										{
+											layout: 'hbox',
+											style: 'margin-bottom: 20px !important;',
+											defaults: { width: 70, margin: '5px 5px' },
+											items: [
+											{
+												xtype: 'combo',
+												name: 'payout',
+												queryMode: 'local',
+												width: 80,
+												store: ['Payout'],//, 'Stake'],
+												displayField: 'payout',
+												autoSelect: true,
+												forceSelection: true,
+												value: 'Payout',
+											},
+											{
+												xtype: 'combo',
+												name: 'payout_units',
+												queryMode: 'local',
+												store: ['USD'],
+												displayField: 'payout_units',
+												autoSelect: true,
+												forceSelection: true,
+												value: 'USD'
+											},
+											{
+												xtype: 'field',
+												name: 'amount',
+												value: '2'
+											}]
+										},
+										{
+											xtype: 'button',
+											text: 'GET PRICES',
+											style: 'margin-left: 10px;',
+											baseCls: 'binary_submit_button',
+											handler: function ()
+											{
+												Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].setLoading(true);
+												Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].setLoading(true);
+												Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[0]);
+												Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[1]);
+											}
+										}
+									]
+								},
 								{
-									if (val == 'days')
-									{
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'DOUBLEUP';
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'DOUBLEDOWN';
-									}
-									else
-									{
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].query('button')[0].contractType = 'FLASHU';
-										Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].query('button')[0].contractType = 'FLASHD';
-									}
+									layout: 'vbox',
+									defaults: { margin: 5 },
+									items:
+									[
+										{
+											xtype: 'panel',
+											name: 'contract_buy_panel',
+											frame: true,
+											cmpCls: 'contract-panel',
+											layout: 'vbox',
+											bodyPadding: 5,
+											items:
+											[
+												{
+													layout: 'hbox',
+													defaults: { margin: '5px 12px' },
+													items:
+													[
+														{
+															xtype: 'image',
+															src: records.get('contract_up_image')
+														},
+														{
+															xtype: 'label',
+															cls: 'contract-buy-panel-title',
+															text: records.get('contract_up_name')
+														}
+													]
+												},
+												{
+													xtype: 'panel',
+													bodyPadding: 5,
+													layout: 'hbox',
+													items:
+													[
+														{
+															height: 90,
+															items:
+															[	
+																{
+																	layout: 'hbox',
+																	style: 'margin-bottom: 20px;',
+																	items:
+																	[
+																		{
+																			xtype: 'label',
+																			width: 40,
+																			cls: 'contract-buy-panel-price',
+																			name: 'currency_label',
+																			text: 'USD'
+																		},
+																		{
+																			xtype: 'label',
+																			cls: 'contract-buy-panel-price',
+																			width: 20,
+																			name: 'price_label'
+																		},
+																		{
+																			xtype: 'label',
+																			cls: 'contract-buy-panel-price-upper',
+																			width: 20,
+																			name: 'price_label_upper'
+																		}
+																	]
+																},
+																{
+																	xtype: 'button',
+																	text: 'PURCHASE',
+																	sentiment: 'up',
+																	contractType: 'DOUBLEUP',
+																	duration_unit: 'day',
+																	duration: 1,
+																	baseCls: 'binary_submit_button',
+																	listeners:
+																	{
+																		click: function (obj) { doPurchase(obj, records.get('display_name'), obj.sentiment, contractType = (obj.sentiment == 'up') ? records.get('contract_up') : records.get('contract_down')); }
+																	}
+																}
+															]
+														},
+														{
+															xtype: 'label',
+															width: 150,
+															style: 'margin-left:5px;',
+															name: 'longcode_label'
+														}
+													]
+												}
+											],
+											listeners:
+											{
+												render: function (panel)
+												{
+													var obj = panel.query('button')[0];
+													configureDuration(obj);
+													if (records.get('display_name') != "Rise/Fall") obj.contractType = (obj.sentiment == 'up') ? records.get('contract_up') : records.get('contract_down');
+													var data =
+													{
+														contract_type: obj.contractType,
+														symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
+														duration_unit: obj.duration_unit,
+														duration: obj.duration,
+														payout_currency: 'USD',
+														payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
+														start_time: 0//parseInt($("#start_time").val())
+													};
+													getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
+												}
+											},
+											dockedItems:
+											[
+												{
+													xtype: 'panel',
+													height: 10,
+													baseCls: 'purchase_docked_panel',
+													dock: 'bottom'
+												}
+											],
+											flex: 2
+										},
+										{
+											xtype: 'panel',
+											name: 'contract_buy_panel',
+											frame: true,
+											cmpCls: 'contract-panel',
+											layout: 'vbox',
+											bodyPadding: 5,
+											items:
+											[
+												{
+													layout: 'hbox',
+													defaults: { margin: '5px 12px' },
+													items:
+													[
+														{
+															xtype: 'image',
+															src: records.get('contract_down_image')
+														},
+														{
+															xtype: 'label',
+															cls: 'contract-buy-panel-title',
+															text: records.get('contract_down_name')
+														}
+													]
+												},
+												{
+													xtype: 'panel',
+													bodyPadding: 5,
+													layout: 'hbox',
+													items:
+													[
+														{
+															height: 90,
+															items:
+															[	
+																{
+																	layout: 'hbox',
+																	style: 'margin-bottom: 20px;',
+																	items:
+																	[
+																		{
+																			xtype: 'label',
+																			width: 40,
+																			cls: 'contract-buy-panel-price',
+																			name: 'currency_label',
+																			text: 'USD'
+																		},
+																		{
+																			xtype: 'label',
+																			cls: 'contract-buy-panel-price',
+																			width: 20,
+																			name: 'price_label'
+																		},
+																		{
+																			xtype: 'label',
+																			cls: 'contract-buy-panel-price-upper',
+																			width: 20,
+																			name: 'price_label_upper'
+																		}
+																	]
+																},
+																{
+																	xtype: 'button',
+																	text: 'PURCHASE',
+																	sentiment: 'down',
+																	contractType: 'DOUBLEDOWN',
+																	duration_unit: 'day',
+																	duration: 1,
+																	baseCls: 'binary_submit_button',
+																	listeners:
+																	{
+																		click: function (obj) { doPurchase(obj, records.get('display_name'), obj.sentiment, contractType = (obj.sentiment == 'up') ? records.get('contract_up') : records.get('contract_down')); }
+																	}
+																}
+															]
+														},
+														{
+															xtype: 'label',
+															width: 150,
+															style: 'margin-left:5px;',
+															name: 'longcode_label'
+														}
+													]
+												}
+											],
+											listeners:
+												{
+													render: function (panel)
+													{
+														var obj = panel.query('button')[0];
+														configureDuration(obj);
+														var data =
+														{
+															contract_type: obj.contractType,
+															symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
+															duration_unit: obj.duration_unit,
+															duration: obj.duration,
+															payout_currency: 'USD',
+															payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
+															start_time: 0//parseInt($("#start_time").val())
+														};
+														getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
+													}
+												},
+											dockedItems:
+											[
+												{
+													xtype: 'panel',
+													height: 10,
+													baseCls: 'purchase_docked_panel',
+													dock: 'bottom'
+												}
+											],
+											flex: 2
+										}
+									]
 								}
-							}
-						}]
-					},
-					{
-						xtype: 'field',
-						name: 'spot',
-						fieldLabel: 'Spot:',
-						labelWidth: 30,
-						width: 130,
-						margin: '5px 10px',
-						disabled: true,
-						listeners: {
-							change: function ()
-							{
-								var s_o = this.up().down('[name=spot_offset]');
-								var b_o = this.up().down('[name=barrier_offset]');
-								s_o.setValue(this.getValue() + b_o.getValue());
-							}
+							]
 						}
-					},
-					{
-						xtype: 'field',
-						fieldLabel: 'Barrier:',
-						name: 'barrier_offset',
-						value: 0.000
-					},
-					{
-						xtype: 'field',
-						name: 'spot_offset',
-						labelWidth: 30,
-						width: 130,
-						margin: '5px 10px',
-						disabled: true
-					},
-					{
-						layout: 'hbox',
-						style: 'margin-bottom: 60px !important;',
-						defaults: { width: 130, margin: '5px 10px' },
-						items: [
-						{
-							xtype: 'combo',
-							name: 'payout',
-							queryMode: 'local',
-							store: ['Payout'],//, 'Stake'],
-							displayField: 'payout',
-							autoSelect: true,
-							forceSelection: true,
-							value: 'Payout',
-						},
-						{
-							xtype: 'combo',
-							name: 'payout_units',
-							queryMode: 'local',
-							store: ['USD'],
-							displayField: 'payout_units',
-							autoSelect: true,
-							forceSelection: true,
-							value: 'USD'
-						},
-						{
-							xtype: 'field',
-							name: 'amount',
-							value: '2'
-						}]
-					},
-					{
-						xtype: 'button',
-						text: 'Get Prices',
-						style: 'margin-left: 10px;',
-						baseCls: 'binary_submit_button',
-						handler: function ()
-						{
-							Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].setLoading(true);
-							Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].setLoading(true);
-							Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[0]);
-							Ext.ComponentQuery.query('[name=contract_buy_panel]')[1].fireEvent('render', Ext.ComponentQuery.query('[name=contract_buy_panel]')[1]);
-						}
-					},
 					],
 					listeners:
 					{
@@ -807,21 +1111,7 @@ createChart = function (symbol_, chartType_, granularity_)
 						}
 					}
 				};
-
-				//else
-				//{
-				//	var inner_tab =
-				//	  {
-				//	  	title: records.get('display_name'),
-				//	  	listeners:
-				//		{
-				//			activate: function ()
-				//			{
-				//				Ext.Msg.alert('Hello', "You selected " + this.text);
-				//			}
-				//		}
-				//	  }
-				//}
+				//if (records.get('display_name') != 'Asian Up/Down' || records.get('display_name') != 'Digit Match/Differ')
 				tabpanel.add(inner_tab);
 			});
 			tabpanel.doLayout();
@@ -849,8 +1139,6 @@ createChart = function (symbol_, chartType_, granularity_)
 			{
 				xtype: 'tabpanel',
 				flex: 1,
-				//baseCls: 'contract-panel',
-				//frame: true,
 				plain: true,
 				items: [],
 				cloneStore: function (originStore, newStore)
@@ -878,9 +1166,51 @@ createChart = function (symbol_, chartType_, granularity_)
 					return newStore;
 				},
 				listeners: {
-					tabchange: function()
+					tabchange: function ()
 					{
-						Ext.data.StoreMgr.lookup('contract_categories_StoreTmp').findRecord('display_name', this.getActiveTab().title);
+						function setContractBuyImage(obj, st)
+						{
+							//obj.query('[name=contract_buy_panel]')[0].setLoading(true);
+							//obj.query('[name=contract_buy_panel]')[1].setLoading(true);
+							//debugger;
+							//obj.query('[name=contract_buy_panel]')[0].down('image').setSrc(st.findRecord('display_name', obj.title).get('contract_up_image'));
+							//obj.query('[name=contract_buy_panel]')[1].down('image').setSrc(st.findRecord('display_name', obj.title).get('contract_down_image'));
+							//obj.query('[name=contract_buy_panel]')[0].setLoading(false);
+							//obj.query('[name=contract_buy_panel]')[1].setLoading(false);
+						};
+						var st = Ext.data.StoreMgr.lookup('contract_categories_StoreTmp');
+						var current_tab_resord = st.findRecord('display_name', this.getActiveTab().title);
+						var tab = this.getActiveTab();
+
+						if (tab.title == "Rise/Fall")
+						{
+							tab.down('[name=offset]').hide();//get_form_method
+							tab.down('[name=barriers]').hide();
+							tab.down('[name=start_time]').show();
+						};
+						if (tab.title == "Higher/Lower" || tab.title == "Touch/No Touch")
+						{
+							tab.down('[name=barriers]').hide();//get_form_method
+							setContractBuyImage(tab, st);
+						};
+						if (tab.title == "In/Out")
+						{
+							tab.down('[name=offset]').hide();//get_form_method
+							setContractBuyImage(tab, st);
+						};
+						if (tab.title == "Asians")
+						{
+							tab.down('[name=offset]').hide();
+							tab.down('[name=barriers]').hide();
+							setContractBuyImage(tab, st);
+						};
+						if (tab.title == "Digits")
+						{
+							tab.down('[name=offset]').hide();
+							tab.down('[name=barriers]').hide();
+							tab.down('[name=last_digit_prediction]').show();
+							setContractBuyImage(tab, st);
+						};
 					},
 					render: function (tabpanel)
 					{
@@ -892,7 +1222,7 @@ createChart = function (symbol_, chartType_, granularity_)
 								model: Ext.define('Market',
 								{
 									extend: 'Ext.data.Model',
-									fields: ['display_name', 'used_name', 'contract_up', 'contract_up_name', 'contract_down', 'contract_down_name']
+									fields: ['display_name', 'used_name', { name: 'contract_up', type: 'auto' }, { name: 'contract_up_name', type: 'auto' }, { name: 'contract_up_image', type: 'auto' }, { name: 'contract_down', type: 'auto' }, { name: 'contract_down_name', type: 'auto' }, { name: 'contract_down_image', type: 'auto' }]
 								}),
 								proxy:
 								{
@@ -900,16 +1230,47 @@ createChart = function (symbol_, chartType_, granularity_)
 									reader: { type: 'array' }
 								}
 							});
-							//setTabs(Ext.data.StoreManager.lookup('marketStore'), tabpanel);
-							//Ext.data.StoreManager.lookup('marketStore').removeAll();
-							st.add([{ display_name: 'Rise/Fall', used_name: 'risefall'},
-								{ display_name: 'Higher/Lower', used_name: 'higherlower', contract_up: 'CALL', contract_up_name: 'Higher', contract_down: 'PUT', contract_down_name: 'Lower'  },
-								{ display_name: 'Touch/No Touch', used_name: 'touchnotouch', contract_up: 'NOTOUCH', contract_up_name: 'Does Not Touch', contract_down: 'ONETOUCH', contract_down_name: 'Touches' },
-								{ display_name: 'Asian Up/Down', used_name: 'asian', contract_up: 'ASIANU', contract_up_name: 'Asian Up', contract_down: 'ASIAND', contract_down_name: 'Asian down' },
-								{ display_name: 'Digit Match/Differ', used_name: 'digits', contract_up: 'DIGITDIFF', contract_up_name: 'Digit Differ', contract_down: 'DIGITMATCH', contract_down_name: 'Digit Match' },
-								{ display_name: 'Ends Between/Outside', used_name: 'endsinout', contract_up: 'EXPIRYRANGE', contract_up_name: 'Ends Between', contract_down: 'EXPIRYMISS', contract_down_name: 'Ends Outside' },
-								{ display_name: 'Stays Between/Goes Outside', used_name: 'staysinout', contract_up: 'RANGE', contract_up_name: 'Stays Between', contract_down: 'UPORDOWN', contract_down_name: 'Goes Outside' },
+							var images_trade_url = 'https://static.binary.com/images/pages/trade/{0}';
+							var cat_names_tmp = []
+							st.add([
+								{
+									display_name: 'Rise/Fall', used_name: 'risefall',
+									contract_up: 'DOUBLEUP',/*much more contract types*/ contract_up_name: 'Rise', contract_up_image: Ext.String.format(images_trade_url, 'rise_1.png'),
+									contract_down: 'DOUBLEDOWN', contract_down_name: 'Fall', contract_down_image: Ext.String.format(images_trade_url, 'fall_1.png')
+								},
+								{
+									display_name: 'Higher/Lower', used_name: 'higherlower',
+									contract_up: 'CALL', contract_up_name: 'Higher', contract_up_image: Ext.String.format(images_trade_url, 'higher_1.png'),
+									contract_down: 'PUT', contract_down_name: 'Lower', contract_down_image: Ext.String.format(images_trade_url, 'lower_1.png')
+								},
+								{
+									display_name: 'Touch/No Touch', used_name: 'touchnotouch',
+									contract_up: 'NOTOUCH', contract_up_name: 'Does Not Touch', contract_up_image: 'https://static.binary.com/images/pages/trade/touch_1.png',
+									contract_down: 'ONETOUCH', contract_down_name: 'Touches', contract_down_image: 'https://static.binary.com/images/pages/trade/no-touch_1.png'
+								},
+								//{ display_name: 'Ends Between/Outside', used_name: 'endsinout', contract_up: 'EXPIRYRANGE', contract_up_name: 'Ends Between', contract_down: 'EXPIRYMISS', contract_down_name: 'Ends Outside' },
+								//{ display_name: 'Stays Between/Goes Outside', used_name: 'staysinout', contract_up: 'RANGE', contract_up_name: 'Stays Between', contract_down: 'UPORDOWN', contract_down_name: 'Goes Outside' },
+								{
+									display_name: 'In/Out', used_name: 'staysinout',
+									contract_up: ['RANGE', 'EXPIRYRANGE'], contract_up_name: 'Stays Between', contract_up_image: 'https://static.binary.com/images/pages/trade/stay-in-between_1.png',
+									contract_down: ['UPORDOWN', 'EXPIRYMISS'], contract_down_name: 'Goes Outside', contract_down_image: 'https://static.binary.com/images/pages/trade/stay-out_1.png'
+								},
+								{
+									display_name: 'Asians', used_name: 'asians',
+									contract_up: 'ASIANU', contract_up_name: 'Asian Up', contract_up_image: 'https://static.binary.com/images/pages/trade/asian-u_1.svg',
+									contract_down: 'ASIAND', contract_down_name: 'Asian Down', contract_down_image: 'https://static.binary.com/images/pages/trade/asian-d_1.svg'
+								},
+								{
+									display_name: 'Digits', used_name: 'digits',
+
+									contract_down: 'DIGITMATCH', contract_up_name: 'Matches', contract_up_image: 'https://static.binary.com/images/pages/trade/differs_1.svg',
+									contract_up: 'DIGITDIFF', contract_down_name: 'Differs', contract_down_image: 'https://static.binary.com/images/pages/trade/matches_1.svg'
+								},
 							]);
+							//st.each(records, function (name, index, recordsItSelf)
+							//{
+							//	debugger;
+							//});
 							setTabs(st, tabpanel);
 							tabpanel.doLayout();
 						}
@@ -924,154 +1285,7 @@ createChart = function (symbol_, chartType_, granularity_)
 						//			tabpanel.items.items[it].tab.activate();
 						//	}
 					},
-
 				}
-			},
-			{
-				xtype: 'splitter'
-			},
-			{
-				items: [
-				{
-					xtype: 'panel',
-					name: 'contract_buy_panel',
-					frame: true,
-					cmpCls: 'contract-panel',
-					title: 'Rise',
-					layout: 'vbox',
-					bodyPadding: 5,
-					items: [
-					Ext.create('Ext.Img',
-					{
-						src: 'https://static.binary.com/images/pages/trade/rise_1.png',
-						renderTo: Ext.getBody()
-					}),
-					{
-						layout: 'hbox',
-						items:
-						[
-							{
-								xtype: 'label', width: 40, name: 'currency_label', text: 'USD'
-							},
-							{
-								xtype: 'label', width: 50, name: 'price_label'
-							},
-							{
-								xtype: 'label', width: 200, name: 'longcode_label'
-							}
-						]
-					},
-					{
-						xtype: 'button',
-						text: 'Purchase',
-						contractType: 'DOUBLEUP',
-						duration_unit: 'day',
-						duration: 1,
-						style: 'margin-left: 10px;',
-						baseCls: 'binary_submit_button',
-						listeners: {
-							click: function (obj) { doPurchase(obj); }
-						}
-					}],
-					listeners:
-						{
-							render: function (panel)
-							{
-
-								var obj = panel.query('button')[0];
-								configureDuration(obj);
-								var data =
-								{
-									contract_type: obj.contractType,
-									symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
-									duration_unit: obj.duration_unit,
-									duration: obj.duration,
-									payout_currency: 'USD',
-									payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
-									start_time: 0//parseInt($("#start_time").val())
-								};
-								getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
-							}
-						},
-					dockedItems: [{
-						xtype: 'panel',
-						height: 10,
-						baseCls: 'purchase_docked_panel',
-						dock: 'bottom'
-					}],
-					flex: 2
-				},
-				{
-					xtype: 'splitter'
-				},
-				{
-					xtype: 'panel',
-					name: 'contract_buy_panel',
-					frame: true,
-					cmpCls: 'contract-panel',
-					title: 'Fall',
-					layout: 'vbox',
-					bodyPadding: 5,
-					items: [
-					Ext.create('Ext.Img',
-					{
-						src: 'https://static.binary.com/images/pages/trade/fall_1.png',
-						renderTo: Ext.getBody()
-					}),
-					{
-						layout: 'hbox',
-						items:
-						[
-							{
-								xtype: 'label', width: 40, name: 'currency_label', text: 'USD'
-							},
-							{
-								xtype: 'label', width: 50, name: 'price_label'
-							},
-							{
-								xtype: 'label', width: 200, name: 'longcode_label'
-							}
-						]
-					},
-					{
-						xtype: 'button',
-						text: 'Purchase',
-						contractType: 'DOUBLEDOWN',
-						duration_unit: 'day',
-						duration: 1,
-						style: 'margin-left: 10px;',
-						baseCls: 'binary_submit_button',
-						listeners: {
-							click: function (obj) { doPurchase(obj); }
-						}
-					}],
-					listeners:
-						{
-							render: function (panel)
-							{
-								var obj = panel.query('button')[0];
-								configureDuration(obj);
-								var data =
-								{
-									contract_type: obj.contractType,
-									symbol: (Ext.getCmp('ext_Symbol_market')) ? Ext.getCmp('ext_Symbol_market').getValue() : 'R_50',
-									duration_unit: obj.duration_unit,
-									duration: obj.duration,
-									payout_currency: 'USD',
-									payout: parseInt(Ext.ComponentQuery.query('[name=amount]')[0].getValue()),
-									start_time: 0//parseInt($("#start_time").val())
-								};
-								getPrice(data.contract_type, data.symbol, data.duration_unit, data.duration, data.payout_currency, data.payout, data.start_time, "show", panel);
-							}
-						},
-					dockedItems: [{
-						xtype: 'panel',
-						height: 10,
-						baseCls: 'purchase_docked_panel',
-						dock: 'bottom'
-					}],
-					flex: 2
-				}]
 			}]
 		});
 
@@ -1146,7 +1360,7 @@ createChart = function (symbol_, chartType_, granularity_)
 				{
 					id: 'ext_Symbol_market',
 					renderTo: 'ext_Symbol_div',
-					value: 'Random 50 Index',
+					value: 'R_50',
 					displayField: 'display_name',
 					valueField: 'symbol',
 					emptyText: 'Select symbol',
@@ -1744,21 +1958,20 @@ LiveChartTick.prototype.process_data = function (point)
 				epoch: parseInt(data_object.time),
 				quote: parseFloat(data_object.price)
 			};
-			//if (!this.config.to || tick.epoch <= this.config.to)
-			//{
-
 			this.chart.series[0].addPoint(
                 [tick.epoch * 1000, tick.quote], false, this.shift, false
             );
 			this.spot = tick.quote;
-			var spot_field = Ext.ComponentQuery.query('[name=tradePanel_container]')[0].down('[name=spot]');
-			spot_field.setValue(this.spot);
+			var tradePanel = Ext.ComponentQuery.query('[name=tradePanel_container]')[0];
+			if (tradePanel)
+			{
+				var spot_fields = tradePanel.query('[name=spot]');
+				if (spot_fields.length > 0)
+					for (var sp in spot_fields)
+						spot_fields[sp].setValue(this.spot);
+			}
 		}
 	}
-	//} else if (point[0] == 'contract')
-	//{
-	//	this.process_contract(point[1]);
-	//}
 };
 LiveChartTick.prototype.update_data = function (point)
 {
@@ -1780,20 +1993,27 @@ LiveChartTick.prototype.update_data = function (point)
 			this.config.repaint_indicators(this);//temp
 			this.chart.redraw();
 
-			var spot_field = Ext.ComponentQuery.query('[name=tradePanel_container]')[0].down('[name=spot]');
-			if (this.spot > tick.quote)
+			var spot_fields = Ext.ComponentQuery.query('[name=tradePanel_container]')[0].query('[name=spot]');
+			for (var sp in spot_fields)
 			{
-				spot_field.inputEl.addCls('red_field');
-				spot_field.inputEl.removeCls('blue_field');
-			}
-			else
-			{
-				spot_field.inputEl.addCls('blue_field');
-				spot_field.inputEl.removeCls('red_field');
-			}
+				var spot_field = spot_fields[sp];
 
-			this.spot = tick.quote;
-			spot_field.setValue(this.spot);
+				spot_field.setValue(this.spot);
+
+				if (this.spot > tick.quote)
+				{
+					spot_field.inputEl.addCls('red_field');
+					spot_field.inputEl.removeCls('blue_field');
+				}
+				else
+				{
+					spot_field.inputEl.addCls('blue_field');
+					spot_field.inputEl.removeCls('red_field');
+				}
+
+				this.spot = tick.quote;
+				spot_field.setValue(this.spot);
+			}
 		}
 	}
 	catch (e) { };
@@ -1818,6 +2038,29 @@ $(function ()
 {
 	getPrice = function (contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action, panel)
 	{
+		function showError(data)
+		{
+			var error_data_string = 'Unknown error';
+			try
+			{
+				error_data_string = (data.fault.faultstring) ? data.fault.faultstring.toString() : error_data_string
+			}
+			catch (ex)
+			{
+				error_data_string = (data.fault) ? data.fault.details[0].toString() : data.message.toString();
+			}
+
+			if (!Ext.getCmp('error_window'))
+				Ext.Msg.show({
+					id: 'error_window',
+					title: 'Error!',
+					msg: error_data_string,
+					width: 400,
+					buttons: Ext.Msg.OK,
+					icon: Ext.Msg.ERROR
+				});
+		}
+
 		if (action == "buy")
 		{
 			Binary.Api.Client.contract(function (data)
@@ -1835,30 +2078,27 @@ $(function ()
 				}
 				else
 				{
-					if (!Ext.getCmp('error_window'))
-						Ext.create('Ext.window.Window', { id: 'error_window', items: [{ width: 400, height: 350, html: data.fault.details[0].toString() }] }).show();
+					showError(data);
 				}
 			}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action);
 		}
 		else
 		{
-			//setInterval(function ()
-			//{
 			Binary.Api.Client.contract(function (data)
 			{
-				if (!data.fault)
+				if (!data.fault && !data.message)
 				{
+					var str = data.ask.toString();
 					panel.query('label[name=longcode_label]')[0].setText(data.longcode.toString());
-					panel.query('label[name=price_label]')[0].setText(data.ask.toString());
+					panel.query('label[name=price_label]')[0].setText(data.ask.toString().split('.', 1));
+					panel.query('label[name=price_label_upper]')[0].setText(str.substr(str.indexOf('.')));
 					panel.setLoading(false);
 				}
 				else
 				{
-					if (!Ext.getCmp('error_window'))
-						Ext.create('Ext.window.Window', { id: 'error_window', items: [{ width: 400, height: 350, html: data.fault.details[0].toString() }] }).show();
+					showError(data);
 				}
 			}, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, action);
-			//}, 2000);
 		}
 	}
 });

@@ -92,9 +92,9 @@
             border: none;
             border-radius: 3px 3px;
             background-color: #2e8836;
-            padding: 5px 20px !important;
+            padding: 8px 10px !important;
             color: white;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
         }
 
@@ -102,19 +102,73 @@
         {
             background-color: grey;
         }
+
+        .contract-buy-panel-title
+        {
+            margin-top: 10px !important;
+            font-weight: 600;
+        }        
+        .contract-buy-panel-price
+        {
+            font-weight: 600;
+        } 
+        .contract-buy-panel-price-upper
+        {
+            font-size: 65%;
+            vertical-align: text-top;
+            margin-left: -13px;
+            font-weight: 600;
+        } 
+        										
     </style>
 </head>
 <body>
-    <!-- <input type="text" value="1406701740" id="min_time"  />
-     <label for="min_time">Start time (unix timestamp)</label>
-    <input type="text" value="1406721740" id="max_time"  />
-    <label for="max_time">End time (unix timestamp)</label>-->
+
     <div id="ext_daterange"></div>
     <button style="display: none;" onclick="$(function() { updateDatesFromConfig();})">Show</button>
 
     <script>
         Ext.onReady(function ()
-        {
+        {           
+            Ext.define('PrecisionNumberfield', {
+                extend: 'Ext.form.NumberField',
+                alias: 'widget.precisionNumberfield',
+                initComponent: function ()
+                {
+                    this.callParent(arguments);
+                },
+                setValue: function (v)
+                {
+                    v = typeof v == 'number' ? v : String(v).replace(this.decimalSeparator, ".");
+                    v = isNaN(v) ? '' : String(v).replace(".", this.decimalSeparator);
+                    v = isNaN(v) ? '' : this.fixPrecision(String(v).replace(".", this.decimalSeparator));
+                    return Ext.form.NumberField.superclass.setRawValue.call(this, v);
+                },
+                onSpinUp: function ()
+                {
+                    var me = this;
+                    if (!me.readOnly)
+                    {
+                        var val = parseFloat(me.step);
+                        if (me.getValue() !== '')
+                        {
+                            val = parseFloat(me.getValue());
+                            me.setValue((val + parseFloat(me.step)));
+                        }
+                    }
+                },
+                fixPrecision: function (value)
+                {
+
+                    var nan = isNaN(value);
+                    if (!this.allowDecimals || this.decimalPrecision == -1 || nan || !value)
+                    {
+                        return nan ? '' : value;
+                    }
+                    return parseFloat(value).toFixed(this.decimalPrecision);
+                }
+            });
+
             Ext.create('Ext.container.Container',
             {
                 id: 'ext_LiveChart_container',
