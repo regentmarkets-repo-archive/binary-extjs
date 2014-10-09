@@ -111,9 +111,12 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg("/payout_currencies", callback);
 	};
 
-	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high)
+	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, callType, barrier_low, barrier_high)
 	{
-		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false);
+		var CallType = callType || "info";
+		if (!barrier_low) barrier_low = 'S0P';
+		if (!barrier_high) barrier_high = 'S0P';
+		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: CallType });
 	};
 
 	this.account = function (callback)
