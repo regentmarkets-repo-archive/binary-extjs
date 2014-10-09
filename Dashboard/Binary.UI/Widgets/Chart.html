@@ -92,7 +92,7 @@
             border: none;
             border-radius: 3px 3px;
             background-color: #2e8836;
-            padding: 8px 10px !important;
+            padding: 8px 10px;
             color: white;
             font-weight: 800;
             cursor: pointer;
@@ -107,19 +107,62 @@
         {
             margin-top: 10px !important;
             font-weight: 600;
-        }        
+        }
+
         .contract-buy-panel-price
         {
             font-weight: 600;
-        } 
+        }
+
         .contract-buy-panel-price-upper
         {
             font-size: 65%;
             vertical-align: text-top;
             margin-left: -13px;
             font-weight: 600;
-        } 
-        										
+        }
+
+        .trade-confirm-window  .x-window-body, .x-window-default
+        {
+            border: 1px solid #eb6420 !important;
+            border-radius: 0px 0px !important;
+            background-color: #f2f2f2 !important;
+        }
+
+        .x-panel .trade-panel-inner .x-panel-default
+        {
+             background-color: #f2f2f2 !important;
+        }
+
+        .trade-panel-inner .x-panel-body
+        {
+             background-color: #f2f2f2 !important;
+        }
+
+        .header-trade-confirm-window
+        {
+            background: #eb6420 !important;
+            border: none !important;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .header-bold
+        {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .x-window-header-default .x-tool-img
+        {
+             background: url('../Scripts/images/tools/tool-sprites.png') !important;
+        }
+
+        .trade-confirm-longcode
+        {
+            background-color: white;
+            border: 2px solid grey;
+        }
     </style>
 </head>
 <body>
@@ -129,7 +172,7 @@
 
     <script>
         Ext.onReady(function ()
-        {           
+        {
             Ext.define('PrecisionNumberfield', {
                 extend: 'Ext.form.NumberField',
                 alias: 'widget.precisionNumberfield',
@@ -291,8 +334,8 @@
         });
     </script>
     <br />
-    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier"/>
-    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier"/>
+    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
+    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
     <button id="show_spot">Show spot</button><br />
 
     <table>

@@ -230,7 +230,29 @@ LiveChart.prototype = {
 					load: function ()
 					{
 						window.chartCreated = true;
-						//if (window.chartCreated) window.chartCreated(this);
+						var me = this;
+						Binary.Api.Client.account.statement(function (statement_data)
+						{
+							me.addSeries(
+							{
+								id: 'eventFlagsSeries',
+								type: 'flags',
+								onSeries: 'dataseries',
+								shape: 'circlepin'
+							}, true);
+							var dat = [];
+							for (var i in statement_data.transactions)
+							{
+								var obj =
+								{
+									x: statement_data.transactions[i].transaction_time * 1000,
+									title: 'C',
+									text: statement_data.transactions[i].amount
+								};
+								dat.push(obj);
+							};
+							me.get('eventFlagsSeries').setData(dat);
+						});
 					}
 				}
 			},
@@ -252,7 +274,8 @@ LiveChart.prototype = {
 			plotOptions:
 			{
 				series:
-				{
+				[{
+					id: 'dataseries',
 					animation: false,
 					dataGrouping:
 					{
@@ -273,7 +296,7 @@ LiveChart.prototype = {
 						enabled: false//this.config.with_markers,
 						//radius: 2,
 					},
-				},
+				}],
 				candlestick:
 				{
 					turboThreshold: 3000
@@ -705,6 +728,7 @@ createChart = function (symbol_, chartType_, granularity_)
 											{
 												xtype: 'combo',
 												name: 'duration_units',
+												width: 70,
 												queryMode: 'local',
 												store: ['days', 'hours', 'minutes', 'seconds'],
 												displayField: 'duration_units',
@@ -749,60 +773,54 @@ createChart = function (symbol_, chartType_, granularity_)
 										{
 											layout: 'hbox',
 											name: 'offset',
-											defaults: {
+											defaults:
+											{
 												width: 160,
 												margin: '5px 5px'
 											},
-											listeners:
-											{
-												hide: function (obj)
+											items:
+											[
 												{
-													//Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = 'S0P'
-													//Ext.ComponentQuery.query('[name=contract_buy_panel]')[0].down('button').barrier_low_offset = 'S0P'
-												}
-											},
-											items: [
-											{
-												xtype: 'precisionNumberfield',
-												fieldLabel: 'Barrier:',
-												name: 'barrier_offset',
-												labelWidth: 85,
-												value: '0.0000',
-												decimalPrecision: 4,
-												step: 0.0001,
-												listeners:
-												{
-													render: function ()
+													xtype: 'precisionNumberfield',
+													fieldLabel: 'Barrier:',
+													name: 'barrier_offset',
+													labelWidth: 85,
+													value: '0.0000',
+													decimalPrecision: 4,
+													step: 0.0001,
+													listeners:
 													{
-														if (this.up('tabpanel').getActiveTab().title == 'Touch/No Touch')
+														render: function ()
 														{
-															this.setValue('13.0043');
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-														}
-													},
-													spin:
-													{
-														fn: function (obj, direction, eOpts)
-														{
-															var s_o = this.up().down('[name=spot_offset]');
-															var spot = this.up().up().down('[name=spot]');
-															s_o.setRawValue(Ext.util.Format.number(parseFloat(spot.getValue()) + parseFloat(this.getValue()), '0.0000'));
-															//function setBarriers(val)
-															//{
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-															//}
-															//TIP - buffer alternate
-															//if (direction == "up")
-															//	setBarriers(1);
-															//else
-															//	setBarriers(-1)
+															if (this.up('tabpanel').getActiveTab().title == 'Touch/No Touch')
+															{
+																this.setValue('13.0043');
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+															}
 														},
-														buffer: 300
+														spin:
+														{
+															fn: function (obj, direction, eOpts)
+															{
+																var s_o = this.up().down('[name=spot_offset]');
+																var spot = this.up().up().down('[name=spot]');
+																s_o.setRawValue(Ext.util.Format.number(parseFloat(spot.getValue()) + parseFloat(this.getValue()), '0.0000'));
+																//function setBarriers(val)
+																//{
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+																//}
+																//TIP - buffer alternate
+																//if (direction == "up")
+																//	setBarriers(1);
+																//else
+																//	setBarriers(-1)
+															},
+															buffer: 300
+														}
 													}
-												}
-											},
+												},
 											{
 												xtype: 'field',
 												name: 'spot_offset',
@@ -812,41 +830,43 @@ createChart = function (symbol_, chartType_, granularity_)
 										},
 										{
 											name: 'barriers',
-											defaults: {
+											defaults:
+											{
 												width: 160,
 												margin: '5px 5px',
 												decimalPrecision: 4,
 												step: 0.0001
 											},
-											items: [
-											{
-												xtype: 'precisionNumberfield',
-												fieldLabel: 'High barrier:',
-												name: 'barrier_high',
-												labelWidth: 85,
-												value: '0.0000',
-												listeners:
+											items:
+											[
 												{
-													render: function ()
+													xtype: 'precisionNumberfield',
+													fieldLabel: 'High barrier:',
+													name: 'barrier_high',
+													labelWidth: 85,
+													value: '0.0000',
+													listeners:
 													{
-														if (this.up('tabpanel').getActiveTab().title == 'In/Out')
+														render: function ()
 														{
-															this.setValue('0.4719');
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
-														}
-													},
-													spin:
-													{
-														fn: function (obj, direction, eOpts)
-														{
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', this.getValue() * 1000);
-															this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', this.getValue() * 1000);
+															if (this.up('tabpanel').getActiveTab().title == 'In/Out')
+															{
+																this.setValue('0.4719');
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', (this.getValue() * 10000));
+															}
 														},
-														buffer: 300
+														spin:
+														{
+															fn: function (obj, direction, eOpts)
+															{
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[0].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', this.getValue() * 1000);
+																this.up('tabpanel').getActiveTab().query('[name=contract_buy_panel]')[1].down('button').barrier_high_offset = Ext.util.Format.format('S{0}P', this.getValue() * 1000);
+															},
+															buffer: 300
+														}
 													}
-												}
-											},
+												},
 											{
 												xtype: 'precisionNumberfield',
 												fieldLabel: 'Low barrier:',
@@ -937,7 +957,8 @@ createChart = function (symbol_, chartType_, granularity_)
 											{
 												xtype: 'field',
 												name: 'amount',
-												value: '20'
+												value: '20',
+												width: 70
 											}]
 										},
 										{
@@ -2233,18 +2254,201 @@ $(function ()
 
 		if (action == "buy")
 		{
+			var display_payout = payout;
+
 			Binary.Api.Client.contract(function (data)
 			{
 				var d = data;
 				var html = "";
+				//data =
+				//{
+				//	detail: 'contract has been purchased',
+				//	transaction_id: '4254745568',
+				//	longcode: 'USD 2.00 payout if Random 50 Index is strictly higher than entry spot at close on 2014-10-08.',
+				//	price: '1.02'
+				//};
+
+
 				if (!data.fault)
 				{
-					for (var item in data)
+					//for (var item in data)
+					//{
+					//	var data_str = "<p>" + item.toString() + ":" + data[item].toString() + "</p>";
+					//	html = html.concat(data_str);
+					//};
+					//Ext.create('Ext.window.Window', { items: [{ width: 400, height: 350, html: html }] }).show();
+
+					Ext.create('Ext.window.Window',
 					{
-						var data_str = "<p>" + item.toString() + ":" + data[item].toString() + "</p>";
-						html = html.concat(data_str);
-					};
-					Ext.create('Ext.window.Window', { items: [{ width: 400, height: 350, html: html }] }).show();
+						cmpCls: 'trade-confirm-window',
+						width: 220,
+						height: 320,
+						header:
+						{
+							title: 'Trade Confirmation',
+							frame: false,
+							tools:
+							[
+								{
+									type: 'close',
+									handler: function ()
+									{
+										this.up('window').destroy();
+									}
+								}
+							],
+							cmpCls: 'header-trade-confirm-window'
+						},
+						collapsible: false,
+						bodyPadding: '10px',
+						layout: 'vbox',
+						defaults: { height: 40 },
+						items:
+						[
+							{
+								xtype: 'label',
+								listeners:
+								{
+									render: function () { this.setText(Ext.String.capitalize(data.detail.toString())); }
+								}
+							},
+							{
+								height: 60,
+								width: 200,
+								cls: 'trade-confirm-longcode',
+								items:
+								[
+									{
+										xtype: 'label',
+										name: 'confirm_longcode',
+										listeners:
+										{
+											render: function () { this.setText(data.longcode.toString()); }
+										}
+									}
+								]
+							},
+							{
+								xtype: 'panel',
+								width: 200,
+								height: 60,
+								cls: 'trade-panel-inner',
+								layout: 'column',
+								items:
+								[
+									{
+										columnWidth: 0.35,
+										items:
+										[
+											{
+												cls: 'trade-panel-inner',
+												style: 'text-align: center; font-weight: 600; padding-bottom: 10px; background-color: #f2f2f2 !important;',
+												html: 'Potential payout',
+											},
+											{
+												xtype: 'label',
+												name: 'confirm_payout',
+												style: 'padding-left: 18px !important; background-color: #f2f2f2 !important;',
+												listeners:
+												{
+													afterrender: function ()
+													{
+														this.setText(parseFloat(display_payout).toFixed(2).toString());
+													}
+												}
+											}
+										]
+									},
+									{
+										columnWidth: 0.3,
+										items:
+										[
+											{
+												html: '<div style="color: orange !important; font-weight: 600; padding-bottom: 10px;">Total </br >Cost</div>',
+												style: 'text-align: center; padding: 0px 10px !important; border-right: 1px solid black; border-left: 1px solid black;',
+											},
+											{
+												xtype: 'label',
+												name: 'confirm_price',
+												style: 'color: orange !important; padding-left: 18px !important;',
+												listeners:
+												{
+													afterrender: function ()
+													{
+														this.setText(data.price.toString());
+													}
+												}
+											}
+										]
+									},
+									{
+										columnWidth: 0.35,
+										items:
+										[
+											{
+												style: 'text-align: center; font-weight: 600; padding-bottom: 10px;',
+												html: 'Potential profit',
+											},
+											{
+												xtype: 'label',
+												name: 'confirm_profit',
+												style: 'padding-left: 18px !important;',
+												listeners:
+												{
+													afterrender: function ()
+													{
+														this.setText((parseFloat(display_payout) - parseFloat(data.price)).toString());
+													}
+												}
+											}
+										]
+									}
+								],
+							},
+							{
+								html: 'You transaction reference </br> number is',
+								baseCls: 'background-color: grey !important;',
+								name: 'confirm_reference',
+								margin: 10,
+								listeners:
+								{
+									beforerender: function ()
+									{
+										this.html = this.html + Ext.util.Format.format(' {0}', data.transaction_id.toString());
+									}
+								},
+								cls: 'header-bold'
+							},
+							{
+								layout:
+								{
+									type: 'hbox',
+									pack: 'center',
+									align: 'middle'
+								},
+								cls: 'trade-panel-inner',
+								width: 200,
+								items:
+								[
+									{
+										xtype: 'button',
+										name: 'confirm_button',
+										text: 'VIEW',
+										height: 35,
+										baseCls: 'binary_submit_button',
+										listeners:
+										{
+											click: function ()
+											{
+												this.setLoading();
+											}
+										}
+
+									}
+								]
+							}
+						]
+					}).show();
 				}
 				else
 				{
