@@ -8,7 +8,7 @@
 		{
 			"Height": "640px",
 			"Collapsed": false,
-			"Title": "Chart",
+			"Title": "Trade",
 			"IFrame": true,
 			"Url": "/Widgets/Chart.html",
 			"PreventExpandable": false,
@@ -23,7 +23,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Forex",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -36,7 +36,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Indices",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -49,7 +49,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Stocks",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=stocks&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=stocks&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -62,7 +62,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Commodities",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=commodities&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=commodities&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -75,7 +75,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Sectors",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -88,7 +88,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Randoms",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -101,7 +101,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Asset Index - Smarties",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/AssetIndex?language=en&market=smarties&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/AssetIndex?language=en&market=smarties&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/asset_index.png"
 		}
@@ -114,7 +114,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Forex",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=forex&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -127,7 +127,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Indices",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -140,7 +140,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Commodities",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=indices&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -153,7 +153,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Sectors",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -166,7 +166,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Randoms",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=random&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -179,7 +179,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Trading Times - Smarties",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&date=2014-09-03&",
+			"Url": "http://localhost:57842/Tradingtimes?language=en&market=sectors&markets[0]=forex&markets[1]=indices&markets[2]=stocks&markets[3]=commodities&markets[4]=sectors&markets[5]=random&markets[6]=smarties&date=2014-09-03&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/trading_times.png"
 		}
@@ -192,7 +192,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Pricing Table",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/Pricingtable?language=en&bet_type=CALL&underlying=frxXAUUSD&currency=USD&low_strike=92.313&strike_step=1&strike_type=Moneyness terms&from_strike=95&expiry_step=Daily&from_expiry=2014-09-02&action=price&",
+			"Url": "http://localhost:57842/Pricingtable?language=en&bet_type=CALL&underlying=frxXAUUSD&currency=USD&low_strike=92.313&strike_step=1&strike_type=Moneyness terms&from_strike=95&expiry_step=Daily&from_expiry=2014-09-02&action=price&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/pricing_table.png"
 		}
@@ -205,7 +205,7 @@
 			"Collapsed": false,
 			"Title": "Resources: Rise/Fall",
 			"IFrame": true,
-			"Url": "http://195.24.133.198/RiseFall?language=en&date_start=now&duration_amount=5&duration_units=t&currency=USD&table_action=price&",
+			"Url": "http://localhost:57842/RiseFall?language=en&date_start=now&duration_amount=5&duration_units=t&currency=USD&table_action=price&",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/pricing_table.png"
 		}
