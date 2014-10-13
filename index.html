@@ -5,7 +5,7 @@
     <title>DashboardDemo</title>
 
     
-	<script src="Scripts/ext-all-debug-w-comments.js"></script>    
+	<script src="Scripts/ext-all.js"></script>    
 	<script src="Scripts/ext-theme-neptune.js"></script>
 	<link href="Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
 	<script src="Scripts/jquery-1.9.1.js"></script>
@@ -39,12 +39,22 @@
 		Ext.onReady(function ()
 		{
 			Ext.Loader.setConfig({ enabled: true });
-			//'http://localhost:57842'
-			//"http://195.24.133.198"
+			var proxyUrl = "http://localhost:57842";//"http://195.24.133.198";
 			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
+			var componentsUpdate = function ()
+			{
+				window.Dashboard.getComponents().each(function (component)
+				{
+					if (component.data.Options.Url.indexOf("{proxyUrl}")>-1)
+					{
+						component.data.Options.Url = component.data.Options.Url.replace("{proxyUrl}", proxyUrl);
+					}
+				});
+			};
+			Ext.app.Mediator.on("componentsLoaded", componentsUpdate);
 			Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
 
-			Binary.Api.Manager = new window.Binary.Api.ManagerClass("http://localhost:57842");
+			Binary.Api.Manager = new window.Binary.Api.ManagerClass(proxyUrl);
 			Binary.Api.Manager.BeginProcessing();
 		});
 	</script>

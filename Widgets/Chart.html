@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-    <script src="../Scripts/ext-all-debug-w-comments.js"></script>
+    <script src="../Scripts/ext-all.js"></script>
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js?v=5b"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
@@ -100,7 +100,10 @@
 
         .purchase_docked_panel
         {
-            background-color: grey;
+            background-color: #dedede;
+            padding-top: 3px;
+            font-size: 12px;
+            color: grey;
         }
 
         .contract-buy-panel-title
@@ -118,7 +121,6 @@
         {
             font-size: 65%;
             vertical-align: text-top;
-            margin-left: -13px;
             font-weight: 600;
         }
 
@@ -221,7 +223,7 @@
             Ext.create('Ext.container.Container',
             {
                 margin: '0px 0px 0px -5px',
-                renderTo: 'ext_daterange',
+                //renderTo: 'ext_daterange',
                 items:
                 [
                     {
@@ -334,10 +336,11 @@
         });
     </script>
     <br />
+	<!--
     <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
     <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
     <button id="show_spot">Show spot</button><br />
-
+	-->
     <table>
         <tr>
             <td id="ext_ChartType_div"></td>
