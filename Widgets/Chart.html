@@ -8,7 +8,7 @@
     <script src="../Scripts/jquery-1.9.1.js"></script>
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js?v=5b"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
@@ -221,7 +221,7 @@
             Ext.create('Ext.container.Container',
             {
                 margin: '0px 0px 0px -5px',
-                renderTo: 'ext_daterange',
+                //renderTo: 'ext_daterange',
                 items:
                 [
                     {
@@ -334,10 +334,11 @@
         });
     </script>
     <br />
+	<!--
     <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
     <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
     <button id="show_spot">Show spot</button><br />
-
+	-->
     <table>
         <tr>
             <td id="ext_ChartType_div"></td>
