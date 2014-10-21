@@ -117,6 +117,22 @@ Binary.Api.ClientClass = function (autoStart)
 		if (!barrier_low) barrier_low = 'S0P';
 		if (!barrier_high) barrier_high = 'S0P';
 		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: CallType });
+
+		//var CallType = callType || "info";
+		//if (!barrier_low) barrier_low = 'S0P';
+		//if (!barrier_high) barrier_high = 'S0P';
+
+		//var url = String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high);
+		//var data =
+		//{
+		//	apiMethod: url,
+		//	callback: callback,
+		//	intervalCallback: function (params)
+		//	{
+		//		postMsg(params.apiMethod, params.callback, false, { callType: CallType });
+		//	}
+		//};
+		//this.addInterval(data);
 	};
 
 	this.account = function (callback)

@@ -1,13 +1,13 @@
 ﻿/// <reference path="Binary.Core.js" />
 
 ns("Binary.Api");
-Binary.Api.ManagerClass=function(proxyUrl)
+Binary.Api.ManagerClass = function (proxyUrl)
 {
 	var me = this;
 	var currentToken = false;
 	me.getToken = function ()
 	{
-		if (currentToken===false)
+		if (currentToken === false)
 		{
 			var storedAuthInfo = window.localStorage.getItem("OAuthInfo");
 			currentToken = storedAuthInfo ? JSON.parse(storedAuthInfo) : null;
@@ -71,6 +71,45 @@ Binary.Api.ManagerClass=function(proxyUrl)
 					}
 					listener.firing = false;
 				}
+			},
+			error: function (x, exception, errorThrown)
+			{
+				var message;
+				var statusErrorMap = {
+					'400': "Server understood the request but request content was invalid.",
+					'401': "Unauthorised access.",
+					'403': "Forbidden resouce can't be accessed",
+					'500': "Internal Server Error.",
+					'503': "Service Unavailable"
+				};
+				if (x.status && x.status != '200')
+				{
+					message = statusErrorMap[x.status];
+					if (!message)
+					{
+						message = "Unknow Error \n.";
+					}
+				} else if (exception == 'parsererror')
+				{
+					message = "Error.\nParsing JSON Request failed.";
+				} else if (exception == 'timeout')
+				{
+					message = "Request Time out.";
+				} else if (exception == 'abort')
+				{
+					message = "Request was aborted by the server";
+				} else
+				{
+					message = "Unknow Error \n.";
+				}
+				Ext.Msg.show(
+				{
+					title: 'Error!',
+					msg: message,
+					width: 400,
+					buttons: Ext.Msg.OK,
+					icon: Ext.Msg.ERROR
+				});
 			},
 			contentType: 'application/json'
 		});
