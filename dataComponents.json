@@ -16,6 +16,19 @@
 		}
 	},	
 	{
+		"ID": 24,
+		"Options":
+		{
+			"Height": "640px",
+			"Collapsed": false,
+			"Title": "Contract",
+			"IFrame": true,
+			"Url": "/Widgets/Contract.html",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/contract.png"
+		}
+	},
+	{
 		"ID": 45,
 		"Options":
 		{

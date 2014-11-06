@@ -13,8 +13,7 @@
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
-    <script src="../Widgets/Contracts.js?v=3"></script>
-    <script src="../Widgets/LiveChart.js?v=8"></script>
+    <script src="../Widgets/Contracts.js"></script>
     <style>
         body
         {
@@ -164,7 +163,6 @@
         {
             background-color: white;
             border: 2px solid grey;
-            padding: 5px;
         }
     </style>
 </head>
@@ -213,12 +211,6 @@
                     }
                     return parseFloat(value).toFixed(this.decimalPrecision);
                 }
-            });
-
-            Ext.create('Ext.container.Container',
-            {
-                id: 'ext_LiveChart_container',
-                renderTo: 'LiveChart_container'
             });
 
             Ext.create('Ext.container.Container',
@@ -287,6 +279,7 @@
                     }
                 ]
             });
+
             Ext.create('Ext.data.Store', {
                 id: 'offeringsStore',
                 model: Ext.define('Offerings',
@@ -300,26 +293,33 @@
                 }
             });
         });
+
+
+
+        Binary.Markets = Binary.Markets || {};
+
+        Binary.Api.Client.markets(function (data_)
+        {
+            for (var k in data_.markets)
+            {
+                if (data_.markets[k] != 'prototype' && data_.markets[k] != 'futures')
+                {
+                    Binary.Markets[k] = {};
+                    Binary.Markets[k].name = data_.markets[k];
+                    Binary.Markets[k].symbols = [];
+                    Binary.Markets[k].contract_categories = [];
+                }
+            }
+            build_market_select();
+        });
+
     </script>
     <script src="Mediator.js"></script>
     <script src="Comboboxes.js"></script>
     <script>
         Binary = Binary || {};
         Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
-
-        $(function ()
-        {
-            createChart('R_50', 'ticks', 'M10');
-            $(".interval-buttons button").click(function ()
-            {
-                $(".interval-buttons button").removeClass('current_range');
-                changeResolution($(this).attr("data-val"));
-                $(this).toggleClass('current_range');
-            });
-        });
     </script>
-
-    <br />
     <!--
     <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
     <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
@@ -332,23 +332,6 @@
             <td id="ext_Symbol_div"></td>
         </tr>
     </table>
-
-    <div class="interval-buttons">
-        <button data-val="M10" class="current_range">10min</button>
-        <button data-val="H1">1h</button>
-        <button data-val="H6">6h</button>
-        <button data-val="H12">12h</button>
-        <button data-val="D">1d</button>
-        <button data-val="D2">2d</button>
-        <button data-val="D5">5d</button>
-        <button data-val="W">1w</button>
-        <button data-val="W2">2w</button>
-        <button data-val="M">1m</button>
-        <button data-val="M3">3m</button>
-        <button data-val="Y">1y</button>
-    </div>
-    <div id="LiveChart_loading" class="hidden" style="min-width: 310px; height: 310px; margin: 0 auto">loading...</div>
-    <div id="LiveChart_container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 
     <!--<fieldset>
         <legend>Contract negotiation</legend>
