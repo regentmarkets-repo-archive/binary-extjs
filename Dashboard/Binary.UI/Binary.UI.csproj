@@ -122,10 +122,14 @@
   <ItemGroup>
     <Content Include="widget.html" />
     <Content Include="Widgets\Chart.html" />
+    <Content Include="Widgets\Chart.js" />
     <Content Include="Widgets\ChartBarrier.js" />
     <Content Include="Widgets\Contracts.js" />
+    <Content Include="Widgets\LiveChartOH.js" />
     <Content Include="Widgets\LiveChart.js" />
     <Content Include="Widgets\Localize.js" />
+    <Content Include="Widgets\Contract.html" />
+    <Content Include="Widgets\MarketSelector.js" />
     <None Include="..\..\Dashboard\Ext.Dashboard\Scripts\ext-all-debug-w-comments.js">
       <Link>Scripts\ext-all-debug-w-comments.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

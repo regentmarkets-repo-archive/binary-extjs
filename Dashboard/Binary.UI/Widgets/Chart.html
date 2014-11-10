@@ -14,7 +14,7 @@
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js?v=3"></script>
-    <script src="../Widgets/LiveChart.js?v=8"></script>
+    <script src="../Widgets/LiveChart.js?v=9"></script>
     <style>
         body
         {
@@ -291,15 +291,14 @@
     </script>
 	<div id="marketSelector"></div>
     <script src="Mediator.js"></script>
-    <script src="Comboboxes.js"></script>
+    <script src="MarketSelector.js"></script>
     <script>
         Binary = Binary || {};
-        Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
-
         $(function ()
         {
+        	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
         	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
-            //createChart('R_50', 'ticks', 'M10');
+            createChart('R_50', 'ticks', 'M10');
             $(".interval-buttons button").click(function ()
             {
                 $(".interval-buttons button").removeClass('current_range');

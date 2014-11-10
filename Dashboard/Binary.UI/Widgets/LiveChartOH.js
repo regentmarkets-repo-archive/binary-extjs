@@ -1053,11 +1053,11 @@ LiveChartTick.prototype.configure_series = function (chart_params)
 	{
 		name: this.config.symbol,// TODO: add real symbol name as translated_display_name()
 		data: [],
-		id: 'primary_series',
 		dataGrouping:
 		{
 			enabled: false
 		},
+		id: 'primary_series',
 		tooltip:
 		{
 			xDateFormat: "%A, %b %e, %H:%M:%S GMT"
