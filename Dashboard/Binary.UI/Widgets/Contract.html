@@ -279,46 +279,17 @@
                     }
                 ]
             });
-
-            Ext.create('Ext.data.Store', {
-                id: 'offeringsStore',
-                model: Ext.define('Offerings',
-                {
-                    extend: 'Ext.data.Model',
-                    fields: ['market', { name: 'submarket', type: 'string' }, { name: 'symbol', type: 'string' }, { name: 'contract_category', type: 'string' }]
-                }),
-                proxy: {
-                    type: 'memory',
-                    reader: { type: 'array', root: 'offerings' }
-                }
-            });
         });
-
-
-
-        Binary.Markets = Binary.Markets || {};
-
-        Binary.Api.Client.markets(function (data_)
-        {
-            for (var k in data_.markets)
-            {
-                if (data_.markets[k] != 'prototype' && data_.markets[k] != 'futures')
-                {
-                    Binary.Markets[k] = {};
-                    Binary.Markets[k].name = data_.markets[k];
-                    Binary.Markets[k].symbols = [];
-                    Binary.Markets[k].contract_categories = [];
-                }
-            }
-            build_market_select();
-        });
-
     </script>
     <script src="Mediator.js"></script>
-    <script src="Comboboxes.js"></script>
+    <script src="MarketSelector.js"></script>
     <script>
         Binary = Binary || {};
         Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
+        $(function ()
+        {
+        	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
+        });
     </script>
     <!--
     <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
