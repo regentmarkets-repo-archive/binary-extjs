@@ -456,14 +456,6 @@ createChart = function (symbol_, chartType_, granularity_)
 	minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
 	var liveChartsFromDT, liveChartsToDT, liveChartConfig = {};
 
-	$(function ()
-	{
-		updateDatesFromConfig = function (config)
-		{
-			live_chart.update_interval($("#min_time").val(), $("#max_time").val());
-		};
-	});
-
 	changeResolution = function (res)
 	{
 		var chartToShow = live_chart;

@@ -456,14 +456,6 @@ createChart = function (symbol_, chartType_, granularity_)
 	minDT.setUTCFullYear(minDT.getUTCFullYear - 3);
 	var liveChartsFromDT, liveChartsToDT, liveChartConfig = {};
 
-	$(function ()
-	{
-		updateDatesFromConfig = function (config)
-		{
-			live_chart.update_interval($("#min_time").val(), $("#max_time").val());
-		};
-	});
-
 	changeResolution = function (res)
 	{
 		var chartToShow = live_chart;
@@ -673,9 +665,8 @@ createChart = function (symbol_, chartType_, granularity_)
 		liveChartConfig = new LiveChartConfig({
 			//renderTo: 'live_chart_div',
 		});
-		configure_livechart();
+		//configure_livechart();
 		show_chart_for_instrument(data, symbol, chartType, granularity);
-		//updateDatesFromConfig(liveChartConfig);
 		//var barrier = new LiveChartIndicator.Barrier({ name: "spot", value: "+0" });
 		//live_chart.add_indicator(barrier);
 		//setInterval(function ()

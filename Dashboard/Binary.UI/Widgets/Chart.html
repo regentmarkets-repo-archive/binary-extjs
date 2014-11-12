@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-    <script src="../Scripts/ext-all.js"></script>
+    <script src="../Scripts/ext-all-debug-w-comments.js"></script>
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
@@ -14,7 +14,7 @@
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js?v=3"></script>
-    <script src="../Widgets/LiveChart.js?v=9"></script>
+    <script src="../Widgets/LiveChart1.js?v=9"></script>
     <style>
         body
         {
@@ -292,14 +292,16 @@
 	<div id="marketSelector"></div>
     <script src="Mediator.js"></script>
     <script src="MarketSelector.js"></script>
+	<script src="Chart.js"></script>
     <script>
         Binary = Binary || {};
         $(function ()
         {
-        	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
+        	//Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
         	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
-            createChart('R_50', 'ticks', 'M10');
-            $(".interval-buttons button").click(function ()
+        	var chart = new Binary.Charting.ChartClass('R_50', 'ticks', 'M10', 'LiveChart_container');
+            //createChart('R_50', 'ticks', 'M10');
+            $(".interval-buttons button").click(function ()                                                                                                                                                                                                                                                                                                                                                                                     
             {
                 $(".interval-buttons button").removeClass('current_range');
                 changeResolution($(this).attr("data-val"));

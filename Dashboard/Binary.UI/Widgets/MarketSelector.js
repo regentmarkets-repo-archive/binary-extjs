@@ -135,7 +135,12 @@ Binary.MarketSelectorClass = function (el)
 					{
 						change: function (combo, value)
 						{
-							Binary.Mediator.fireEvent('symbolChanged', value);
+							Binary.Mediator.fireEvent('symbolChanged', 
+							{
+								market: marketSelector.getValue(),
+								subMarket: submarketSelector.getValue(),
+								symbol: symbolSelector.getValue()
+							});
 						}
 					}
 				})
