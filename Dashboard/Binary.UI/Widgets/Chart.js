@@ -6,22 +6,151 @@ Binary.Charting.ChartType =
 	Tick:
 	{
 		name: 'tick',
-		chart: {}
+		chart: {},
+		setPoint: function ()
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			this.chart.series[0].addPoint([point.x, point.y], false, false, false);
+		}
 	},
 	ClosingPrice:
 	{
 		name: 'closing',
-		chart: {}
+		chart: {},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			point.y = point.close;
+			chart.series[0].addPoint(point, false, false, false);
+		}
 	},
 	Prices:
 	{
 		name: 'prices',
-		chart: {}
+		chart:
+		{
+			type: 'ohlc',
+			series:
+			[
+				{
+					type: 'ohlc',
+					color: 'red',
+					upColor: 'green'
+				}
+			],
+		},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			chart.series[0].addPoint(point, false, false, false);
+		}
 	},
-	Candles: 'candles',
-	Median: 'median',
-	Typical: 'typical',
-	Weighted: 'weighted'
+	Candles:
+	{
+		name: 'candles',
+		chart:
+		{
+			type: 'candlestick',
+			series:
+			[
+				{
+					type: 'candlestick',
+					color: 'red',
+					upColor: 'green'
+				}
+			]
+		},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			chart.series[0].addPoint(point, false, false, false);
+		}
+	},
+	Median:
+	{
+		name: 'median',
+		chart: {},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			point.y = (point.high + point.low) / 2;
+			chart.series[0].addPoint(point, false, false, false);
+		}
+	},
+	Typical:
+	{
+		name: 'typical',
+		chart: {},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			point.y = (point.high + point.low + point.close) / 3;
+			chart.series[0].addPoint(point, false, false, false);
+		}
+	},
+	Weighted:
+	{
+		name: 'weighted',
+		chart: {},
+		setPoint: function (pointData, chart)
+		{
+			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
+			point.y = (point.high + point.low + point.close*2) / 4;
+			chart.series[0].addPoint(point, false, false, false);
+		}
+	},
+	GetCandlePoint: function(pointData)
+	{
+		var point =
+		{
+			x: parseInt(pointData.time) * 1000,
+			open: parseFloat(pointData.open),
+			y: parseFloat(pointData.open),
+			high: parseFloat(pointData.high),
+			low: parseFloat(pointData.low),
+			close: parseFloat(pointData.close)
+		};
+		return point;
+	},
+	Configure: function(chartTypeName, title, chartParams)
+	{
+		chartParams.chart.type = 'line';
+		chartParams.series =
+		[
+			{
+				name: title,
+				data: [],
+				//id: 'primary_series',
+				type: 'line'
+			}
+		];
+		var chart = this.GetByName(chartTypeName);
+		if (chart.type)
+		{
+			chartParams.chart.type = chart.type;
+			if (chart.series)
+			{
+				chartParams.series = [];
+				for (var i = 0; i < chart.series.length; i++)
+				{
+					var serie = chart.series[i];
+					serie.name = title;
+					serie.data = [];
+					chartParams.series.push(chart.series[i]);
+				}
+			}
+		}
+	},
+	GetByName: function (chartTypeName)
+	{
+		for (var p in Binary.Charting.ChartType)
+		{
+			if (Binary.Charting.ChartType[p].name == chartTypeName)
+			{
+				return Binary.Charting.ChartType[p];
+			}
+		}
+	}
 };
 
 Binary.Charting.ChartClass = function (config)
@@ -32,99 +161,18 @@ Binary.Charting.ChartClass = function (config)
 	this.candlestick.period = this.config.resolution_seconds * 1000//() * 1000;
 	this.shift = false;
 
-	this.configureSeries = function (chartType, chartParams)
+	this.configureSeries = function (chartTypeName, chartParams)
 	{
-		chart_params.series =
-		[
-			{
-				name: this.config.symbol,
-				data: [],
-				id: 'primary_series',
-				type: 'line'
-			}
-		];
-		chart_params.chart.type = 'line';
-		do
-		{
-			if (chartType == charting.ChartType.Candles)
-			{
-				chart_params.chart.type = 'candlestick';
-				chart_params.series[0].type = 'candlestick';
-				chart_params.series[0].color = 'red';
-				chart_params.series[0].upColor = 'green';
-				break;
-			}
-
-			if (chartType == charting.ChartType.Prices)
-			{
-				chart_params.chart.type = 'ohlc';
-				chart_params.series[0].type = 'ohlc';
-				chart_params.series[0].color = 'red';
-				chart_params.series[0].upColor = 'green';
-			}
-		}
-		while (false);
+		Binary.Charting.ChartType.Configure(chartTypeName, this.config.symbol, chartParams);
 	};
 
-	this.processData = function (point)
+	this.processData = function (chartTypeName, chartData, chart)
 	{
-		if (point.candles)
+		var chartSettings = Binary.Charting.ChartType.GetByName(chartTypeName);
+		var pointData = chartData.candles || chartData.ticks;
+		for (var i in pointData)
 		{
-			var setY = function (point) { };
-			switch (this.config.chartType)
-			{
-				case 'closing':
-					{
-						setY = function (point, apiData)
-						{
-							point.y = parseFloat(apiData.close);
-						};
-						break;
-					}
-				case 'median':
-					{
-						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low)) / 2;
-						break;
-					}
-				case 'typical':
-					{
-						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close)) / 3;
-						break;
-					}
-				case 'weighted':
-					{
-						ohlc_pt.y = (parseFloat(data_object.high) + parseFloat(data_object.low) + parseFloat(data_object.close) * 2) / 4;
-						break;
-					}
-			}
-			for (var i in ohlc)
-			{
-				var data_object = ohlc[i];
-				var epoch = parseInt(data_object.time);
-
-				var ohlc_pt = {
-					x: epoch * 1000,
-					open: parseFloat(data_object.open),
-					y: parseFloat(data_object.open),
-					high: parseFloat(data_object.high),
-					low: parseFloat(data_object.low),
-					close: parseFloat(data_object.close)
-				};
-				this.chart.series[0].addPoint(ohlc_pt, false, false, false);
-				this.spot = ohlc_pt.close;
-			}
-		}
-		if (point.ticks)
-		{
-			for (var i in point.ticks)
-			{
-				var data_object = point.ticks[i];
-				this.chart.series[0].addPoint(
-					[
-						parseInt(data_object.time) * 1000,
-						parseFloat(data_object.price),
-					], false, this.shift, false);
-			}
+			chartSettings.setPoint(pointData[i], chart);
 		}
 	}
 }
