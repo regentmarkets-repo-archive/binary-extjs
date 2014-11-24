@@ -17,18 +17,23 @@ Binary.Api.DashboardProxy = function ()
 	{
 		this.Listeners = {};
 	};
-	this.apiCall = function (message, callback)
+	this.apiCall = function (message, callback, eventData)
 	{
-		me.Listeners[message.apiMethod] = callback;
+		me.Listeners[message.apiMethod] =
+		{
+			callback: callback,
+			eventData: eventData
+		};
 		top.postMessage(JSON.stringify(message), "*");
 	};
 
 	var processCallback = function (e)
 	{
 		var data = JSON.parse(e.originalEvent.data);
-		if (me.Listeners[data.apiMethod])
+		var listener = me.Listeners[data.apiMethod];
+		if (listener)
 		{
-			me.Listeners[data.apiMethod](data.data);
+			listener.callback(data.data, listener.eventData);
 		}
 	}
 

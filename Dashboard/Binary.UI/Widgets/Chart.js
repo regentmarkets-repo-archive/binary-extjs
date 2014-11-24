@@ -10,10 +10,10 @@ Binary.Charting.ChartType =
 	{
 		name: 'ticks',
 		chart: {},
-		setPoint: function ()
+		setPoint: function (pointData, chart)
 		{
 			var point = Binary.Charting.ChartType.GetCandlePoint(pointData);
-			this.chart.series[0].addPoint([point.x, point.y], false, false, false);
+			chart.series[0].addPoint([point.x, point.y], false, false, false);
 		}
 	},
 	ClosingPrice:
@@ -156,21 +156,8 @@ Binary.Charting.ChartType =
 	}
 };
 
-/*
-Binary.Charting.Charts = Binary.Charting.Charts || {};
-Binary.Charting.CreateChart = function (symbol, chartType, timeInterval, renderTo)
-{
-	if (Binary.Charting.Charts[renderTo])
-	{
-		this.chart = new Highcharts.StockChart(this.chart_params());
-		this.chart.destroy();
-		Binary.Charting.Charts[renderTo].destroy();
-		delete Binary.Charting.Charts[renderTo];
-	}
-	Binary.Charting.Charts[renderTo] = new Binary.Charting.ChartClass(symbol, chartType, timeInterval, renderTo);
-};
-*/
 Binary.Charting.ChartsConfigured = false;
+Binary.Charting.ChartInstance = null;
 Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo)
 {
 	if (!Binary.Charting.ChartsConfigured)
@@ -214,26 +201,46 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			}
 		});
 
-		Binary.Mediator.on('symbolChanged', function (sy)
-		{
-			var s = sy;
-		});
 		Binary.Charting.ChartsConfigured = true;
 	};
 
+	this.changeSymbol = function (eventData)
+	{
+		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.display_name, currentChartType, currentInterval);
+	};
+
+	if (Binary.Charting.ChartInstance != null)
+	{
+		Binary.Mediator.un('symbolChanged', Binary.Charting.ChartInstance.changeSymbol);
+	}
+	Binary.Charting.ChartInstance = this;
+	Binary.Mediator.on('symbolChanged', this.changeSymbol);
+
 	var dataProcessed = false;
 	var currentSymbol = symbol;
+	var displayName = null;
 	var currentInterval = timeInterval;
 	var currentChartType = chartType;
 	var renderEl = renderTo;
 
+	this.getParams = function ()
+	{
+		var params =
+		{
+			symbol: currentSymbol,
+			displayName: displayName,
+			interval: currentInterval,
+			chartType: currentChartType
+		};
+		return params;
+	};
 	var chart = null;
 	var me = this;
 
 	var createChart = function ()
 	{
 		dataProcessed = false;
-		Binary.Api.Client.unsubscribeAll();
+		Binary.Api.Client.clearIntervals();
 		if (chart != null)
 		{
 			chart.destroy();
@@ -271,7 +278,8 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 						},
 						turboThreshold: 3000
 					},
-					marker: {
+					marker:
+					{
 						enabled: false//this.config.with_markers,
 						//radius: 2,
 					},
@@ -303,11 +311,11 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			},
 			title:
 			{
-				//text: this.config.symbol,// TODO: add real symbol name as translated_display_name()
+				text: displayName,// TODO: add real symbol name as translated_display_name()
 			}
 		};
 
-		Binary.Charting.ChartType.Configure(currentChartType, currentSymbol, chartParams);
+		Binary.Charting.ChartType.Configure(currentChartType, displayName, chartParams);
 		chart = new Highcharts.StockChart(chartParams);
 		chart.showLoading();
 		Binary.Api.Client.symbols(function (data)
@@ -319,9 +327,10 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 		currentInterval);
 	};
 
-	this.update = function (symbol, chartType, timeInterval)
+	this.update = function (symbol, display_name, chartType, timeInterval)
 	{
 		currentSymbol = symbol;
+		displayName = display_name;
 		currentChartType = chartType;
 		currentInterval = timeInterval;
 		createChart();

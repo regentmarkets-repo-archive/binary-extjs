@@ -303,8 +303,14 @@
             //createChart('R_50', 'ticks', 'M10');
             $(".interval-buttons button").click(function ()                                                                                                                                                                                                                                                                                                                                                                                     
             {
-                $(".interval-buttons button").removeClass('current_range');
-                changeResolution($(this).attr("data-val"));
+            	$(".interval-buttons button").removeClass('current_range');
+            	var chartParams=Binary.Charting.ChartInstance.getParams();
+            	Binary.Charting.ChartInstance.update(
+					chartParams.symbol,
+					chartParams.displayName,
+					chartParams.chartType,
+					$(this).attr("data-val"));
+                //changeResolution($(this).attr("data-val"));
                 $(this).toggleClass('current_range');
             });
         });
