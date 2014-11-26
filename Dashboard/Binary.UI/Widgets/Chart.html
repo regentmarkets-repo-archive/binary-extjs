@@ -297,11 +297,10 @@
         Binary = Binary || {};
         $(function ()
         {
-        	//Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
         	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
         	var chart = new Binary.Charting.ChartClass('R_50', 'ticks', 'M10', 'LiveChart_container');
             //createChart('R_50', 'ticks', 'M10');
-            $(".interval-buttons button").click(function ()                                                                                                                                                                                                                                                                                                                                                                                     
+            $(".interval-buttons button").click(function ()
             {
             	$(".interval-buttons button").removeClass('current_range');
             	var chartParams=Binary.Charting.ChartInstance.getParams();
@@ -315,20 +314,6 @@
             });
         });
     </script>
-
-    <br />
-    <!--
-    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
-    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
-    <button id="show_spot">Show spot</button><br />
-	-->
-    <table>
-        <tr>
-            <td id="ext_ChartType_div"></td>
-            <td id="ext_Market_div"></td>
-            <td id="ext_Symbol_div"></td>
-        </tr>
-    </table>
 
     <div class="interval-buttons">
         <button data-val="M10" class="current_range">10min</button>

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using System.Xml;
+using System.Xml.Schema;
 
 namespace Binary.OAuthProxy.Controllers
 {
@@ -97,6 +100,46 @@ namespace Binary.OAuthProxy.Controllers
 		{
 			return View(Controllers.ResouceModel.GetPricingTable(language,
 				bet_type, underlying, currency, low_strike, strike_step, strike_type, from_strike, expiry_step, from_expiry, action));
+		}
+
+		public string ValidateWidget(string widgetXml)
+		{
+			GadgetModel model = new GadgetModel();
+			bool validationResult=true;
+			List<string> messages=new List<string>();
+			try
+			{
+				XmlDocument xdoc = new XmlDocument();
+				xdoc.LoadXml(widgetXml);
+				XmlTextReader reader = new XmlTextReader(Path.Combine(
+					AppDomain.CurrentDomain.BaseDirectory, "GadgetXMLSchema.xsd"));
+				XmlSchema schema = XmlSchema.Read(reader, (o,e)=>{});
+				xdoc.Schemas.Add(schema);
+				xdoc.Validate(new System.Xml.Schema.ValidationEventHandler((o, e) =>
+					{
+						if (e.Severity == System.Xml.Schema.XmlSeverityType.Error)
+						{
+							validationResult = false;
+						}
+						messages.Add(string.Format("{0} ({1})", e.Message, e.Severity));
+					}));
+			}
+			catch (Exception ex)
+			{
+				validationResult = false;
+				messages.Add(ex.Message);
+			}
+			return string.Format(
+				@"<body><script>
+				var message=JSON.stringify({0});
+				top.postMessage(message, '*');
+				</script></body>",
+				new JavaScriptSerializer().Serialize(new
+				{
+					widget = model,
+					validationResult = validationResult,
+					messages = messages
+				}));
 		}
 	}
 }

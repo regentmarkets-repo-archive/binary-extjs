@@ -20,7 +20,7 @@
 		layoutsPanel.resumeEvents();
 	};
 
-	panel.insert(0,
+	var leftPanel = panel.insert(0,
 	{
 		title: 'Options',
 		region: 'west',
@@ -30,6 +30,10 @@
 		maxWidth: 400,
 		split: true,
 		collapsible: true,
+		getComponentList: function()
+		{
+			return this.down('[name="ComponentList"]');
+		},
 		layout:
 		{
 			type: 'accordion',
@@ -97,6 +101,7 @@
 			},
 			{
 				title: 'Components',
+				name: 'ComponentList',
 				border: false,
 				autoScroll: true,
 				hideHeaders: true,
@@ -182,4 +187,5 @@
 			}
 		]
 	});
+	return leftPanel;
 };

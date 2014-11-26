@@ -113,7 +113,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\WidgetController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -130,6 +129,7 @@
     <Content Include="Widgets\Localize.js" />
     <Content Include="Widgets\Contract.html" />
     <Content Include="Widgets\MarketSelector.js" />
+    <Content Include="Widgets\Mediator.js" />
     <None Include="..\..\Dashboard\Ext.Dashboard\Scripts\ext-all-debug-w-comments.js">
       <Link>Scripts\ext-all-debug-w-comments.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -201,7 +201,9 @@
     <Content Include="Scripts\Binary\Binary.Core.js" />
     <Content Include="Scripts\Binary\Binary.Api.Proxy.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Index.html" />
   </ItemGroup>

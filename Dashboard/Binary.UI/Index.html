@@ -41,18 +41,122 @@
 			Ext.Loader.setConfig({ enabled: true });
 			var proxyUrl = "http://localhost:57842";//"http://195.24.133.198";
 			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
+
+			var developerWidgetStore = Ext.create('Ext.data.Store',
+			{
+				type: 'localstorage',
+				id: 'developerComponents',
+				autoLoad: true,
+				writer:
+				{
+					type: 'json',
+					allowSingle: false,
+					root: ''
+				},
+				fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings']
+			});
+
 			var componentsUpdate = function ()
 			{
-				window.Dashboard.getComponents().each(function (component)
+				var components = window.Dashboard.getComponents();
+				components.each(function (component)
 				{
 					if (component.data.Options.Url.indexOf("{proxyUrl}")>-1)
 					{
 						component.data.Options.Url = component.data.Options.Url.replace("{proxyUrl}", proxyUrl);
 					}
 				});
+				developerWidgetStore.each(function (devComponent)
+				{
+					components.add(devComponent.data);
+				});
 			};
 			Ext.app.Mediator.on("componentsLoaded", componentsUpdate);
-			Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
+
+			var leftPanel = Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
+			var componentList = leftPanel.getComponentList();
+
+			window.gadgetWindow = new Ext.window.Window(
+			{
+				width: 600,
+				height: 400,
+				title: 'Add new gadget',
+				processGadgetSubmit: function(e)
+				{
+					var result = $.parseJSON(e.originalEvent.data);
+					if (!result.apiMethod)
+					{
+						$(window).unbind("message", window.gadgetWindow.processGadgetSubmit);
+						if (result.validationResult)
+						{
+							developerWidgetStore.add(result.widget);
+							window.Dashboard.getComponents().add(result.widget);
+							Ext.MessageBox.show("Widget succesfully created");
+						}
+						else
+						{
+							Ext.MessageBox.show(result.messages);
+						}
+					}
+				},
+				items:
+				[
+					{
+						xtype: 'form',
+						layout: 'fit',
+						standardSubmit: true,
+						url: proxyUrl + '/ValidateWidget',
+						items:
+						[
+							{
+								xtype: 'textarea',
+								hideLabel: true,
+								style: 'width:100%;',
+								height: 350,
+								name: 'widgetXml'
+							}
+						]
+					},
+					{
+						xtype: 'container',
+						width: 0,
+						height: 0,
+						html: '<iframe id="widgetSumbitFrame" name="widgetSumbitFrame"></iframe>'
+					}
+				],
+				buttons:
+				[
+					{
+						text: 'Validate & Add',
+						handler: function()
+						{
+							$(window).bind("message", window.gadgetWindow.processGadgetSubmit);
+							this.up().up().down('form').submit({ target: 'widgetSumbitFrame' });
+						}
+					},
+					{
+						text: 'Cancel',
+						handler: function ()
+						{
+							window.gadgetWindow.close();
+							window.gadgetWindow = null;
+						}
+					}
+				]
+			});
+			window.gadgetWindow.show();
+			componentList.add(
+			{
+				xtype: 'button',
+				text: 'Add gadget',
+				style:'margin:10px 0px 10px 10px;',
+				listeners:
+				{
+					click: function ()
+					{
+					}
+				}
+			});
 
 			Binary.Api.Manager = new window.Binary.Api.ManagerClass(proxyUrl);
 			Binary.Api.Manager.BeginProcessing();

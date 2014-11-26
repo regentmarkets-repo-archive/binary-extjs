@@ -340,36 +340,45 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	{
 		var chartSettings = Binary.Charting.ChartType.GetByName(currentChartType);
 		var enumerable = chartData.candles || chartData.ticks;
-		if (dataProcessed)
+		if (enumerable && chartData.ticks.length > 0)
 		{
-			enumerable = [enumerable[enumerable.length - 1]];
-		}
-		if (chartData.candles)
-		{
-			for (var i in enumerable)
+			if (dataProcessed)
 			{
-				chartSettings.setPoint(enumerable[i], chart);
+				enumerable = [enumerable[enumerable.length - 1]];
 			}
-		}
-		else
-		{
-			for (var i in enumerable)
+			if (chartData.candles)
 			{
-				var pointData = enumerable[i];
-				var tick =
+				for (var i in enumerable)
 				{
-					epoch: parseInt(pointData.time),
-					quote: parseFloat(pointData.price)
-				};
-				chart.series[0].addPoint([tick.epoch * 1000, tick.quote], dataProcessed, dataProcessed, false);
+					chartSettings.setPoint(enumerable[i], chart);
+				}
 			}
+			else
+			{
+				for (var i in enumerable)
+				{
+					var pointData = enumerable[i];
+					var tick =
+					{
+						epoch: parseInt(pointData.time),
+						quote: parseFloat(pointData.price)
+					};
+					chart.series[0].addPoint([tick.epoch * 1000, tick.quote], dataProcessed, dataProcessed, false);
+				}
+			}
+			if (!dataProcessed)
+			{
+				chart.hideLoading();
+				chart.redraw();
+			}
+			dataProcessed = true;
 		}
-		if (!dataProcessed)
+
+		if (chartData.code)
 		{
-			chart.hideLoading();
-			chart.redraw();
+			chart.showLoading("Chart data is not available. Please try again later");
+			Binary.Api.Client.clearIntervals();
 		}
-		dataProcessed = true;
 	};
 
 	createChart();

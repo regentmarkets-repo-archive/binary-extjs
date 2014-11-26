@@ -56,6 +56,7 @@ Binary.Api.ClientClass = function (autoStart)
 	{
 
 	};
+
 	this.Intervals = {};
 	this.addInterval = function (data)
 	{
