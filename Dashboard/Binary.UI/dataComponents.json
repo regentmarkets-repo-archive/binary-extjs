@@ -1,8 +1,5 @@
 [
 	{
-		"DashboardID": 11,
-		"ComponentID": 12,
-		"DashletID": "column-1-order-1",
 		"ID": 23,
 		"Options":
 		{
@@ -15,6 +12,19 @@
 			"IconUrl": "/Widgets/chart_curve.png"
 		}
 	},	
+	{
+		"ID": 24,
+		"Options":
+		{
+			"Height": "640px",
+			"Collapsed": false,
+			"Title": "Contract",
+			"IFrame": true,
+			"Url": "/Widgets/Contract.html",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/contract.png"
+		}
+	},
 	{
 		"ID": 45,
 		"Options":

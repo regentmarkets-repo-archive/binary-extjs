@@ -45,15 +45,13 @@
 			var developerWidgetStore = Ext.create('Ext.data.Store',
 			{
 				type: 'localstorage',
-				id: 'developerComponents',
 				autoLoad: true,
-				writer:
+				proxy:
 				{
-					type: 'json',
-					allowSingle: false,
-					root: ''
+					type: 'localstorage',
+					id: 'developerComponents'
 				},
-				fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings']
+				fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings', 'Manifest', 'IsOwner']
 			});
 
 			var componentsUpdate = function ()
@@ -81,21 +79,48 @@
 				width: 600,
 				height: 400,
 				title: 'Add new gadget',
+				modal: true,
 				processGadgetSubmit: function(e)
 				{
+					debugger;
 					var result = $.parseJSON(e.originalEvent.data);
 					if (!result.apiMethod)
 					{
 						$(window).unbind("message", window.gadgetWindow.processGadgetSubmit);
 						if (result.validationResult)
 						{
-							developerWidgetStore.add(result.widget);
-							window.Dashboard.getComponents().add(result.widget);
-							Ext.MessageBox.show("Widget succesfully created");
+							var widget=
+							{
+								ID: result.ID,
+								Manifest: result.manifest,
+								Name: result.widget.ModulePrefs.Title,
+								IconUrl: result.widget.ModulePrefs.ThumbnailUrl,
+								IsOwner: true,
+								Options:
+								{
+									Height: result.widget.ModulePrefs.Height || "300px",
+									Collapsed: false,
+									Title: result.widget.ModulePrefs.Title,
+									IFrame: true,
+									Url: result.widget.Content.Href,
+									PreventExpandable: false,
+									IconUrl: result.widget.ModulePrefs.ThumbnailUrl
+								}
+							};
+							developerWidgetStore.add(widget);
+							developerWidgetStore.sync();
+							window.Dashboard.getComponents().add(widget);
+							Ext.Msg.alert("Status", "Widget succesfully created");
 						}
 						else
 						{
-							Ext.MessageBox.show(result.messages);
+							Ext.Msg.show(
+							{
+								title: "Error",
+								msg: result.messages.join('<br/>'),
+								buttons: Ext.Msg.OK,
+								icon: Ext.Msg.ERROR
+							});
 						}
 					}
 				},

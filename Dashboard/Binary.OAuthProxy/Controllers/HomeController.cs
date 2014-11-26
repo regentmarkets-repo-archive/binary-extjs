@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ext.Dashboard;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -6,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Binary.OAuthProxy.Controllers
 {
@@ -102,6 +104,7 @@ namespace Binary.OAuthProxy.Controllers
 				bet_type, underlying, currency, low_strike, strike_step, strike_type, from_strike, expiry_step, from_expiry, action));
 		}
 
+		[ValidateInput(false)]
 		public string ValidateWidget(string widgetXml)
 		{
 			GadgetModel model = new GadgetModel();
@@ -109,26 +112,18 @@ namespace Binary.OAuthProxy.Controllers
 			List<string> messages=new List<string>();
 			try
 			{
-				XmlDocument xdoc = new XmlDocument();
-				xdoc.LoadXml(widgetXml);
-				XmlTextReader reader = new XmlTextReader(Path.Combine(
-					AppDomain.CurrentDomain.BaseDirectory, "GadgetXMLSchema.xsd"));
-				XmlSchema schema = XmlSchema.Read(reader, (o,e)=>{});
-				xdoc.Schemas.Add(schema);
-				xdoc.Validate(new System.Xml.Schema.ValidationEventHandler((o, e) =>
-					{
-						if (e.Severity == System.Xml.Schema.XmlSeverityType.Error)
-						{
-							validationResult = false;
-						}
-						messages.Add(string.Format("{0} ({1})", e.Message, e.Severity));
-					}));
+				validationResult = GadgetModel.Validate(widgetXml, messages);
+				if (validationResult)
+				{
+					model = HttpHelpers.XmlDeserialize<GadgetModel>(widgetXml);
+				}
 			}
 			catch (Exception ex)
 			{
 				validationResult = false;
 				messages.Add(ex.Message);
 			}
+
 			return string.Format(
 				@"<body><script>
 				var message=JSON.stringify({0});
@@ -136,7 +131,9 @@ namespace Binary.OAuthProxy.Controllers
 				</script></body>",
 				new JavaScriptSerializer().Serialize(new
 				{
+					ID = Guid.NewGuid(),
 					widget = model,
+					manifest = widgetXml,
 					validationResult = validationResult,
 					messages = messages
 				}));

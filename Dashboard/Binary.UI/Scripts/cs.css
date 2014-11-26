@@ -77,3 +77,9 @@
 {
 	height:100%;
 }
+
+.left-panel-components-list .x-grid-cell-inner
+{
+	padding-left:0px;
+	padding-right:0px;
+}

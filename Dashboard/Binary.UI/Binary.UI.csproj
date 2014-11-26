@@ -119,7 +119,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="widget.html" />
     <Content Include="Widgets\Chart.html" />
     <Content Include="Widgets\Chart.js" />
     <Content Include="Widgets\ChartBarrier.js" />
@@ -183,7 +182,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Global.asax" />
-    <Content Include="MessageTest.html" />
+    <Content Include="w.html" />
     <Content Include="Scripts\Binary\Binary.Api.Client.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Web.config">

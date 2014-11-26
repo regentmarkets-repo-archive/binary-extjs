@@ -111,7 +111,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\GadgetModel.cs" />
     <Compile Include="Controllers\ResouceModel.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -162,6 +161,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\RiseFall.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dashboard\Ext.Dashboard\Ext.Dashboard.csproj">
+      <Project>{22b786f9-e467-4292-becc-c56376114e90}</Project>
+      <Name>Ext.Dashboard</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

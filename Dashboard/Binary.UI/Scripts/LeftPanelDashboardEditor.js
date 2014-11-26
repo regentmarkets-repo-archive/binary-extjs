@@ -116,6 +116,7 @@
 					{
 						xtype: 'grid',
 						hideHeaders: true,
+						cls: 'left-panel-components-list',
 						store: dashboard.getComponents(),
 						columns:
 						[
@@ -131,16 +132,46 @@
 								dataIndex: 'Name',
 								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
 								{
-									return record.get('Options').Title || "";
+									return (record.get('Options').Title || "") +
+										(record.get('IsOwner') ?
+										"&nbsp;<div class='owner-gadget-functions'><img src='Scripts/Images/application_delete.png' />&nbsp;<img src='Scripts/Images/application_delete.png' /></div>" :
+										"");
 								},
 								flex: 1
+							},
+							{
+								dataIndex: 'IsOnwer',
+								width: 20,
+								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
+								{
+									return record.get('IsOwner') ? "<img src='Scripts/Images/application_edit.png' />" : "";
+								}
+							},
+							{
+								dataIndex: 'IsOnwer',
+								width: 20,
+								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
+								{
+									return record.get('IsOwner') ? "<img src='Scripts/Images/application_delete.png' />" : "";
+								}
 							}
 						],
 						listeners:
 						{
-							itemclick: function (grid, record, item, index, e, eOpts)
+							cellclick: function (view, cellEl, colIndex, record, rowEl, rowIndex, e)
 							{
-								dashboard.addComponent(record);
+								if (colIndex == 0 || colIndex == 1)
+								{
+									dashboard.addComponent(record);
+								}
+								if (colIndex == 2 && record.get('IsOwner'))
+								{
+									alert("edit" + record.data.Manifest);
+								}
+								if (colIndex == 3 && record.get('IsOwner'))
+								{
+									alert("delete" + record.data.ID);
+								}
 							}
 						}
 					},

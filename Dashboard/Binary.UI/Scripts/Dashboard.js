@@ -362,7 +362,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 	var componentsStore = new Ext.data.JsonStore(
 	{
 		storeId: 'componentsStore' + id,
-		fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings'],
+		fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings', 'IsOwner', 'Manifest'],
 		proxy: Ext.apply(common.getDefaultProxy(), componentsProxy),
 		autoLoad: true,
 		listeners:
