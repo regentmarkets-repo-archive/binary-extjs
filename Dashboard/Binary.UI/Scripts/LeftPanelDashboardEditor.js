@@ -166,11 +166,11 @@
 								}
 								if (colIndex == 2 && record.get('IsOwner'))
 								{
-									alert("edit" + record.data.Manifest);
+									mediator.fireEvent("componentModify", record, dashboard);
 								}
 								if (colIndex == 3 && record.get('IsOwner'))
 								{
-									alert("delete" + record.data.ID);
+									mediator.fireEvent("componentRemove", record, dashboard);
 								}
 							}
 						}
@@ -179,6 +179,15 @@
 						xtype: 'container',
 						html: '<i style="font-size:11px">Click on component<br/> to add to the current dashboard</i>',
 						style: 'margin-top:10px; float:right'
+					},
+					{
+						xtype: 'button',
+						text: 'Add gadget',
+						style: 'margin:10px 0px 10px 10px;',
+						handler:  function ()
+						{
+							mediator.fireEvent("componentCreate", dashboard);
+						}
 					}
 				]
 			},

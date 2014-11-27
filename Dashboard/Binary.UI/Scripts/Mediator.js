@@ -34,7 +34,10 @@ Ext.app.Dashboard.CreateMediator = function ()
 										// A handler can return false to cancel edit action (can be useful to implement own editor).
 		'componentEdit',				// Fires after component settings modified. componentEdit(Portlet component, DashboardComponentSettingsConfig settingsConfig)
 		'componentCollapsed',			// Fires after component collapsed. componentCollapsed(Portlet component)
-		'componentExpanded'				// Fires after component expanded. componentExpanded(Portlet component)
+		'componentExpanded',			// Fires after component expanded. componentExpanded(Portlet component)
+		'componentCreate',				// Fires when developer click a button to create component
+		'componentModify',				// Fires when developer click a button to modify component
+		'componentRemove'				// Fires when developer click a button to delete component
 	);
 
 	var getLoadedListener = function (eventName)
