@@ -1,7 +1,38 @@
 ﻿Ext.app.ComponentEditor = function (componentStore, localDeveloperStore, validateWidgetUrl)
 {
 	var mediator = Ext.app.Mediator;
-	var createOrEditGadget = function (record)
+	var removeGadgetFromStores = function (rec)
+	{
+		var id = rec.get("ID");
+		var index = componentStore.find("ID", id);
+		componentStore.removeAt(index);
+		componentStore.sync();
+		if (localDeveloperStore)
+		{
+			index = localDeveloperStore.find("ID", id);
+			localDeveloperStore.removeAt(index);
+		}
+	};
+
+	var componentRemove = function (rec)
+	{
+		Ext.Msg.show(
+		{
+			title: 'Please configm',
+			msg: 'Are you to delete your gadget?',
+			buttons: Ext.Msg.YESNO,
+			icon: Ext.Msg.QUESTION,
+			fn: function (btn)
+			{
+				if (btn == "yes")
+				{
+					removeGadgetFromStores(rec);
+				}
+			}
+		});
+	};
+
+	var createOrEditGadget = function (record, dashboard)
 	{
 		Ext.app.ComponentEditor.gadgetWindow = new Ext.window.Window(
 		{
@@ -38,13 +69,7 @@
 						};
 						if (record)
 						{
-							var index = componentStore.find("ID", record.get("ID"));
-							componentStore.removeAt(index);
-							if (localDeveloperStore)
-							{
-								index = localDeveloperStore.find("ID", record.get("ID"));
-								localDeveloperStore.removeAt(index);
-							}
+							removeGadgetFromStores(record);
 						}
 
 						if (localDeveloperStore)
@@ -55,7 +80,8 @@
 						componentStore.add(widget);
 						componentStore.sync();
 
-						Ext.Msg.alert("Status", "Widget succesfully created");
+						Ext.Msg.alert("Status", "Widget succesfully " + (record ? "modified" : "created"));
+						Ext.app.ComponentEditor.gadgetWindow.closeAndCleanup();
 					}
 					else
 					{
@@ -72,6 +98,9 @@
 			closeAndCleanup: function()
 			{
 				$(window).unbind("message", Ext.app.ComponentEditor.gadgetWindow.processGadgetSubmit);
+				mediator.un("componentCreate", createOrEditGadget);
+				mediator.un("componentModify", createOrEditGadget);
+				mediator.un("componentRemove", componentRemove);
 				Ext.app.ComponentEditor.gadgetWindow.close();
 				Ext.app.ComponentEditor.gadgetWindow = null;
 			},
@@ -89,6 +118,7 @@
 							hideLabel: true,
 							style: 'width:100%;',
 							height: 350,
+							value: record ? record.data.Manifest : "",
 							name: 'widgetXml'
 						}
 					]
@@ -103,7 +133,7 @@
 			buttons:
 			[
 				{
-					text: 'Validate & Add',
+					text: 'Validate & ' + (record ? "Update" : "Add"),
 					handler: function ()
 					{
 						$(window).bind("message", Ext.app.ComponentEditor.gadgetWindow.processGadgetSubmit);
@@ -119,27 +149,17 @@
 				}
 			]
 		});
-		window.gadgetWindow.show();
+		Ext.app.ComponentEditor.gadgetWindow.show();
 	};
 	mediator.on("componentCreate", createOrEditGadget);
 	mediator.on("componentModify", createOrEditGadget);
-
-	var componentRemove = function (record)
-	{
-
-	};
 	mediator.on("componentRemove", componentRemove);
 
 	this.destroy = function ()
 	{
-		mediator.un("componentCreate", componentCreate);
-		mediator.un("componentModify", createOrEditGadget);
-		mediator.on("componentRemove", componentRemove);
 		if (Ext.app.ComponentEditor.gadgetWindow)
 		{
-			Ext.app.ComponentEditor.gadgetWindow.close();
-			$(window).unbind("message", Ext.app.ComponentEditor.gadgetWindow.processGadgetSubmit);
-			Ext.app.ComponentEditor.gadgetWindow = null;
+			Ext.app.ComponentEditor.gadgetWindow.closeAndCleanup();
 		}
 	};
 };

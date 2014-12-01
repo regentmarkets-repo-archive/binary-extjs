@@ -33,3 +33,4 @@ C:\Work\Binary\Binary.UI\bin\System.Web.Mvc.xml
 C:\Work\Binary\Binary.UI\obj\Debug\Binary.UI.dll
 C:\Work\Binary\Binary.UI\obj\Debug\Binary.UI.pdb
 C:\Work\Binary\Binary.UI\obj\Debug\Binary.UI.csprojResolveAssemblyReference.cache
+C:\Work\Binary\Binary.UI\bin\Scripts\ComponentEditor.js

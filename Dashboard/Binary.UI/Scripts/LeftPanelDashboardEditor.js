@@ -132,10 +132,7 @@
 								dataIndex: 'Name',
 								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
 								{
-									return (record.get('Options').Title || "") +
-										(record.get('IsOwner') ?
-										"&nbsp;<div class='owner-gadget-functions'><img src='Scripts/Images/application_delete.png' />&nbsp;<img src='Scripts/Images/application_delete.png' /></div>" :
-										"");
+									return record.get('Options').Title || "";
 								},
 								flex: 1
 							},
@@ -186,7 +183,7 @@
 						style: 'margin:10px 0px 10px 10px;',
 						handler:  function ()
 						{
-							mediator.fireEvent("componentCreate", dashboard);
+							mediator.fireEvent("componentCreate", null, dashboard);
 						}
 					}
 				]
