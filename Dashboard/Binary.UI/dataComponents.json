@@ -24,7 +24,8 @@
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/contract.png"
 		}
-	},
+	}
+	/*,
 	{
 		"ID": 45,
 		"Options":
@@ -219,5 +220,5 @@
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/pricing_table.png"
 		}
-	}
+	}*/
 ]
