@@ -1,0 +1,6 @@
+C:\Work\Binary\Binary.OpenSocialBuilder\bin\Debug\Binary.OpenSocialBuilder.exe
+C:\Work\Binary\Binary.OpenSocialBuilder\bin\Debug\Binary.OpenSocialBuilder.pdb
+C:\Work\Binary\Binary.OpenSocialBuilder\obj\Debug\Binary.OpenSocialBuilder.csprojResolveAssemblyReference.cache
+C:\Work\Binary\Binary.OpenSocialBuilder\obj\Debug\Binary.OpenSocialBuilder.exe
+C:\Work\Binary\Binary.OpenSocialBuilder\obj\Debug\Binary.OpenSocialBuilder.pdb
+C:\Work\Binary\Binary.OpenSocialBuilder\bin\Debug\features.txt

@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>DashboardDemo</title>
 
+	<script src="Scripts/OpenSocial/os.js"></script>
     
 	<script src="Scripts/ext-all-debug-w-comments.js"></script>    
 	<script src="Scripts/ext-theme-neptune.js"></script>
@@ -23,7 +24,10 @@
 	<script src="Scripts/ComponentEditor.js"></script>
 
 	<script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="Scripts/Binary/Binary.App.js"></script>
 	<script src="../Scripts/Binary/Binary.Api.Manager.js"></script>
+
+
 	
 	<link href="Scripts/cs.css" rel="stylesheet" />
 	<style>
@@ -39,44 +43,8 @@
 	    
 		Ext.onReady(function ()
 		{
-			Ext.Loader.setConfig({ enabled: true });
 			var proxyUrl = "http://localhost:57842";//"http://195.24.133.198";
-			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
-
-			var localDeveloperStore = Ext.create('Ext.data.Store',
-			{
-				type: 'localstorage',
-				autoLoad: true,
-				proxy:
-				{
-					type: 'localstorage',
-					id: 'localDeveloperStore'
-				},
-				fields: ['Name', 'ID', 'IconUrl', 'ComponentID', 'Options', 'DisplaySettings', 'Manifest', 'IsOwner']
-			});
-
-			var componentsUpdate = function ()
-			{
-				var components = window.Dashboard.getComponents();
-				components.each(function (component)
-				{
-					if (component.data.Options.Url.indexOf("{proxyUrl}")>-1)
-					{
-						component.data.Options.Url = component.data.Options.Url.replace("{proxyUrl}", proxyUrl);
-					}
-				});
-				localDeveloperStore.each(function (devComponent)
-				{
-					components.add(devComponent.data);
-				});
-			};
-			Ext.app.Mediator.on("componentsLoaded", componentsUpdate);
-
-			var leftPanel = Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
-			var componentEditor = new Ext.app.ComponentEditor(window.Dashboard.getComponents(), localDeveloperStore, proxyUrl + '/ValidateWidget');
-
-			Binary.Api.Manager = new window.Binary.Api.ManagerClass(proxyUrl);
-			Binary.Api.Manager.BeginProcessing();
+			Binary.App.run(proxyUrl);
 		});
 	</script>
 </body>

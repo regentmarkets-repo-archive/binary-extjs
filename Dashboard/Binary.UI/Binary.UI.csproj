@@ -123,11 +123,7 @@
       <Link>Scripts\ComponentEditor.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\core.prefs\feature.xml" />
-    <Content Include="Scripts\core.prefs\prefs.js" />
-    <Content Include="Scripts\core.prefs\taming.js" />
-    <Content Include="Scripts\globals\feature.xml" />
-    <Content Include="Scripts\globals\globals.js" />
+    <Content Include="Scripts\Binary\Binary.App.js" />
     <Content Include="Widgets\Chart.html" />
     <Content Include="Widgets\Chart.js" />
     <Content Include="Widgets\ChartBarrier.js" />

@@ -1,0 +1,2 @@
+﻿ospath=c:\Work\Binary\Binary.UI\Scripts\OpenSocial\
+feature=setprefs
