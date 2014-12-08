@@ -53,16 +53,6 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 	};
 
 	var common = Ext.app.Dashboard.Common;
-	
-	this.getNextStoreID = function (store)
-	{
-		var maxId = 0;
-		store.each(function (rec)
-		{
-			maxId = Math.max(maxId, rec.get('ID'));
-		});
-		return maxId + 1;
-	};
 
 	var dashboardProxy =
 	{
@@ -102,7 +92,8 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 	{
 		api:
 		{
-			read: 'Dashboard/GetLayouts'
+			read: 'Dashboard/GetLayouts',
+			create: 'Dashboard/CreateLayouts'	//not implemented on the server yet
 		}
 	}
 
@@ -170,7 +161,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 			},
 			load: function ()
 			{
-				if ((dashboardsStore.getCount() == 0) && (mode == "local"))
+				if (dashboardsStore.getCount() == 0)
 				{
 					dashboardsStore.add(
 					{
@@ -178,21 +169,13 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 						IsCurrent: true,
 						UserID: dashboard.getUserID(),
 						LayoutID: 1,
-						ID: dashboard.getNextStoreID(dashboardsStore)
+						ID: (mode == "local" ? 1 : 0)
 					});
 					dashboardsStore.sync(
 					{
 						success: function ()
 						{
 							mediator.fireEvent("dashboardsLoaded", this);
-						}
-					});
-					layoutsStore.add(layoutsArray);
-					layoutsStore.sync(
-					{
-						success: function ()
-						{
-							mediator.fireEvent("layoutsLoaded", this);
 						}
 					});
 				}
@@ -225,6 +208,11 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 			}
 		}
 	});
+
+	var getNextLocalStoreID=function(store)
+	{
+		return mode == "local" ? (store.max("ID") || 0) + 1 : 0;
+	}
 	
 
 	this.getDashboards = function ()
@@ -314,7 +302,21 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 		{
 			load: function ()
 			{
-				mediator.fireEvent("layoutsLoaded", this);
+				if (layoutsStore.getCount() == 0)
+				{
+					layoutsStore.add(Ext.app.Dashboard.DefaultLayouts);
+					layoutsStore.sync(
+					{
+						success: function ()
+						{
+							mediator.fireEvent("layoutsLoaded", this);
+						}
+					});
+				}
+				else
+				{
+					mediator.fireEvent("layoutsLoaded", this);
+				}
 			}
 		}
 	});
@@ -338,7 +340,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 	{
 		/// <signature>
 		/// <summary>Change current dashboard layout by layoutID</summary>
-		/// <param name="layoutID" type="Number">layout ID</param>
+		/// <param name="layoutID" type="Number">layout ID</param>dashboard
 		/// </signature>
 		var currentDashboard = this.getCurrentDashboard();
 		if (currentDashboard.get("LayoutID") != layoutID)
@@ -389,7 +391,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 			IsCurrent: false,
 			UserID: dashboard.getUserID(),
 			LayoutID: 1,
-			ID: dashboard.getNextStoreID(dashboardsStore)
+			ID: getNextLocalStoreID(dashboardsStore)
 		});
 		dashboardsStore.sync();
 	};
@@ -407,7 +409,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 			DashboardID: currentDashboard.get("ID"),
 			DashletID: this.LayoutFactory.getNextId(this.DashboardPanel.getPortalPanel(), 0),
 			Options: component.data.Options,//test
-			ID: 0
+			ID: getNextLocalStoreID(dashboardComponentsStore)
 		});
 		dashboardComponentsStore.sync(
 		{

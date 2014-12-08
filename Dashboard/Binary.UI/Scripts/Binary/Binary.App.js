@@ -58,5 +58,17 @@ Binary.App.run = function (proxyUrl)
 
 gadgets.Prefs.prototype.set = function (key, value)
 {
-
+	var gadgetID=this.getString("ID");
+	var widgetRecord = Binary.App.widgetSettingsStore.findRecord("ID", gadgetID);
+	if (!widgetRecord)
+	{
+		widgetRecord = Binary.App.widgetSettingsStore.add(
+		{
+			ID: gadgetID,
+			Options: {}
+		});
+	}
+	var options = widgetRecord.get("Options");
+	options[key] = value;
+	Binary.App.widgetSettingsStore.sync();
 };
