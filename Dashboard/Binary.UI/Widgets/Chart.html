@@ -5,6 +5,10 @@
     <script src="../Scripts/ext-all-debug-w-comments.js"></script>
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+
+	<script src="../Scripts/OpenSocial/os.js"></script>
+	<script src="../Scripts/Binary/Binary.OpenSocial.js"></script>
+
     <script src="../Scripts/jquery-1.9.1.js"></script>
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
@@ -15,6 +19,7 @@
     <script src="../Widgets/Localize.js"></script>
     <script src="../Widgets/Contracts.js?v=3"></script>
     <script src="../Widgets/LiveChart1.js?v=9"></script>
+	
     <style>
         body
         {
@@ -297,7 +302,14 @@
         Binary = Binary || {};
         $(function ()
         {
-        	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
+			var prefs=gadgets.Prefs();
+			Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector', prefs.getString('CurrentMarket'), prefs.getString('CurrentSymbol'));
+			Binary.Mediator.on('symbolChanged', function(symbolData)
+			{
+				prefs.set("CurrentMarket", symbolData.marketDetails.market);
+				prefs.set("CurrentSymbol", symbolData.symbolDetails.symbol);
+			});
+
         	var chart = new Binary.Charting.ChartClass('R_50', 'ticks', 'M10', 'LiveChart_container');
             //createChart('R_50', 'ticks', 'M10');
             $(".interval-buttons button").click(function ()

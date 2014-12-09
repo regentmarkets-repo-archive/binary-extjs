@@ -3,7 +3,7 @@
 
 Binary = Binary || {};
 
-Binary.MarketSelectorClass = function (el)
+Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 {
 	var marketStore = Ext.create('Ext.data.Store',
 	{
@@ -77,7 +77,8 @@ Binary.MarketSelectorClass = function (el)
 						{
 							afterrender: function ()
 							{
-								marketSelector.selectFirst();
+								var val = currentMarket || this.store.getAt(0).get(this.valueField);
+								marketSelector.setValue(val);
 							}
 						},
 						items:
@@ -89,12 +90,22 @@ Binary.MarketSelectorClass = function (el)
 								store: marketStore,
 								queryMode: 'local',
 								editable: false,
+								value: 'initial',
 								listeners:
 								{
 									change: function (combo, value)
 									{
 										Binary.Mediator.fireEvent('marketChanged', value);
-										symbolSelector.selectFirst('market', value);
+										symbolSelector.store.clearFilter();
+										symbolSelector.store.filter("market", value);
+										if (symbolSelector.getValue() == 'initial' && currentSymbol)
+										{
+											symbolSelector.setValue(currentSymbol);
+										}
+										else
+										{
+											symbolSelector.setValue(symbolSelector.store.getAt(0).get(symbolSelector.valueField));
+										}
 									}
 								}
 							}),
@@ -105,6 +116,7 @@ Binary.MarketSelectorClass = function (el)
 								store: symbolStore,
 								editable: false,
 								queryMode: 'local',
+								value: 'initial',
 								listeners:
 								{
 									change: function (combo, value)
