@@ -53,31 +53,16 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 						renderTo: el,
 						width: '100%',
 						layout: 'column',
+						bodyStyle: 'margin: 3px 3px 3px 3px',
 						defaults:
 						{
-							columnWidth: 1 / 2,
-							selectFirst: function (field, value)
-							{
-								if (field && value)
-								{
-									this.store.clearFilter();
-									this.store.filter(field, value);
-								}
-								if (this.store.getCount() > 0)
-								{
-									this.setValue(this.store.getAt(0).get(this.valueField));
-								}
-								else
-								{
-									this.setValue(null);
-								}
-							}
+							columnWidth: 1 / 2
 						},
 						listeners:
 						{
 							afterrender: function ()
 							{
-								var val = currentMarket || this.store.getAt(0).get(this.valueField);
+								var val = currentMarket || marketSelector.store.getAt(0).get(marketSelector.valueField);
 								marketSelector.setValue(val);
 							}
 						},

@@ -294,7 +294,7 @@
             });
         });
     </script>
-	<div id="marketSelector"></div>
+	<div id="marketSelector" style="width:50%"></div>
     <script src="Mediator.js"></script>
     <script src="MarketSelector.js"></script>
 	<script src="Chart.js"></script>
@@ -302,7 +302,7 @@
         Binary = Binary || {};
         $(function ()
         {
-			var prefs=gadgets.Prefs();
+			var prefs=new gadgets.Prefs();
 			Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector', prefs.getString('CurrentMarket'), prefs.getString('CurrentSymbol'));
 			Binary.Mediator.on('symbolChanged', function(symbolData)
 			{
@@ -310,8 +310,12 @@
 				prefs.set("CurrentSymbol", symbolData.symbolDetails.symbol);
 			});
 
-        	var chart = new Binary.Charting.ChartClass('R_50', 'ticks', 'M10', 'LiveChart_container');
-            //createChart('R_50', 'ticks', 'M10');
+			var chart = new Binary.Charting.ChartClass(
+				prefs.getString('CurrentSymbol') || 'R_50',
+				prefs.getString('CurrentChartType') || 'ticks',
+				prefs.getString('CurrentChartInterval') || 'M10',
+				'LiveChart_container');
+            
             $(".interval-buttons button").click(function ()
             {
             	$(".interval-buttons button").removeClass('current_range');

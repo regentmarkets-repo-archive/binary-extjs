@@ -65,15 +65,27 @@ Binary.Api.Granularities = function ()
 	/// <field name="H8" type="String" static="true"></field>
 	/// <field name="D" type="String" static="true"></field>
 }
-Binary.Api.Granularities.Tick="tick";
-Binary.Api.Granularities.M1="M1";
+/*
+Binary.Api.Granularities.Tick =
+{
+	name: "tick",
+	displayName: '10min',
+	seconds: 600
+};
+Binary.Api.Granularities.M1 =
+{
+	name: "M1",
+	displayName: "",
+	seconds: 
 Binary.Api.Granularities.M5="M5";
 Binary.Api.Granularities.M30="M30";
 Binary.Api.Granularities.H1="H1";
 Binary.Api.Granularities.H8="H8";
 Binary.Api.Granularities.D="D";
 Binary.Api.Granularities.__enum=true;
+*/
 
+//Binary.ApiCallType
 /*
 Binary.Api.getIntervalForGranularity = function (granularity)
 {
@@ -108,7 +120,7 @@ Binary.Api.GranularityConfig =
 	'W2': { seconds: 21 * 86400, timeframe: 'H4', chartType: 'candles' },
 	'M': { seconds: 31 * 86400, timeframe: 'H4', chartType: 'candles' },
 	'M3': { seconds: 93 * 86400, timeframe: 'H8', chartType: 'candles' },
-	'Y': { seconds: 364 * 86400, timeframe: 'D', chartType: 'candles' },
+	'Y': { seconds: 364 * 86400, timeframe: 'D', chartType: 'candles' }
 };
 
 if (!String.format)

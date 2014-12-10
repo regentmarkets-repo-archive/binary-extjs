@@ -425,6 +425,7 @@ Ext.app.Dashboard = function (id, currentUserID, mode, componentsUrl)
 	this.DashboardPanel = Ext.create("Ext.app.DashboardPanel",
 	{
 		containerId: dashboard.getId(),
+		cls: 'dashboard-panel',
 		dashboard: dashboard
 	});
 	mediator.on("componentPositionChanged", function (component)

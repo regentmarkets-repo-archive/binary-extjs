@@ -9,6 +9,7 @@ Binary.Charting.ChartType =
 	Tick:
 	{
 		name: 'ticks',
+		displayName: 'Ticks',
 		chart: {},
 		setPoint: function (pointData, chart)
 		{
@@ -19,6 +20,7 @@ Binary.Charting.ChartType =
 	ClosingPrice:
 	{
 		name: 'closing',
+		displayName: 'Closing price',
 		chart: {},
 		setPoint: function (pointData, chart)
 		{
@@ -30,6 +32,7 @@ Binary.Charting.ChartType =
 	Prices:
 	{
 		name: 'prices',
+		displayName: 'Prices',
 		chart:
 		{
 			type: 'ohlc',
@@ -51,6 +54,7 @@ Binary.Charting.ChartType =
 	Candles:
 	{
 		name: 'candles',
+		displayName: 'Candles',
 		chart:
 		{
 			type: 'candlestick',
@@ -72,6 +76,7 @@ Binary.Charting.ChartType =
 	Median:
 	{
 		name: 'median',
+		displayName: 'Median price',
 		chart: {},
 		setPoint: function (pointData, chart)
 		{
@@ -83,6 +88,7 @@ Binary.Charting.ChartType =
 	Typical:
 	{
 		name: 'typical',
+		displayName: 'Typical price',
 		chart: {},
 		setPoint: function (pointData, chart)
 		{
@@ -94,6 +100,7 @@ Binary.Charting.ChartType =
 	Weighted:
 	{
 		name: 'weighted',
+		displayName: 'Weighted price',
 		chart: {},
 		setPoint: function (pointData, chart)
 		{
@@ -200,9 +207,94 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 				}
 			}
 		});
-
 		Binary.Charting.ChartsConfigured = true;
 	};
+
+	var chartTypeSelector = null;
+	var chartTimeIntervalSelector = null;
+	var chartTypeStore=	Ext.create('Ext.data.Store',
+	{
+		fields: ['name', 'displayName']
+	});
+	for (var p in Binary.Charting.ChartType)
+	{
+		if (Binary.Charting.ChartType[p].name)
+		{
+			chartTypeStore.add(
+			{
+				name: Binary.Charting.ChartType[p].name,
+				displayName: Binary.Charting.ChartType[p].displayName
+			});
+		}
+	};
+	var chartTimeIntervalStore = Ext.create('Ext.data.Store',
+	{
+		fields: ['name', 'displayName']
+	});
+
+	Ext.fly(document.getElementById(renderTo)).update('');
+	var chartContainer = new Ext.container.Container(
+	{
+		renderTo: renderTo,
+		width: '100%',
+		layout: 'column',
+		bodyStyle: 'margin: 3px 3px 3px 3px',
+		defaults:
+		{
+			columnWidth: 1 / 2
+		},
+		listeners:
+		{
+			afterrender: function ()
+			{
+				var val = chartType || chartTypeStore.getAt(0).get(chartTypeSelector.valueField);
+				marketSelector.setValue(val);
+			}
+		},
+		items:
+		[
+			chartTypeSelector = Ext.create('Ext.form.field.ComboBox',
+			{
+				valueField: 'name',
+				displayField: 'displayName',
+				store: chartTypeStore,
+				queryMode: 'local',
+				editable: false,
+				value: chartType,
+				listeners:
+				{
+					change: function (combo, value)
+					{
+						Binary.Mediator.fireEvent('chartChanged', 
+						{
+							chartType: value,
+							timeInterval: chartTimeIntervalSelector.getValue()
+						});
+					}
+				}
+			}),
+			chartTimeIntervalSelector = Ext.create('Ext.form.field.ComboBox',
+			{
+				valueField: 'name',
+				displayField: 'displayName',
+				store: chartTimeIntervalStore,
+				editable: false,
+				queryMode: 'local',
+				value: timeInterval,
+				listeners:
+				{
+					change: function (combo, value)
+					{
+						Binary.Mediator.fireEvent('chartChanged',
+						{
+							chartType: chartTypeSelector.getValue(),
+							timeInterval: value
+						});
+					}
+				}
+			})
+		]
+	});
 
 	this.changeSymbol = function (eventData)
 	{
