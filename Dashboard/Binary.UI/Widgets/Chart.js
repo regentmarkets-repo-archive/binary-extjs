@@ -210,6 +210,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 		Binary.Charting.ChartsConfigured = true;
 	};
 
+	var me = this;
 	var chartTypeSelector = null;
 	var chartTimeIntervalSelector = null;
 	var chartTypeStore=	Ext.create('Ext.data.Store',
@@ -231,11 +232,22 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	{
 		fields: ['name', 'displayName']
 	});
+	for (var p in Binary.Api.Granularities)
+	{
+		if (Binary.Api.Granularities[p].name)
+		{
+			chartTimeIntervalStore.add(
+			{
+				name: Binary.Api.Granularities[p].name,
+				displayName: Binary.Api.Granularities[p].displayName
+			});
+		}
+	}
 
-	Ext.fly(document.getElementById(renderTo)).update('');
+	Ext.fly(document.getElementById(renderTo)).update('<div id="chartSettings_' + renderTo + '"></div><br/><div id="chart_' + renderTo + '"></div>');
 	var chartContainer = new Ext.container.Container(
 	{
-		renderTo: renderTo,
+		renderTo: 'chartSettings_' + renderTo,
 		width: '100%',
 		layout: 'column',
 		bodyStyle: 'margin: 3px 3px 3px 3px',
@@ -248,7 +260,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			afterrender: function ()
 			{
 				var val = chartType || chartTypeStore.getAt(0).get(chartTypeSelector.valueField);
-				marketSelector.setValue(val);
+				chartTypeSelector.setValue(val);
 			}
 		},
 		items:
@@ -265,6 +277,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 				{
 					change: function (combo, value)
 					{
+						me.update(currentSymbol, displayName, value, currentInterval);
 						Binary.Mediator.fireEvent('chartChanged', 
 						{
 							chartType: value,
@@ -285,6 +298,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 				{
 					change: function (combo, value)
 					{
+						me.update(currentSymbol, displayName, currentChartType, value);
 						Binary.Mediator.fireEvent('chartChanged',
 						{
 							chartType: chartTypeSelector.getValue(),
@@ -342,7 +356,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			chart:
 			{
 				height: 400,
-				renderTo: renderEl,
+				renderTo: 'chart_' + renderTo,
 				events:
 				{
 					load: function ()
@@ -432,7 +446,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	{
 		var chartSettings = Binary.Charting.ChartType.GetByName(currentChartType);
 		var enumerable = chartData.candles || chartData.ticks;
-		if (enumerable && chartData.ticks.length > 0)
+		if (enumerable && enumerable.length > 0)
 		{
 			if (dataProcessed)
 			{

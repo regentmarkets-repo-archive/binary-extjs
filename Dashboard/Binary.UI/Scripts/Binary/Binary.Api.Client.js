@@ -58,7 +58,7 @@ Binary.Api.ClientClass = function (autoStart)
 	};
 
 	this.Intervals = {};
-	this.addInterval = function (data)
+	this.addInterval = function (data, timeInterval)
 	{
 		if (this.Intervals[data.apiMethod])
 		{
@@ -66,35 +66,32 @@ Binary.Api.ClientClass = function (autoStart)
 			delete this.Intervals[data.apiMethod];
 		}
 		this.Intervals[data.apiMethod] = data;
-		data.timerID = window.setInterval(function () { data.intervalCallback(data) }, 3000);
+		data.timerID = window.setInterval(function () { data.intervalCallback(data) }, timeInterval * 1000);
+		data.intervalCallback(data)
 	};
 	this.symbols = function (callback, symbol, chartType, granularity)
 	{
-		//if ((granularity) && (granularity != 'M10' && granularity != 'M30')) chartType = 'candles';
-		var shortInterval = (granularity.indexOf('M') > -1);
-		var cType = shortInterval ? chartType : Binary.Api.GranularityConfig[granularity].chartType;
-		var url = String.format("/symbols/{0}/{1}", symbol, cType);
+		var url = String.format("/symbols/{0}/{1}", symbol, Binary.Api.Granularities[granularity].callType || 'candles');
 		var data =
 		{
 			apiMethod: url,
-			granularity: Binary.Api.GranularityConfig[granularity].timeframe || granularity,
+			granularity: Binary.Api.Granularities[granularity],
 			callback: callback,
-			og: granularity,
-			chartType: cType,
 			intervalCallback: function (params)
 			{
 				var callData = {};
-				var cfg = Binary.Api.GranularityConfig[params.og];// Binary.Api.getConfigForTimeFrame(params.granularity);
-				callData.start = Math.floor(+new Date / 1000) - cfg.seconds;
+				callData.start = Math.floor(+new Date / 1000) - params.granularity.seconds;
+				callData.granularity = params.granularity.name;
+				callData.count = params.granularity.seconds / 3;
+				/*
 				if (params.chartType == 'candles' )
 				{
 					callData.count = 4000;
-					callData.granularity = params.granularity;//Binary.Api.getTimeframeForGranularity(params.granularity);
-				}				
+				}*/
 				postMsg(params.apiMethod, params.callback, false, callData);
 			}
 		};
-		this.addInterval(data);
+		this.addInterval(data, 3);
 	};
 
 	this.symbols.price = function (callback, symbol)
