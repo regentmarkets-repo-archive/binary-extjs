@@ -311,11 +311,14 @@
 				prefs.set("CurrentMarket", symbolData.marketDetails.market);
 				prefs.set("CurrentSymbol", symbolData.symbolDetails.symbol);
 
-				var chart = new Binary.Charting.ChartClass(
-					symbolData.symbolDetails.symbol,
-					prefs.getString('CurrentChartType') || 'ticks',
-					prefs.getString('CurrentChartInterval') || 'M10',
-					'LiveChart_container');
+				if (Binary.Charting.ChartInstance == null)
+				{
+					var chart = new Binary.Charting.ChartClass(
+						symbolData.symbolDetails.symbol,
+						prefs.getString('CurrentChartType') || 'ticks',
+						prefs.getString('CurrentChartInterval') || 'M10',
+						'LiveChart_container');
+				}
 			});
 
             $(".interval-buttons button").click(function ()
@@ -333,6 +336,7 @@
         });
     </script>
 
+    <div id="LiveChart_container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 	<!--
     <div class="interval-buttons">
         <button data-val="M10">10min</button>
@@ -349,8 +353,6 @@
         <button data-val="Y">1y</button>
     </div>
 	-->
-    <div id="LiveChart_loading" class="hidden" style="min-width: 310px; height: 310px; margin: 0 auto">loading...</div>
-    <div id="LiveChart_container" style="min-width: 310px; height: 310px; margin: 0 auto"></div>
 
     <!--<fieldset>
         <legend>Contract negotiation</legend>
