@@ -82,7 +82,7 @@ Binary.Api.ClientClass = function (autoStart)
 				var callData = {};
 				callData.start = Math.floor(+new Date / 1000) - params.granularity.seconds;
 				callData.granularity = params.granularity.name;
-				callData.count = params.granularity.seconds / 3;
+				callData.count = 4000;//params.granularity.seconds / 3;
 				/*
 				if (params.chartType == 'candles' )
 				{

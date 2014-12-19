@@ -3,7 +3,7 @@ ns("Binary.Api");
 
 Binary.Api.ProxyBase = function ()
 {
-	this.apiCall = function (apiMethod, callback, interval, data) { };
+	this.apiCall = function (apiMethod, callback, data) { };
 	this.processCallback = function (data) { };
 	this.start();
 	this.stop();
