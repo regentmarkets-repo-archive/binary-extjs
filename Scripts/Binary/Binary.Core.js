@@ -31,21 +31,6 @@ Binary.isDefined = function (value)
 
 Binary.Gadget = Binary.parseUrl();
 
-/*
-Binary.Api.Tick = 1000;
-Binary.Api.Intervals = function()
-{
-	/// <field name="Once" type="Number" static="true">instant call</field>
-	/// <field name="Fast" type="String" static="true">frequent call (few seconds delay)</field>
-	/// <field name="Medium" type="String" static="true">medium frequency call (10 or more seconds)</field>
-	/// <field name="Slow" type="String" static="true">slow frequency call (minute or more)</field>
-}
-Binary.Api.Intervals.Once = 0;
-Binary.Api.Intervals.Fast = 3 * Binary.Api.Tick;
-Binary.Api.Intervals.Medium = 10 * Binary.Api.Tick;
-Binary.Api.Intervals.Slow = 60 * Binary.Api.Tick;
-Binary.Api.Intervals.__enum = true;
-*/
 Binary.Api.Methods = function ()
 {
 	/// <field name="Token" type="String" static="true"></field>
@@ -57,59 +42,85 @@ Binary.Api.Methods.__enum = true;
 
 Binary.Api.Granularities = function ()
 {
-	/// <field name="Tick" type="String" static="true"></field>
 	/// <field name="M1" type="String" static="true"></field>
 	/// <field name="M5" type="String" static="true"></field>
+	/// <field name="M10" type="String" static="true"></field>
 	/// <field name="M30" type="String" static="true"></field>
 	/// <field name="H1" type="String" static="true"></field>
+	/// <field name="H2" type="String" static="true"></field>
+	/// <field name="H4" type="String" static="true"></field>
 	/// <field name="H8" type="String" static="true"></field>
 	/// <field name="D" type="String" static="true"></field>
 }
-Binary.Api.Granularities.Tick="tick";
-Binary.Api.Granularities.M1="M1";
-Binary.Api.Granularities.M5="M5";
-Binary.Api.Granularities.M30="M30";
-Binary.Api.Granularities.H1="H1";
-Binary.Api.Granularities.H8="H8";
-Binary.Api.Granularities.D="D";
-Binary.Api.Granularities.__enum=true;
-
 /*
-Binary.Api.getIntervalForGranularity = function (granularity)
+Binary.Api.Granularities.ticks =
 {
-	return Binary.Api.GranularityConfig[granularity].seconds;
+	name: "ticks",
+	callType: 'ticks',
+	displayName: 'Ticks',
+	seconds: 3
 };
-
-Binary.Api.getTimeframeForGranularity = function (granularity)
+Binary.Api.Granularities.M1 =
 {
-	return Binary.Api.GranularityConfig[granularity].timeframe;
+	name: "M1",
+	callType: 'ticks',
+	displayName: '1 Minute',
+	seconds: 60
+};
+Binary.Api.Granularities.M5 =
+{
+	name: "M5",
+	callType: 'ticks',
+	displayName: "5 Minutes",
+	seconds: 5*60
 };
 */
-Binary.Api.getConfigForTimeFrame = function (timeFrame)
+Binary.Api.Granularities.M10 =
 {
-	var c=Binary.Api.GranularityConfig;
-	for (var p in c)
-	{
-		if (c[p].timeframe == timeFrame) return c[p];
-	}
-	return null;
+	name: "M10",
+	callType: 'ticks',
+	displayName: "10 Minutes",
+	seconds: 10*60
 };
-Binary.Api.GranularityConfig =
-{	
-	'M10': { seconds: 600, timeframe: 'M1', chartType: 'ticks' },
-	'H1': { seconds: 3600, timeframe: 'M1', chartType: 'candles' },
-	//'H2': { seconds: 2*3600, timeframe: 'M5', chartType: 'candles' },
-	'H6': { seconds: 21600, timeframe: 'M1', chartType: 'candles' },
-	'H12': { seconds: 43200, timeframe: 'M1', chartType: 'candles' },
-	'D': { seconds: 86400, timeframe: 'M10', chartType: 'candles' },
-	'D2': { seconds: 2 * 86400, timeframe: 'M30', chartType: 'candles' },
-	'D5': { seconds: 5 * 86400, timeframe: 'M30', chartType: 'candles' },
-	'W': { seconds: 7 * 86400, timeframe: 'H1', chartType: 'candles' },
-	'W2': { seconds: 21 * 86400, timeframe: 'H4', chartType: 'candles' },
-	'M': { seconds: 31 * 86400, timeframe: 'H4', chartType: 'candles' },
-	'M3': { seconds: 93 * 86400, timeframe: 'H8', chartType: 'candles' },
-	'Y': { seconds: 364 * 86400, timeframe: 'D', chartType: 'candles' },
+Binary.Api.Granularities.M30 =
+{
+	name: "M30",
+	callType: 'ticks',
+	displayName: "30 Minutes",
+	seconds: 30*60
 };
+Binary.Api.Granularities.H1 =
+{
+	name: "H1",
+	callType: 'ticks',
+	displayName: "1 Hour",
+	seconds: 1*60*60
+};
+Binary.Api.Granularities.H2 =
+{
+	name: "H2",
+	displayName: "2 Hours",
+	seconds: 2*60*60
+};
+Binary.Api.Granularities.H4 =
+{
+	name: "H4",
+	displayName: "4 Hours",
+	seconds: 4*60*60
+};
+Binary.Api.Granularities.H8 =
+{
+	name: "H8",
+	displayName: "8 Hours",
+	seconds: 8*60*60
+};
+Binary.Api.Granularities.D =
+{
+	name: "D",
+	displayName: "Day",
+	seconds: 24*60*60
+};
+Binary.Api.Granularities.__enum = true;
 
 if (!String.format)
 {

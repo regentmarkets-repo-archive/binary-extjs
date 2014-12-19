@@ -1,0 +1,336 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="../Scripts/ext-all.js"></script>
+    <script src="../Scripts/ext-theme-neptune.js"></script>
+    <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.9.1.js"></script>
+    <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
+    <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
+    <script src="../Widgets/highstock.js"></script>
+    <script src="../Widgets/exporting_stocks.js"></script>
+    <script src="../Widgets/ChartBarrier.js"></script>
+    <script src="../Widgets/Localize.js"></script>
+    <script src="../Widgets/Contracts.js"></script>
+    <style>
+        body
+        {
+            background-color: white !important;
+        }
+
+        .hidden
+        {
+            display: none;
+        }
+
+        .binary_field
+        {
+            height: 20px;
+            line-height: 0.6em;
+            border-radius: 3px 4px 4px 3px;
+            border-width: 1px;
+            margin: 5px;
+        }
+
+        button
+        {
+            background-color: Transparent;
+            background-repeat: no-repeat;
+            border: none;
+            text-decoration: underline;
+            display: inline-block;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
+            margin: 4px;
+        }
+
+        .current_range
+        {
+            color: orange;
+        }
+
+        .interval-buttons
+        {
+            display: table;
+            margin: 0 auto;
+        }
+
+        button[data-val]
+        {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        .contract-panel
+        {
+            border: 2px solid #157fcc;
+            border-radius: 3px 3px;
+            margin-bottom: 0px;
+        }
+
+        .red_field
+        {
+            background-color: red;
+            opacity: 0.7 !important;
+            color: white;
+        }
+
+        .blue_field
+        {
+            background-color: blue;
+            opacity: 0.7 !important;
+            color: white;
+        }
+
+        .binary_submit_button
+        {
+            border: none;
+            border-radius: 3px 3px;
+            background-color: #2e8836;
+            padding: 8px 10px;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .purchase_docked_panel
+        {
+            background-color: #dedede;
+            padding-top: 3px;
+            font-size: 12px;
+            color: grey;
+        }
+
+        .contract-buy-panel-title
+        {
+            margin-top: 10px !important;
+            font-weight: 600;
+        }
+
+        .contract-buy-panel-price
+        {
+            font-weight: 600;
+        }
+
+        .contract-buy-panel-price-upper
+        {
+            font-size: 65%;
+            vertical-align: text-top;
+            font-weight: 600;
+        }
+
+        .trade-confirm-window .x-window-body, .x-window-default
+        {
+            border: 1px solid #eb6420 !important;
+            border-radius: 0px 0px !important;
+            background-color: #f2f2f2 !important;
+        }
+
+        .x-panel .trade-panel-inner .x-panel-default
+        {
+            background-color: #f2f2f2 !important;
+        }
+
+        .trade-panel-inner .x-panel-body
+        {
+            background-color: #f2f2f2 !important;
+        }
+
+        .header-trade-confirm-window
+        {
+            background: #eb6420 !important;
+            border: none !important;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .header-bold
+        {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .x-window-header-default .x-tool-img
+        {
+            background: url('../Scripts/images/tools/tool-sprites.png') !important;
+        }
+
+        .trade-confirm-longcode
+        {
+            background-color: white;
+            border: 2px solid grey;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ext_daterange"></div>
+    <button style="display: none;" onclick="$(function() { updateDatesFromConfig();})">Show</button>
+
+    <script>
+        Ext.onReady(function ()
+        {
+            Ext.define('PrecisionNumberfield', {
+                extend: 'Ext.form.NumberField',
+                alias: 'widget.precisionNumberfield',
+                initComponent: function ()
+                {
+                    this.callParent(arguments);
+                },
+                setValue: function (v)
+                {
+                    v = typeof v == 'number' ? v : String(v).replace(this.decimalSeparator, ".");
+                    v = isNaN(v) ? '' : String(v).replace(".", this.decimalSeparator);
+                    v = isNaN(v) ? '' : this.fixPrecision(String(v).replace(".", this.decimalSeparator));
+                    return Ext.form.NumberField.superclass.setRawValue.call(this, v);
+                },
+                onSpinUp: function ()
+                {
+                    var me = this;
+                    if (!me.readOnly)
+                    {
+                        var val = parseFloat(me.step);
+                        if (me.getValue() !== '')
+                        {
+                            val = parseFloat(me.getValue());
+                            me.setValue((val + parseFloat(me.step)));
+                        }
+                    }
+                },
+                fixPrecision: function (value)
+                {
+
+                    var nan = isNaN(value);
+                    if (!this.allowDecimals || this.decimalPrecision == -1 || nan || !value)
+                    {
+                        return nan ? '' : value;
+                    }
+                    return parseFloat(value).toFixed(this.decimalPrecision);
+                }
+            });
+
+            Ext.create('Ext.container.Container',
+            {
+                margin: '0px 0px 0px -5px',
+                //renderTo: 'ext_daterange',
+                items:
+                [
+                    {
+                        xtype: 'panel',
+                        layout: 'hbox',
+                        tbar:
+                        [
+                            {
+                                xtype: 'datefield',
+                                flex: 5,
+                                margin: 0,
+                                labelWidth: 30,
+                                value: (new Date()).getDate() - 1,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'timefield',
+                                flex: 4,
+                                margin: 2,
+                                value: new Date().getHours().toString(),
+                                format: 'H:i:s',
+                                increment: 30,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'label',
+                                text: '-'
+                            },
+                            {
+                                xtype: 'datefield',
+                                flex: 5,
+                                margin: '0px 0px 0px -8px',
+                                labelWidth: 15,
+                                value: new Date(),
+                                handler: function (obj, date)
+                                { }
+                            },
+                            {
+                                xtype: 'timefield',
+                                flex: 4,
+                                margin: '2px 3px 2px 2px',
+                                value: new Date().getHours().toString(),
+                                format: 'H:i:s',
+                                increment: 30,
+                                handler: function (obj, date)
+                                { }
+                            },
+                            ' ',
+                            {
+                                xtype: 'button',
+                                flex: 2,
+                                style: 'margin-left: -10px; margin-right: 0px; padding: 3px 0px;',
+                                text: 'Show',
+                                handler: function (picker, date)
+                                { }
+                            }
+                        ]
+                    }
+                ]
+            });
+        });
+    </script>
+    <script src="Mediator.js"></script>
+    <script src="MarketSelector.js"></script>
+    <script>
+        Binary = Binary || {};
+        $(function ()
+        {
+        	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
+        	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
+        });
+    </script>
+    <!--
+    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
+    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
+    <button id="show_spot">Show spot</button><br />
+	-->
+    <table>
+        <tr>
+            <td id="ext_ChartType_div"></td>
+            <td id="ext_Market_div"></td>
+            <td id="ext_Symbol_div"></td>
+        </tr>
+    </table>
+
+    <!--<fieldset>
+        <legend>Contract negotiation</legend>
+        <select id="subMarket_select" name="submarket"></select>
+        <label for="submarket">Submarket</label><br />
+        <select id="contractCategory_select" name="contractCategory">
+            <option value="FLASHD" selected="selected">FLASHD</option>
+        </select>
+        <label for="contractCategory">Contract Category</label><br />
+        <br />
+        <input type="text" id="start_time" name="start_time" style="width: 50px;" value="0" />
+        <label for="start_time">start time</label><br />
+        <input type="text" id="pip_size" name="pip_size" style="width: 50px;" />
+        <label for="pip_size">pip_size</label>
+        <input type="text" id="duration" name="duration" style="width: 50px;" value="3600" />
+        <label for="duration">duration</label><br />
+        <input type="text" id="duration_unit" name="duration_unit" style="width: 50px;" value="sec" />
+        <label for="duration_unit">duration_unit</label>
+        <input type="text" id="payout_currency" name="payout_currency" style="width: 50px;" value="USD" />
+        <label for="payout_currency">payout_currency</label><br />
+        <input type="text" id="payout" name="payout" style="width: 50px;" value="2" />
+        <label for="payout">payout</label>
+        <input type="text" id="amount_type" name="amount_type" style="width: 50px;" />
+        <label for="amount_type">amount_type</label><br />
+        <button id="purchase_btn" style="color: green">Purchase</button>
+        <button id="contract_table">Contract table</button>
+        <button id="contract_chart">Contract chart</button>
+    </fieldset>-->
+
+</body>
+</html>

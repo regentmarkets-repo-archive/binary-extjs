@@ -20,7 +20,7 @@
 		layoutsPanel.resumeEvents();
 	};
 
-	panel.insert(0,
+	var leftPanel = panel.insert(0,
 	{
 		title: 'Options',
 		region: 'west',
@@ -30,6 +30,10 @@
 		maxWidth: 400,
 		split: true,
 		collapsible: true,
+		getComponentList: function()
+		{
+			return this.down('[name="ComponentList"]');
+		},
 		layout:
 		{
 			type: 'accordion',
@@ -97,6 +101,7 @@
 			},
 			{
 				title: 'Components',
+				name: 'ComponentList',
 				border: false,
 				autoScroll: true,
 				hideHeaders: true,
@@ -111,6 +116,7 @@
 					{
 						xtype: 'grid',
 						hideHeaders: true,
+						cls: 'left-panel-components-list',
 						store: dashboard.getComponents(),
 						columns:
 						[
@@ -129,13 +135,40 @@
 									return record.get('Options').Title || "";
 								},
 								flex: 1
+							},
+							{
+								dataIndex: 'IsOnwer',
+								width: 20,
+								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
+								{
+									return record.get('IsOwner') ? "<img src='Scripts/Images/application_edit.png' />" : "";
+								}
+							},
+							{
+								dataIndex: 'IsOnwer',
+								width: 20,
+								renderer: function (value, metaData, record, rowIdx, colIdx, store, view)
+								{
+									return record.get('IsOwner') ? "<img src='Scripts/Images/application_delete.png' />" : "";
+								}
 							}
 						],
 						listeners:
 						{
-							itemclick: function (grid, record, item, index, e, eOpts)
+							cellclick: function (view, cellEl, colIndex, record, rowEl, rowIndex, e)
 							{
-								dashboard.addComponent(record);
+								if (colIndex == 0 || colIndex == 1)
+								{
+									dashboard.addComponent(record);
+								}
+								if (colIndex == 2 && record.get('IsOwner'))
+								{
+									mediator.fireEvent("componentModify", record, dashboard);
+								}
+								if (colIndex == 3 && record.get('IsOwner'))
+								{
+									mediator.fireEvent("componentRemove", record, dashboard);
+								}
 							}
 						}
 					},
@@ -143,6 +176,15 @@
 						xtype: 'container',
 						html: '<i style="font-size:11px">Click on component<br/> to add to the current dashboard</i>',
 						style: 'margin-top:10px; float:right'
+					},
+					{
+						xtype: 'button',
+						text: 'Add gadget',
+						style: 'margin:10px 0px 10px 10px;',
+						handler:  function ()
+						{
+							mediator.fireEvent("componentCreate", null, dashboard);
+						}
 					}
 				]
 			},
@@ -182,4 +224,5 @@
 			}
 		]
 	});
+	return leftPanel;
 };

@@ -1,6 +1,6 @@
 ﻿Ext.app.Dashboard = Ext.app.Dashboard || {};
 
-var layoutsArray =
+Ext.app.Dashboard.DefaultLayouts =
 [
 	{
 		Name: '1-Column',

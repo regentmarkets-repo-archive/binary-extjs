@@ -34,10 +34,7 @@ Ext.define('Ext.app.DashboardPanel',
 					tbar:
 					{
 						name: 'portalpanel-toolbar',
-						style:
-						{
-							marginTop: '5px'
-						},
+						cls: 'dashboard-name-tbar',
 						items:
 						[
 							{

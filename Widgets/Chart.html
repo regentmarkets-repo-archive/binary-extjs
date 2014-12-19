@@ -2,19 +2,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-    <script src="../Scripts/ext-all.js"></script>
+    <script src="../Scripts/ext-all-debug-w-comments.js"></script>
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
+
+	<script src="../Scripts/OpenSocial/os.js"></script>
+	<script src="../Scripts/Binary/Binary.OpenSocial.js"></script>
+
     <script src="../Scripts/jquery-1.9.1.js"></script>
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
-    <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
+    <script src="../Scripts/Binary/Binary.Api.Client.js?v=1"></script>
     <script src="../Widgets/highstock.js"></script>
     <script src="../Widgets/exporting_stocks.js"></script>
     <script src="../Widgets/ChartBarrier.js"></script>
     <script src="../Widgets/Localize.js"></script>
-    <script src="../Widgets/Contracts.js"></script>
-    <script src="../Widgets/LiveChart.js?v=6a"></script>
+    <script src="../Widgets/Contracts.js?v=3"></script>
+    <script src="../Widgets/LiveChart1.js?v=9"></script>
+	
     <style>
         body
         {
@@ -124,7 +129,7 @@
             font-weight: 600;
         }
 
-        .trade-confirm-window  .x-window-body, .x-window-default
+        .trade-confirm-window .x-window-body, .x-window-default
         {
             border: 1px solid #eb6420 !important;
             border-radius: 0px 0px !important;
@@ -133,12 +138,12 @@
 
         .x-panel .trade-panel-inner .x-panel-default
         {
-             background-color: #f2f2f2 !important;
+            background-color: #f2f2f2 !important;
         }
 
         .trade-panel-inner .x-panel-body
         {
-             background-color: #f2f2f2 !important;
+            background-color: #f2f2f2 !important;
         }
 
         .header-trade-confirm-window
@@ -157,13 +162,14 @@
 
         .x-window-header-default .x-tool-img
         {
-             background: url('../Scripts/images/tools/tool-sprites.png') !important;
+            background: url('../Scripts/images/tools/tool-sprites.png') !important;
         }
 
         .trade-confirm-longcode
         {
             background-color: white;
             border: 2px solid grey;
+            padding: 5px;
         }
     </style>
 </head>
@@ -286,71 +292,51 @@
                     }
                 ]
             });
-            Ext.create('Ext.data.Store',
-            {
-                id: 'marketStore',
-                model: Ext.define('Market',
-                {
-                    extend: 'Ext.data.Model',
-                    fields: ['marketName', 'display_name', { name: 'submarkets', type: 'string' }, { name: 'symbols', type: 'string' }, { name: 'contract_categories', type: 'string' }]
-                }),
-                proxy:
-                {
-                    type: 'memory',
-                    reader: { type: 'array' }
-                }
-            });
-
-            Ext.create('Ext.data.Store',
-            {
-                id: 'symbolStore',
-                model: Ext.define('Symbol',
-                {
-                    extend: 'Ext.data.Model',
-                    fields: ['symbol', 'display_name']
-                })
-            });
-            Ext.create('Ext.data.Store', {
-                id: 'offeringsStore',
-                model: Ext.define('Offerings',
-                {
-                    extend: 'Ext.data.Model',
-                    fields: ['market', { name: 'submarket', type: 'string' }, { name: 'symbol', type: 'string' }, { name: 'contract_category', type: 'string' }]
-                }),
-                proxy: {
-                    type: 'memory',
-                    reader: { type: 'array', root: 'offerings' }
-                }
-            });
         });
-
+    </script>
+	<div id="marketSelector" style="width:50%"></div>
+    <script src="Mediator.js"></script>
+    <script src="MarketSelector.js"></script>
+	<script src="Chart.js"></script>
+    <script>
+        Binary = Binary || {};
         $(function ()
         {
-            createChart('R_50', 'ticks', 'M10');
+			var prefs=new gadgets.Prefs();
+			Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector', prefs.getString('CurrentMarket'), prefs.getString('CurrentSymbol'));
+			Binary.Mediator.on('symbolChanged', function(symbolData)
+			{
+				prefs.set("CurrentMarket", symbolData.marketDetails.market);
+				prefs.set("CurrentSymbol", symbolData.symbolDetails.symbol);
+			});
+
+			var chart = new Binary.Charting.ChartClass(
+				prefs.getString('CurrentSymbol') || 'R_50',
+				prefs.getString('CurrentChartType') || 'ticks',
+				prefs.getString('CurrentChartInterval') || 'M10',
+				'LiveChart_container');
+            
             $(".interval-buttons button").click(function ()
             {
-                $(".interval-buttons button").removeClass('current_range');
-                changeResolution($(this).attr("data-val"));
+            	$(".interval-buttons button").removeClass('current_range');
+            	var chartParams=Binary.Charting.ChartInstance.getParams();
+            	Binary.Charting.ChartInstance.update(
+					chartParams.symbol,
+					chartParams.displayName,
+					chartParams.chartType,
+					$(this).attr("data-val"));
+                //changeResolution($(this).attr("data-val"));
                 $(this).toggleClass('current_range');
             });
         });
     </script>
-    <br />
-	<!--
-    <input type="text" value="" class="binary_field" id="high_barrier" placeholder="High barrier" />
-    <input type="text" value="" class="binary_field" id="low_barrier" placeholder="Low barrier" />
-    <button id="show_spot">Show spot</button><br />
-	-->
-    <table>
-        <tr>
-            <td id="ext_ChartType_div"></td>
-            <td id="ext_Market_div"></td>
-            <td id="ext_Symbol_div"></td>
-        </tr>
-    </table>
 
     <div class="interval-buttons">
-        <button data-val="M10" class="current_range">10min</button>
+		<!--
+		<button data-val="ticks" class="current_range">Ticks</button>
+		<button data-val="M1" >1min</button>
+		-->
+        <button data-val="M10">10min</button>
         <button data-val="H1">1h</button>
         <button data-val="H6">6h</button>
         <button data-val="H12">12h</button>

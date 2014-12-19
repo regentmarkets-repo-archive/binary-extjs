@@ -159,28 +159,31 @@ Binary.Api.ManagerClass = function (proxyUrl)
 					return;
 				}
 
-				var listener = me.EventBus.getByKey(data.apiMethod);
-				if (!listener)
+				if (data.apiMethod)
 				{
-					listener = me.EventBus.add(data.apiMethod, new Ext.util.MixedCollection(
+					var listener = me.EventBus.getByKey(data.apiMethod);
+					if (!listener)
 					{
-						firing: false,
-						result: null,
-						cached: data.cached,
-						apiMethod: data.apiMethod
-					}));
-				}
+						listener = me.EventBus.add(data.apiMethod, new Ext.util.MixedCollection(
+						{
+							firing: false,
+							result: null,
+							cached: data.cached,
+							apiMethod: data.apiMethod
+						}));
+					}
 
-				var widget = listener.getByKey(data.widgetID) || listener.add(data.widgetID, {});
-				widget.widgetID = data.widgetID;
+					var widget = listener.getByKey(data.widgetID) || listener.add(data.widgetID, {});
+					widget.widgetID = data.widgetID;
 
-				if (!me.getToken())
-				{
-					return;
-				}
-				if (!listener.firing)
-				{
-					callMethod(listener);
+					if (!me.getToken())
+					{
+						return;
+					}
+					if (!listener.firing)
+					{
+						callMethod(listener);
+					}
 				}
 			});
 		}

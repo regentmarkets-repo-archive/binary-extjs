@@ -2,10 +2,9 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>DashboardDemo</title>
+    <title>binary.com - interface futures</title>
 
-    
-	<script src="Scripts/ext-all.js"></script>    
+	<script src="Scripts/ext-all-debug-w-comments.js"></script>    
 	<script src="Scripts/ext-theme-neptune.js"></script>
 	<link href="Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
 	<script src="Scripts/jquery-1.9.1.js"></script>
@@ -20,9 +19,13 @@
 	<script src="Scripts/Mediator.js"></script>
 	<script src="Scripts/LayoutFactory.js"></script>
 	<script src="Scripts/LeftPanelDashboardEditor.js"></script>
+	<script src="Scripts/ComponentEditor.js"></script>
 
-	<script src="../Scripts/Binary/Binary.Core.js"></script>
-	<script src="../Scripts/Binary/Binary.Api.Manager.js"></script>
+	<script src="Scripts/Binary/Binary.Core.js"></script>
+	<script src="Scripts/Binary/Binary.App.js"></script>
+	<script src="Scripts/Binary/Binary.Api.Manager.js"></script>
+
+
 	
 	<link href="Scripts/cs.css" rel="stylesheet" />
 	<style>
@@ -30,6 +33,14 @@
 	 {
 		 height:100%;
 	 }
+	.dashboard-panel .x-panel-default-framed
+	{
+		border-width:2px;
+	}
+	.dashboard-name-tbar
+	{
+		border-bottom:1px solid red;
+	}
 	</style>
 </head>
 <body>
@@ -38,24 +49,8 @@
 	    
 		Ext.onReady(function ()
 		{
-			Ext.Loader.setConfig({ enabled: true });
-			var proxyUrl = "http://195.24.133.198";
-			window.Dashboard = new Ext.app.Dashboard('dashboardTest', '1', 'local', 'dataComponents.json');
-			var componentsUpdate = function ()
-			{
-				window.Dashboard.getComponents().each(function (component)
-				{
-					if (component.data.Options.Url.indexOf("{proxyUrl}")>-1)
-					{
-						component.data.Options.Url = component.data.Options.Url.replace("{proxyUrl}", proxyUrl);
-					}
-				});
-			};
-			Ext.app.Mediator.on("componentsLoaded", componentsUpdate);
-			Ext.app.Dashboard.ApplyLeftPanelDashboardEditor(window.Dashboard);
-
-			Binary.Api.Manager = new window.Binary.Api.ManagerClass(proxyUrl);
-			Binary.Api.Manager.BeginProcessing();
+			var proxyUrl = "http://195.24.133.198";//"http://localhost:57842";//
+			Binary.App.run(proxyUrl);
 		});
 	</script>
 </body>
