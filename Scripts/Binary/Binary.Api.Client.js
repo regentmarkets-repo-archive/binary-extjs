@@ -71,17 +71,29 @@ Binary.Api.ClientClass = function (autoStart)
 	};
 	this.symbols = function (callback, symbol, chartType, granularity)
 	{
-		var url = String.format("/symbols/{0}/{1}", symbol, Binary.Api.Granularities[granularity].callType || 'candles');
+		var callType = 'candles';
+		var candleSize = null;
+		if (chartType == 'ticks')
+		{
+			callType = Binary.Api.Granularities[granularity].callType;
+		}
+		else
+		{
+			candleSize = 'M1';
+		}
+		var url = String.format("/symbols/{0}/{1}", symbol, callType);
+		
 		var data =
 		{
 			apiMethod: url,
+			candleSize: candleSize,
 			granularity: Binary.Api.Granularities[granularity],
 			callback: callback,
 			intervalCallback: function (params)
 			{
 				var callData = {};
 				callData.start = Math.floor(+new Date / 1000) - params.granularity.seconds;
-				callData.granularity = params.granularity.name;
+				callData.granularity = params.candleSize || params.granularity.name;
 				callData.count = 4000;//params.granularity.seconds / 3;
 				/*
 				if (params.chartType == 'candles' )
@@ -155,11 +167,12 @@ Binary.Api.ClientClass = function (autoStart)
 
 	this.clearIntervals = function ()
 	{
+		Binary.Api.Proxy.unsubscribeAll();
 		for (var p in this.Intervals)
 		{
 			window.clearInterval(this.Intervals[p].timerID);
 			delete this.Intervals[p];
-		}
+		};
 	};
 
 	this.stop = function ()

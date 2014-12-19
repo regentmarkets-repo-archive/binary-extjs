@@ -135,18 +135,19 @@ Binary.Charting.ChartType =
 			}
 		];
 		var chart = this.GetByName(chartTypeName);
-		if (chart.type)
+		if (chart.chart.type)
 		{
-			chartParams.chart.type = chart.type;
-			if (chart.series)
+			var ccs = chart.chart;
+			chartParams.chart.type = ccs.type;
+			if (ccs.series)
 			{
 				chartParams.series = [];
-				for (var i = 0; i < chart.series.length; i++)
+				for (var i = 0; i < ccs.series.length; i++)
 				{
-					var serie = chart.series[i];
+					var serie = ccs.series[i];
 					serie.name = title;
 					serie.data = [];
-					chartParams.series.push(chart.series[i]);
+					chartParams.series.push(serie);
 				}
 			}
 		}
@@ -312,6 +313,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 
 	this.changeSymbol = function (eventData)
 	{
+		Binary.Api.Client.clearIntervals();
 		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.display_name, currentChartType, currentInterval);
 	};
 
