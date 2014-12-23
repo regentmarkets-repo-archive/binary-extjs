@@ -1,7 +1,7 @@
-﻿/// <reference path="../../../Dashboard/Ext.Dashboard/Scripts/ext-all-debug-w-comments.js" />
+﻿/// <reference path="../Scripts/ext-all-debug-w-comments.js" />
 /// <reference path="../Scripts/Binary/Binary.Api.Client.js" />
 
-Binary = Binary || {};
+window.Binary = window.Binary || {};
 
 Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 {

@@ -28,7 +28,7 @@ Binary.Api.ManagerClass = function (proxyUrl)
 			var frame = $("iframe[src*='id=" + widget.widgetID + "']");
 			if (frame.length > 0)
 			{
-				frame[0].contentWindow.postMessage(JSON.stringify({ data: listener.result, apiMethod: listener.apiMethod }), "*");
+				frame[0].contentWindow.postMessage(JSON.stringify({ data: listener.result, originalMessage: listener.originalMessage, apiMethod: listener.apiMethod }), "*");
 			};
 		});
 	};
@@ -169,6 +169,7 @@ Binary.Api.ManagerClass = function (proxyUrl)
 							firing: false,
 							result: null,
 							cached: data.cached,
+							originalMessage: data,
 							apiMethod: data.apiMethod
 						}));
 					}
