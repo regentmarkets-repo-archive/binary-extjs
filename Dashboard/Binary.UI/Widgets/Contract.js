@@ -17,6 +17,16 @@ Binary.ContractsClass = function (renderTo, symbolName)
 		return false;
 	};
 
+	this.requestPrice = function ()
+	{
+		var contractData = '';
+		tabs.query('field')
+		Binary.Api.Client.contract(function (data)
+		{
+		},
+		contractData);
+	};
+
 	this.update = function (symbolTitle)
 	{
 		if (tabs != null)
@@ -24,6 +34,7 @@ Binary.ContractsClass = function (renderTo, symbolName)
 			tabs.destroy();
 		}
 
+		var me = this;
 		Binary.Api.Client.offerings(function (data)
 		{
 			var s = data.offerings;
@@ -36,6 +47,16 @@ Binary.ContractsClass = function (renderTo, symbolName)
 				{
 					title: category.contract_category,
 					layout: 'form',
+					defaults:
+					{
+						listeners:
+						{
+							change: function (combo, value)
+							{
+								me.reqestPrice();
+							}
+						}
+					},
 					items:
 					[
 						{
@@ -73,70 +94,161 @@ Binary.ContractsClass = function (renderTo, symbolName)
 							{
 								change: function (combo, value)
 								{
-
+									me.reqestPrice();
 								}
 							}
 						},
 						{
 							xtype: 'datefield',
-							name: 'durationDays'
+							name: 'durationDays',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'datefield',
-							name: 'endTimeDurationDays'
+							name: 'endTimeDurationDays',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'textfield',
 							readonly: true,
-							name: 'endTimeDurationTime'
+							name: 'endTimeDurationTime',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'label',
-							text: 'minimum duration'
+							text: 'minimum duration',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
-							name: 'duration'
+							name: 'duration',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'combobox',
-							name: 'durationType'
+							name: 'durationType',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
 							name: 'spot',
 							fieldLabel: 'Spot',
-							width: 100
+							width: 100,
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
 							name: 'barrierOffset',
-							fieldLabel: 'Barrier offset'
+							fieldLabel: 'Barrier offset',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
 							name: 'highBarrierOffset',
-							fieldLabel: 'High barrier offset'
+							fieldLabel: 'High barrier offset',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
 							name: 'lowBarrierOffset',
-							fieldLabel: 'Low barrier offset'
+							fieldLabel: 'Low barrier offset',
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'combobox',
 							name: 'payoutType',
-							width: 90
+							width: 90,
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'combobox',
 							name: 'payoutCurrency',
-							width: 77
+							width: 77,
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						},
 						{
 							xtype: 'text',
 							name: 'payoutAmount',
-							width: 85
+							width: 85,
+							listeners:
+							{
+								change: function (combo, value)
+								{
+									me.reqestPrice();
+								}
+							}
 						}
 					]
 				});

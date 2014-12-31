@@ -314,7 +314,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	this.changeSymbol = function (eventData)
 	{
 		Binary.Api.Client.clearIntervals();
-		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.display_name, currentChartType, currentInterval);
+		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.displayName, currentChartType, currentInterval);
 	};
 
 	if (Binary.Charting.ChartInstance != null)

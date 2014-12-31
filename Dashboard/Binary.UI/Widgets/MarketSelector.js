@@ -7,12 +7,12 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 {
 	var marketStore = Ext.create('Ext.data.Store',
 	{
-		fields: ['market', 'display_name']
+		fields: ['market', 'displayName']
 	});
 
 	var symbolStore = Ext.create('Ext.data.Store',
 	{
-		fields: ['market', 'symbol', 'display_name']
+		fields: ['market', 'symbol', 'displayName']
 	});
 
 	Binary.Markets = {};
@@ -28,7 +28,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 			var market = data.markets[i];
 			marketStore.add(
 			{
-				display_name: market.charAt(0).toUpperCase() + market.substr(1),
+				displayName: market.charAt(0).toUpperCase() + market.substr(1),
 				market: market
 			});
 			Binary.Api.Client.markets.market(function (marketData, eventData)
@@ -41,7 +41,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 					{
 						market: eventData.market,
 						symbol: symbolDetails.symbol,
-						display_name: symbolDetails.display_name
+						displayName: symbolDetails.displayName
 					});
 				};
 				marketsCount--;
@@ -71,7 +71,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 							marketSelector = Ext.create('Ext.form.field.ComboBox',
 							{
 								valueField: 'market',
-								displayField: 'display_name',
+								displayField: 'displayName',
 								store: marketStore,
 								queryMode: 'local',
 								editable: false,
@@ -97,7 +97,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 							symbolSelector = Ext.create('Ext.form.field.ComboBox',
 							{
 								valueField: 'symbol',
-								displayField: 'display_name',
+								displayField: 'displayName',
 								store: symbolStore,
 								editable: false,
 								queryMode: 'local',
@@ -119,7 +119,9 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 				}
 			},
 			market,
-			{ market: market });
+			{
+				market: market
+			});
 		}
 	});
-}
+};
