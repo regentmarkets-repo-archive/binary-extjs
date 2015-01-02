@@ -39,11 +39,12 @@
 				{
 					var chart = new Binary.Charting.ChartClass(
 						symbolData.symbolDetails.symbol,
+						symbolData.symbolDetails.displayName,
 						prefs.getString('CurrentChartType') || 'ticks',
 						prefs.getString('CurrentChartInterval') || 'M10',
 						'LiveChart_container');
 				}
-				/*
+				
 				if (contract == null)
 				{
 					contract = new Binary.ContractsClass("contract-container", "Random 50 Index");//symbolData.symbolDetails.displayName);
@@ -52,7 +53,6 @@
 				{
 					contract.update(symbolData.symbolDetails.displayName);
 				}
-				*/
 			});
         });
     </script>

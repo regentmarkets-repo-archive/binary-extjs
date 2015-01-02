@@ -41,7 +41,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 					{
 						market: eventData.market,
 						symbol: symbolDetails.symbol,
-						displayName: symbolDetails.displayName
+						displayName: symbolDetails.display_name
 					});
 				};
 				marketsCount--;

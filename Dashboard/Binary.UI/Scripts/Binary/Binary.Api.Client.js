@@ -72,14 +72,10 @@ Binary.Api.ClientClass = function (autoStart)
 	this.symbols = function (callback, symbol, chartType, granularity)
 	{
 		var callType = 'candles';
-		var candleSize = null;
+		var candleSize = 'M1';
 		if (chartType == 'ticks')
 		{
 			callType = Binary.Api.Granularities[granularity].callType;
-		}
-		else
-		{
-			candleSize = 'M1';
 		}
 		var url = String.format("/symbols/{0}/{1}", symbol, callType);
 		
@@ -93,8 +89,8 @@ Binary.Api.ClientClass = function (autoStart)
 			{
 				var callData = {};
 				callData.start = Math.floor(+new Date / 1000) - params.granularity.seconds;
-				callData.granularity = params.candleSize || params.granularity.name;
-				callData.count = 4000;//params.granularity.seconds / 3;
+				callData.granularity = params.candleSize;
+				callData.count = 4000;
 				/*
 				if (params.chartType == 'candles' )
 				{

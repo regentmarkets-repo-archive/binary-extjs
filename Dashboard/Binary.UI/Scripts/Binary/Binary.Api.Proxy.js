@@ -32,7 +32,9 @@ Binary.Api.DashboardProxy = function ()
 
 	var processCallback = function (e)
 	{
+		//Binary.log("processCallback start");
 		var data = JSON.parse(e.originalEvent.data);
+		//Binary.log("processCallback end");
 		var listener = me.Listeners[data.originalMessage.listenerId];
 		if (listener)
 		{

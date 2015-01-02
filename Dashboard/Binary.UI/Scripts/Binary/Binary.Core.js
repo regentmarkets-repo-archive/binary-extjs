@@ -99,24 +99,28 @@ Binary.Api.Granularities.H1 =
 Binary.Api.Granularities.H2 =
 {
 	name: "H2",
+	callType: 'candles',
 	displayName: "2 Hours",
 	seconds: 2*60*60
 };
 Binary.Api.Granularities.H4 =
 {
 	name: "H4",
+	callType: 'candles',
 	displayName: "4 Hours",
 	seconds: 4*60*60
 };
 Binary.Api.Granularities.H8 =
 {
 	name: "H8",
+	callType: 'candles',
 	displayName: "8 Hours",
 	seconds: 8*60*60
 };
 Binary.Api.Granularities.D =
 {
 	name: "D",
+	callType: 'candles',
 	displayName: "Day",
 	seconds: 24*60*60
 };
@@ -137,3 +141,8 @@ if (!String.format)
 	};
 }
 
+Binary.log = function (message)
+{
+	var dt=new Date();
+	console.log(dt.getMinutes() + ":" + dt.getSeconds() + ":" + dt.getMilliseconds() + " " + message);
+};
