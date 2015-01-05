@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+	<script src="../Scripts/jquery-1.9.1.js"></script>
+	<script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
+</head>
+<body>
+	<style>
+		.portfolio
+		{
+			font-size: 14px;
+		}
+		.portfolio th, .portfolio td
+		{
+			border-bottom:dotted 2px #dddddd;
+		}
+	</style>
+	<table id="portfolio" class="portfolio">
+		<tr>
+			<th style="width:100px">Ref.</th>
+			<th style="width:300px">Start/End</th>
+			<th>Contract Details</th>
+			<th>Purchase/Payout</th>
+		</tr>
+	</table>
+	<script>
+		$(function ()
+		{
+			Binary.Api.Client.portfolio(function (data)
+			{
+				var formatDate = function (date)
+				{
+					return start.getDay() + '/' + start.toString().split(' ')[1] + '/' + (start.getYear() + 1900) + ' ' + start.getHours() + ":" + start.getMinutes() + ':' + start.getSeconds();
+				};
+				var html='';
+				for(var i=0;i<data.contracts.length;i++)
+				{
+					var contract = data.contracts[i];
+					html += String.format("<tr><td>{0}</td><td>{1} / {2}</td><td>{3}</td><td>{4}/{5}</td></tr>",
+						contract.contract_id,
+						formatDate(new Date(contract.start_time * 1000)),
+						formatDate(new Date(contract.expiry_time * 1000)),
+						contract.contract_type + "/" + contract.underlying_symbol,
+						contract.buy_price,
+						contract.payout_price);
+				}
+				$("#portfolio").append(html);
+			});
+		});
+	</script>
+</body>
+</html>
