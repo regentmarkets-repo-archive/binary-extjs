@@ -6,6 +6,9 @@
     <script src="../Scripts/ext-theme-neptune.js"></script>
     <link href="../Scripts/ext-theme-neptune-all.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.9.1.js"></script>
+	<script src="../Scripts/OpenSocial/os.js"></script>
+	<script src="../Scripts/Binary/Binary.OpenSocial.js"></script>
+
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
     <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
@@ -66,7 +69,8 @@
         {
         	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
         	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
-        	Binary.Mediator.on('symbolChanged', function(symbolData)
+        	var prefs = new gadgets.Prefs();
+        	Binary.Mediator.on('symbolChanged', function (symbolData)
         	{
         		prefs.set("CurrentMarket", symbolData.marketDetails.market);
         		prefs.set("CurrentSymbol", symbolData.symbolDetails.symbol);
@@ -79,6 +83,8 @@
         		{
         			Binary.Contracts.update(symbolData.symbolDetails.displayName);
         		}
+        	});
+
         });
     </script>
 </body>

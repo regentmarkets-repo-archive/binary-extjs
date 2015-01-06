@@ -11,43 +11,93 @@
 	<style>
 		.portfolio
 		{
+			font-family:proxima-nova,arial;
 			font-size: 14px;
+			color: #303030;
 		}
 		.portfolio th, .portfolio td
 		{
-			border-bottom:dotted 2px #dddddd;
+			border-bottom:2px dotted #AAAAAA;
+			text-align:center;
 		}
 	</style>
 	<table id="portfolio" class="portfolio">
 		<tr>
-			<th style="width:100px">Ref.</th>
-			<th style="width:300px">Start/End</th>
-			<th>Contract Details</th>
-			<th>Purchase/Payout</th>
+			<th style="width:20%;">Ref.</th>
+			<th style="width:60%">Contract details</th>
+			<th style="width:20%;">Purchase/Payout</th>
 		</tr>
 	</table>
 	<script>
 		$(function ()
 		{
+			/*
+			var contracts =
+			{
+				FLASHU:
+				{
+					action: 'strictly higher'
+				},
+				FLASHD:
+				{
+					action: 'strictly lower'
+				},
+				CALL:
+				{
+					action: 'strictly higher'
+				},
+				PUT:
+				{
+					action: 'strictly lower'
+				},
+				INTRADU:
+				{
+					action: 'strictly higher'
+				},
+				INTRADD:
+				{
+					action: 'strictly lower'
+				},
+				ONETOUCH:
+				{
+					action: '
+				}
+			};
+			*/
 			Binary.Api.Client.portfolio(function (data)
 			{
 				var formatDate = function (date)
 				{
-					return start.getDay() + '/' + start.toString().split(' ')[1] + '/' + (start.getYear() + 1900) + ' ' + start.getHours() + ":" + start.getMinutes() + ':' + start.getSeconds();
+					return date.getDay() + '-' + date.toString().split(' ')[1] + '-' + (date.getYear() + 1900) + ' ' + date.getHours() + ":" + date.getMinutes() + ':' + date.getSeconds();
 				};
 				var html='';
 				for(var i=0;i<data.contracts.length;i++)
 				{
-					var contract = data.contracts[i];
-					html += String.format("<tr><td>{0}</td><td>{1} / {2}</td><td>{3}</td><td>{4}/{5}</td></tr>",
-						contract.contract_id,
-						formatDate(new Date(contract.start_time * 1000)),
-						formatDate(new Date(contract.expiry_time * 1000)),
-						contract.contract_type + "/" + contract.underlying_symbol,
-						contract.buy_price,
-						contract.payout_price);
+					Binary.Api.Client.portfolio(function (contractDetails, contract)
+					{
+						/*
+						html += String.format("<tr><td>{0}</td><td>{1} <strong>{2}</strong> payout if <b>{3}</b> is <b>{4}</b> than <b>{5}</b> at {6} started at {7}</td><td>{8}/{9}</td></tr>",
+							contract.contract_id,
+							'USD',
+							contract.payout_price,
+							contract.underlying_symbol,
+							'highter',//contract.contract_type,
+							'entry spot',
+							formatDate(new Date(contract.expiry_time * 1000)),
+							formatDate(new Date(contract.start_time * 1000)),
+							contract.buy_price,
+							contract.payout_price);
+						*/
+						var html = String.format("<tr><td>{0}</td><td>{1}</td><td>{2}/{3}</td></tr>",
+							contractDetails.contract.contract_id,
+							contractDetails.contract.description,
+							contractDetails.contract.buy_price,
+							contractDetails.contract.payout_price);
+						$("#portfolio").append(html);
+					},
+					data.contracts[i].contract_id, data.contracts[i]);
 				}
-				$("#portfolio").append(html);
+				//$("#portfolio").append(html);
 			});
 		});
 	</script>
