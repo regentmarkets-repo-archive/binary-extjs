@@ -52,29 +52,7 @@ Binary.Api.Granularities = function ()
 	/// <field name="H8" type="String" static="true"></field>
 	/// <field name="D" type="String" static="true"></field>
 }
-/*
-Binary.Api.Granularities.ticks =
-{
-	name: "ticks",
-	callType: 'ticks',
-	displayName: 'Ticks',
-	seconds: 3
-};
-Binary.Api.Granularities.M1 =
-{
-	name: "M1",
-	callType: 'ticks',
-	displayName: '1 Minute',
-	seconds: 60
-};
-Binary.Api.Granularities.M5 =
-{
-	name: "M5",
-	callType: 'ticks',
-	displayName: "5 Minutes",
-	seconds: 5*60
-};
-*/
+
 Binary.Api.Granularities.M10 =
 {
 	name: "M10",
@@ -99,24 +77,28 @@ Binary.Api.Granularities.H1 =
 Binary.Api.Granularities.H2 =
 {
 	name: "H2",
+	callType: 'candles',
 	displayName: "2 Hours",
 	seconds: 2*60*60
 };
 Binary.Api.Granularities.H4 =
 {
 	name: "H4",
+	callType: 'candles',
 	displayName: "4 Hours",
 	seconds: 4*60*60
 };
 Binary.Api.Granularities.H8 =
 {
 	name: "H8",
+	callType: 'candles',
 	displayName: "8 Hours",
 	seconds: 8*60*60
 };
 Binary.Api.Granularities.D =
 {
 	name: "D",
+	callType: 'candles',
 	displayName: "Day",
 	seconds: 24*60*60
 };
@@ -137,3 +119,13 @@ if (!String.format)
 	};
 }
 
+Binary.log = function (message)
+{
+	var dt=new Date();
+	console.log(dt.getMinutes() + ":" + dt.getSeconds() + ":" + dt.getMilliseconds() + " " + message);
+};
+
+Binary.Api.ContractTypes =
+{
+
+};

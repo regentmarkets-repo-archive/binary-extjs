@@ -3,9 +3,9 @@
 		"ID": 23,
 		"Options":
 		{
-			"Height": "640px",
+			"Height": "365px",
 			"Collapsed": false,
-			"Title": "Trade",
+			"Title": "Chart",
 			"IFrame": true,
 			"Url": "/Widgets/Chart.html",
 			"PreventExpandable": false,
@@ -16,11 +16,24 @@
 		"ID": 24,
 		"Options":
 		{
-			"Height": "640px",
+			"Height": "450px",
 			"Collapsed": false,
 			"Title": "Contract",
 			"IFrame": true,
 			"Url": "/Widgets/Contract.html",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/contract.png"
+		}
+	},
+	{
+		"ID": 25,
+		"Options":
+		{
+			"Height": "365px",
+			"Collapsed": false,
+			"Title": "Portfolio",
+			"IFrame": true,
+			"Url": "/Widgets/Portfolio.html",
 			"PreventExpandable": false,
 			"IconUrl": "/Widgets/contract.png"
 		}

@@ -69,7 +69,6 @@ Binary.Api.ManagerClass = function (proxyUrl)
 					{
 						me.EventBus.removeAtKey(listener.apiMethod);
 					}
-					listener.firing = false;
 				}
 			},
 			error: function (x, exception, errorThrown)
@@ -156,6 +155,10 @@ Binary.Api.ManagerClass = function (proxyUrl)
 				{
 					me.setToken(data.data);
 					tokenRequestWindow.hide();
+					me.EventBus.each(function (listener)
+					{
+						callMethod(listener);
+					});
 					return;
 				}
 

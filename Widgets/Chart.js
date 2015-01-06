@@ -166,8 +166,19 @@ Binary.Charting.ChartType =
 
 Binary.Charting.ChartsConfigured = false;
 Binary.Charting.ChartInstance = null;
-Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo)
+Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, timeInterval, renderTo)
 {
+	var dataProcessed = false;
+	var currentSymbol = symbol;
+	var displayName = displaySymbolName;
+	var currentInterval = timeInterval;
+	var currentChartType = chartType;
+	var renderEl = renderTo;
+	var chart = null;
+	var me = this;
+	var chartTypeSelector = null;
+	var chartTimeIntervalSelector = null;
+
 	if (!Binary.Charting.ChartsConfigured)
 	{
 		Highcharts.setOptions(
@@ -211,9 +222,6 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 		Binary.Charting.ChartsConfigured = true;
 	};
 
-	var me = this;
-	var chartTypeSelector = null;
-	var chartTimeIntervalSelector = null;
 	var chartTypeStore=	Ext.create('Ext.data.Store',
 	{
 		fields: ['name', 'displayName']
@@ -314,7 +322,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	this.changeSymbol = function (eventData)
 	{
 		Binary.Api.Client.clearIntervals();
-		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.display_name, currentChartType, currentInterval);
+		me.update(eventData.symbolDetails.symbol, eventData.symbolDetails.displayName, currentChartType, currentInterval);
 	};
 
 	if (Binary.Charting.ChartInstance != null)
@@ -323,27 +331,6 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	}
 	Binary.Charting.ChartInstance = this;
 	Binary.Mediator.on('symbolChanged', this.changeSymbol);
-
-	var dataProcessed = false;
-	var currentSymbol = symbol;
-	var displayName = null;
-	var currentInterval = timeInterval;
-	var currentChartType = chartType;
-	var renderEl = renderTo;
-
-	this.getParams = function ()
-	{
-		var params =
-		{
-			symbol: currentSymbol,
-			displayName: displayName,
-			interval: currentInterval,
-			chartType: currentChartType
-		};
-		return params;
-	};
-	var chart = null;
-	var me = this;
 
 	var createChart = function ()
 	{
@@ -357,7 +344,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 		{
 			chart:
 			{
-				height: 400,
+				height: 300,
 				renderTo: 'chart_' + renderTo,
 				events:
 				{
@@ -368,30 +355,32 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			plotOptions:
 			{
 				series:
-				[{
-					id: 'dataseries',
-					animation: false,
-					dataGrouping:
+				[
 					{
-						dateTimeLabelFormats:
+						id: 'dataseries',
+						animation: false,
+						dataGrouping:
 						{
-							millisecond: ['%A, %b %e, %H:%M:%S.%L GMT', '%A, %b %e, %H:%M:%S.%L', '-%H:%M:%S.%L GMT'],
-							second: ['%A, %b %e, %H:%M:%S GMT', '%A, %b %e, %H:%M:%S', '-%H:%M:%S GMT'],
-							minute: ['%A, %b %e, %H:%M GMT', '%A, %b %e, %H:%M', '-%H:%M GMT'],
-							hour: ['%A, %b %e, %H:%M GMT', '%A, %b %e, %H:%M', '-%H:%M GMT'],
-							day: ['%A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
-							week: ['Week from %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
-							month: ['%B %Y', '%B', '-%B %Y'],
-							year: ['%Y', '%Y', '-%Y']
+							dateTimeLabelFormats:
+							{
+								millisecond: ['%A, %b %e, %H:%M:%S.%L GMT', '%A, %b %e, %H:%M:%S.%L', '-%H:%M:%S.%L GMT'],
+								second: ['%A, %b %e, %H:%M:%S GMT', '%A, %b %e, %H:%M:%S', '-%H:%M:%S GMT'],
+								minute: ['%A, %b %e, %H:%M GMT', '%A, %b %e, %H:%M', '-%H:%M GMT'],
+								hour: ['%A, %b %e, %H:%M GMT', '%A, %b %e, %H:%M', '-%H:%M GMT'],
+								day: ['%A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
+								week: ['Week from %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
+								month: ['%B %Y', '%B', '-%B %Y'],
+								year: ['%Y', '%Y', '-%Y']
+							},
+							turboThreshold: 3000
 						},
-						turboThreshold: 3000
-					},
-					marker:
-					{
-						enabled: false//this.config.with_markers,
-						//radius: 2,
-					},
-				}],
+						marker:
+						{
+							enabled: false//this.config.with_markers,
+							//radius: 2,
+						},
+					}
+				],
 				candlestick:
 				{
 					turboThreshold: 3000
@@ -419,7 +408,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			},
 			title:
 			{
-				text: displayName,// TODO: add real symbol name as translated_display_name()
+				text: displayName
 			}
 		};
 
@@ -448,6 +437,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 	{
 		var chartSettings = Binary.Charting.ChartType.GetByName(currentChartType);
 		var enumerable = chartData.candles || chartData.ticks;
+		//if (dataProcessed) return;
 		if (enumerable && enumerable.length > 0)
 		{
 			if (dataProcessed)
@@ -458,13 +448,16 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 			{
 				for (var i in enumerable)
 				{
+					//dataProcessed ? Binary.log("set candle point start") : '';
 					chartSettings.setPoint(enumerable[i], chart);
+					//dataProcessed ? Binary.log("set candle point end") : '';
 				}
 			}
 			else
 			{
 				for (var i in enumerable)
 				{
+					//dataProcessed ? Binary.log("set tick point start") : '';
 					var pointData = enumerable[i];
 					var tick =
 					{
@@ -472,6 +465,7 @@ Binary.Charting.ChartClass = function (symbol, chartType, timeInterval, renderTo
 						quote: parseFloat(pointData.price)
 					};
 					chart.series[0].addPoint([tick.epoch * 1000, tick.quote], dataProcessed, dataProcessed, false);
+					//dataProcessed ? Binary.log("set tick point end") : '';
 				}
 			}
 			if (!dataProcessed)
