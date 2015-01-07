@@ -27,6 +27,41 @@ Binary.ContractsClass = function (renderTo, symbolName)
 		contractData);
 	};
 
+	var startTimeStore = Ext.create('Ext.data.Store',
+	{
+		fields: ['startTime', 'startTimeLabel'],
+		data:
+		[
+			{
+				startTime: 'Now',
+				startTimeLabel: 'Now'
+			}
+		]
+	});
+
+	var durationTypeStore = Ext.create('Ext.data.Store',
+	{
+		fields: ['duration'],
+		data:
+		[
+			{
+				duration: 'days'
+			},
+			{
+				duration: 'hours'
+			},
+			{
+				duration: 'minutes'
+			},
+			{
+				duration: 'seconds'
+			},
+			{
+				duration: 'ticks'
+			}
+		]
+	});
+
 	this.update = function (symbolTitle)
 	{
 		if (tabs != null)
@@ -49,121 +84,89 @@ Binary.ContractsClass = function (renderTo, symbolName)
 					layout: 'form',
 					defaults:
 					{
-						listeners:
-						{
-							change: function (combo, value)
-							{
-								me.reqestPrice();
-							}
-						}
+						labelSeparator: '',
+						labelWidth: 70,
+						anchor: '50%',
+						labelAlign: 'right'
 					},
 					items:
 					[
 						{
-							labelAlign: 'right',
-							labelSeparator: '',
 							xtype: 'combobox',
 							name: 'startTime',
+							displayField: 'startTimeLabel',
+							valueField: 'startTime',
+							disabled: true,
+							value: 'Now',
+							store: startTimeStore,
 							hidden: !any(category.available, function(item) { return item.is_forward_starting=="Y"; }),
 							fieldLabel: 'Start Time'
 						},
 						{
-							xtype: 'combobox',
-							name: 'durationKind',
-							valueField: 'duration',
-							displayField: 'durationName',
-							queryMode: 'local',
-							value: 'Duration',
-							editable: false,
-							store: Ext.create('Ext.data.Store',
+							xtype: 'fieldcontainer',
+							fieldLabel: ' ',
+							layout: 'hbox',
+							defaults:
 							{
-								fields: ['durationName', 'duration'],
-								data:
-								[
+								flex: 1,
+							},
+							items:
+							[
+								{
+									xtype: 'combobox',
+									name: 'durationKind',
+									valueField: 'duration',
+									displayField: 'durationName',
+									queryMode: 'local',
+									value: 'Duration',
+									editable: false,
+									store: Ext.create('Ext.data.Store',
 									{
-										durationName: 'Duration',
-										duration: 'Duration'
-									},
+										fields: ['durationName', 'duration'],
+										data:
+										[
+											{
+												durationName: 'Duration',
+												duration: 'Duration'
+											},
+											{
+												durationName: 'End Time',
+												duration: 'EndTime'
+											}
+										]
+									}),
+									listeners:
 									{
-										durationName: 'End Time',
-										duration: 'EndTime'
+										change: function (combo, value)
+										{
+											var endTimeVisible = (value == 'EndTime');
+											var ct = this.up();
+											ct.down('[name="endDay"]').setVisible(endTimeVisible);
+											ct.down('[name="endTime"]').setVisible(endTimeVisible);
+											ct.down('[name="duration"]').setVisible(!endTimeVisible);
+											ct.down('[name="durationType"]').setVisible(!endTimeVisible);
+										}
 									}
-								]
-							}),
-							listeners:
-							{
-								change: function (combo, value)
+								},
 								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'datefield',
-							name: 'durationDays',
-							listeners:
-							{
-								change: function (combo, value)
+									xtype: 'datefield',
+									hidden: true,
+									name: 'endDay'
+								},
 								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'datefield',
-							name: 'endTimeDurationDays',
-							listeners:
-							{
-								change: function (combo, value)
+									xtype: 'timefield',
+									hidden: true,
+									name: 'endTime'
+								},
 								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'textfield',
-							readonly: true,
-							name: 'endTimeDurationTime',
-							listeners:
-							{
-								change: function (combo, value)
+									xtype: 'textfield',
+									name: 'duration'
+								},
 								{
-									me.reqestPrice();
+									xtype: 'combobox',
+									name: 'durationType'
 								}
-							}
-						},
-						{
-							xtype: 'label',
-							text: 'minimum duration',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'text',
-							name: 'duration',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'combobox',
-							name: 'durationType',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
+							]
 						},
 						{
 							xtype: 'text',
@@ -256,9 +259,10 @@ Binary.ContractsClass = function (renderTo, symbolName)
 			tabs = Ext.create("Ext.tab.Panel",
 			{
 				renderTo: el,
-				border: 1,
 				bodyStyle: 'padding:10px 10px 10px 10px',
-				width: 400,
+				width: '100%',
+				style: 'max-width:700px',
+				cls: 'aaa',
 				items: items
 			});
 		},
