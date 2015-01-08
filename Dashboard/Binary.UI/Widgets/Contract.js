@@ -8,6 +8,8 @@ Binary.ContractsClass = function (renderTo, symbolName)
 	var symbol = symbolName;
 	var el = renderTo;
 	var tabs = null;
+	var payoutCurrencies = ["USD"];
+	var me=this;
 	var any = function (array, expression)
 	{
 		for (var i = 0; i < array.length; i++)
@@ -39,29 +41,6 @@ Binary.ContractsClass = function (renderTo, symbolName)
 		]
 	});
 
-	var durationTypeStore = Ext.create('Ext.data.Store',
-	{
-		fields: ['duration'],
-		data:
-		[
-			{
-				duration: 'days'
-			},
-			{
-				duration: 'hours'
-			},
-			{
-				duration: 'minutes'
-			},
-			{
-				duration: 'seconds'
-			},
-			{
-				duration: 'ticks'
-			}
-		]
-	});
-
 	this.update = function (symbolTitle)
 	{
 		if (tabs != null)
@@ -69,10 +48,8 @@ Binary.ContractsClass = function (renderTo, symbolName)
 			tabs.destroy();
 		}
 
-		var me = this;
 		Binary.Api.Client.offerings(function (data)
 		{
-			var s = data.offerings;
 			var contractCategories = data.offerings[0].available[0].available[0].available;
 			var items = [];
 			for (var i = 0; i < contractCategories.length; i++)
@@ -81,13 +58,47 @@ Binary.ContractsClass = function (renderTo, symbolName)
 				items.push(
 				{
 					title: category.contract_category,
-					layout: 'form',
+					//layout: 'form',
+					xtype: 'form',
+					name: 'contractContainer',
+					contractMetedata: category,
 					defaults:
 					{
 						labelSeparator: '',
 						labelWidth: 70,
-						anchor: '50%',
+						anchor: '100%',
 						labelAlign: 'right'
+					},
+					listeners:
+					{
+						afterrender: function ()
+						{
+							this.updateUI();
+						}
+					},
+					updateUI: function(offering)
+					{
+						var cm = this.contractMetedata = (offering || this.contractMetedata);
+						this.down('[name="startTime"]').setVisible(
+							any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
+
+						var durationKindCombo=this.down('[name="durationKind"]');
+						var endTimeVisible = (durationKindCombo.getValue() == 'EndTime');
+						this.down('[name="endDay"]').setVisible(endTimeVisible);
+						this.down('[name="endTime"]').setVisible(endTimeVisible);
+						this.down('[name="duration"]').setVisible(!endTimeVisible);
+
+						var durationTypeCombo = this.down('[name="durationType"]');
+						durationTypeCombo.setVisible(!endTimeVisible);
+						durationTypeCombo.store.clearFilter();
+
+						if (!endTimeVisible)
+						{
+							durationTypeCombo.store.filterBy(function (rec)
+							{
+								return any(cm.available, function (item) { return !!rec.data.applicableFor[item.expiry_type]; });
+							});
+						}
 					},
 					items:
 					[
@@ -99,7 +110,6 @@ Binary.ContractsClass = function (renderTo, symbolName)
 							disabled: true,
 							value: 'Now',
 							store: startTimeStore,
-							hidden: !any(category.available, function(item) { return item.is_forward_starting=="Y"; }),
 							fieldLabel: 'Start Time'
 						},
 						{
@@ -108,30 +118,31 @@ Binary.ContractsClass = function (renderTo, symbolName)
 							layout: 'hbox',
 							defaults:
 							{
-								flex: 1,
+								flex: 1
 							},
 							items:
 							[
 								{
 									xtype: 'combobox',
 									name: 'durationKind',
-									valueField: 'duration',
+									valueField: 'durationKind',
 									displayField: 'durationName',
 									queryMode: 'local',
 									value: 'Duration',
+									style: 'margin-right:5px',
 									editable: false,
 									store: Ext.create('Ext.data.Store',
 									{
-										fields: ['durationName', 'duration'],
+										fields: ['durationKind', 'durationName'],
 										data:
 										[
 											{
 												durationName: 'Duration',
-												duration: 'Duration'
+												durationKind: 'Duration'
 											},
 											{
 												durationName: 'End Time',
-												duration: 'EndTime'
+												durationKind: 'EndTime'
 											}
 										]
 									}),
@@ -139,18 +150,14 @@ Binary.ContractsClass = function (renderTo, symbolName)
 									{
 										change: function (combo, value)
 										{
-											var endTimeVisible = (value == 'EndTime');
-											var ct = this.up();
-											ct.down('[name="endDay"]').setVisible(endTimeVisible);
-											ct.down('[name="endTime"]').setVisible(endTimeVisible);
-											ct.down('[name="duration"]').setVisible(!endTimeVisible);
-											ct.down('[name="durationType"]').setVisible(!endTimeVisible);
+											this.up('[name="contractContainer"]').updateUI();
 										}
 									}
 								},
 								{
 									xtype: 'datefield',
 									hidden: true,
+									style: 'margin-right:5px',
 									name: 'endDay'
 								},
 								{
@@ -160,98 +167,121 @@ Binary.ContractsClass = function (renderTo, symbolName)
 								},
 								{
 									xtype: 'textfield',
+									style: 'margin-right:5px',
+									value: 5,
 									name: 'duration'
 								},
 								{
 									xtype: 'combobox',
-									name: 'durationType'
+									name: 'durationType',
+									valueField: 'durationType',
+									displayField: 'durationName',
+									queryMode: 'local',
+									value: 'ticks',
+									editable: false,
+									store: Ext.create('Ext.data.Store',
+									{
+										fields: ['durationType', 'durationName', 'applicableFor'],
+										data:
+										[
+											{
+												durationType: 'days',
+												durationName: 'days',
+												applicableFor: { daily: true }
+											},
+											{
+												durationType: 'hours',
+												durationName: 'hours',
+												applicableFor: { daily: true, intraday: true }
+											},
+											{
+												durationType: 'minutes',
+												durationName: 'minutes',
+												applicableFor: { daily: true, intraday: true }
+											},
+											{
+												durationType: 'seconds',
+												durationName: 'seconds',
+												applicableFor: { daily: true, intraday: true }
+											},
+											{
+												durationType: 'ticks',
+												durationName: 'ticks',
+												applicableFor: { daily: true, intraday: true, tick: true }
+											}
+										]
+									})
 								}
 							]
 						},
 						{
-							xtype: 'text',
+							xtype: 'textfield',
 							name: 'spot',
 							fieldLabel: 'Spot',
-							width: 100,
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
+							anchor: '34%'
 						},
 						{
-							xtype: 'text',
+							xtype: 'textfield',
 							name: 'barrierOffset',
-							fieldLabel: 'Barrier offset',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
+							hidden: true,
+							fieldLabel: 'Barrier offset'
 						},
 						{
-							xtype: 'text',
+							xtype: 'textfield',
 							name: 'highBarrierOffset',
-							fieldLabel: 'High barrier offset',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
+							hidden: true,
+							fieldLabel: 'High barrier offset'
 						},
 						{
-							xtype: 'text',
+							xtype: 'textfield',
 							name: 'lowBarrierOffset',
-							fieldLabel: 'Low barrier offset',
-							listeners:
-							{
-								change: function (combo, value)
-								{
-									me.reqestPrice();
-								}
-							}
+							hidden: true,
+							fieldLabel: 'Low barrier offset'
 						},
 						{
-							xtype: 'combobox',
-							name: 'payoutType',
-							width: 90,
-							listeners:
+							xtype: 'fieldcontainer',
+							fieldLabel: ' ',
+							layout: 'hbox',
+							defaults:
 							{
-								change: function (combo, value)
+								flex: 1
+							},
+							items:
+							[
 								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'combobox',
-							name: 'payoutCurrency',
-							width: 77,
-							listeners:
-							{
-								change: function (combo, value)
+									xtype: 'combobox',
+									name: 'payoutType',
+									valueField: 'payoutType',
+									displayField: 'payoutName',
+									queryMode: 'local',
+									value: 'Payout',
+									editable: false,
+									store: Ext.create('Ext.data.Store',
+									{
+										fields: ['payoutType', 'payoutName'],
+										data:
+										[
+											{
+												payoutType: 'Stake',
+												payoutName: 'Stake'
+											},
+											{
+												payoutType: 'Payout',
+												payoutName: 'Payout'
+											}
+										]
+									})
+								},
 								{
-									me.reqestPrice();
-								}
-							}
-						},
-						{
-							xtype: 'text',
-							name: 'payoutAmount',
-							width: 85,
-							listeners:
-							{
-								change: function (combo, value)
+									xtype: 'combobox',
+									name: 'payoutCurrency',
+									store: payoutCurrencies
+								},
 								{
-									me.reqestPrice();
+									xtype: 'textfield',
+									name: 'payoutAmount'
 								}
-							}
+							]
 						}
 					]
 				});
@@ -269,5 +299,9 @@ Binary.ContractsClass = function (renderTo, symbolName)
 		null, null, symbolTitle, null, null, null, null, null, null);
 	};
 
-	this.update(symbol);
+	Binary.Api.Client.payout_currencies(function (data)
+	{
+		payoutCurrencies = data.payout_currencies;
+		me.update(symbol);
+	});
 };
