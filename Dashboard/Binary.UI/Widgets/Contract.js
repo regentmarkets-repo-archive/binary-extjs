@@ -94,10 +94,15 @@ Binary.ContractsClass = function (renderTo, symbolName)
 
 						if (!endTimeVisible)
 						{
-							durationTypeCombo.store.filterBy(function (rec)
-							{
-								return any(cm.available, function (item) { return !!rec.data.applicableFor[item.expiry_type]; });
-							});
+							durationTypeCombo.store.filter(
+							[
+								{
+									filterFn: function (rec)
+									{
+										return any(cm.available, function (item) { return !!rec.data.applicableFor[item.expiry_type]; });
+									}
+								}
+							]);
 						}
 					},
 					items:
@@ -216,9 +221,11 @@ Binary.ContractsClass = function (renderTo, symbolName)
 						},
 						{
 							xtype: 'textfield',
+							height: 40,
+							width: 250,
+							anchor: null,
 							name: 'spot',
-							fieldLabel: 'Spot',
-							anchor: '34%'
+							fieldLabel: 'Spot'
 						},
 						{
 							xtype: 'textfield',
@@ -255,6 +262,7 @@ Binary.ContractsClass = function (renderTo, symbolName)
 									displayField: 'payoutName',
 									queryMode: 'local',
 									value: 'Payout',
+									style: 'margin-right:5px',
 									editable: false,
 									store: Ext.create('Ext.data.Store',
 									{
@@ -275,10 +283,12 @@ Binary.ContractsClass = function (renderTo, symbolName)
 								{
 									xtype: 'combobox',
 									name: 'payoutCurrency',
+									style: 'margin-right:5px',
 									store: payoutCurrencies
 								},
 								{
 									xtype: 'textfield',
+									value: 30,
 									name: 'payoutAmount'
 								}
 							]

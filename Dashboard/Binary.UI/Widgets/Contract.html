@@ -12,52 +12,10 @@
     <script src="../Scripts/Binary/Binary.Core.js?v=5e"></script>
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
     <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
+
+	<link href="../Scripts/app.css" rel="stylesheet" />
 </head>
 <body>
-
-    <script>
-        Ext.onReady(function ()
-        {
-            Ext.define('PrecisionNumberfield', {
-                extend: 'Ext.form.NumberField',
-                alias: 'widget.precisionNumberfield',
-                initComponent: function ()
-                {
-                    this.callParent(arguments);
-                },
-                setValue: function (v)
-                {
-                    v = typeof v == 'number' ? v : String(v).replace(this.decimalSeparator, ".");
-                    v = isNaN(v) ? '' : String(v).replace(".", this.decimalSeparator);
-                    v = isNaN(v) ? '' : this.fixPrecision(String(v).replace(".", this.decimalSeparator));
-                    return Ext.form.NumberField.superclass.setRawValue.call(this, v);
-                },
-                onSpinUp: function ()
-                {
-                    var me = this;
-                    if (!me.readOnly)
-                    {
-                        var val = parseFloat(me.step);
-                        if (me.getValue() !== '')
-                        {
-                            val = parseFloat(me.getValue());
-                            me.setValue((val + parseFloat(me.step)));
-                        }
-                    }
-                },
-                fixPrecision: function (value)
-                {
-
-                    var nan = isNaN(value);
-                    if (!this.allowDecimals || this.decimalPrecision == -1 || nan || !value)
-                    {
-                        return nan ? '' : value;
-                    }
-                    return parseFloat(value).toFixed(this.decimalPrecision);
-                }
-            });
-        });
-    </script>
     <script src="Mediator.js"></script>
     <script src="MarketSelector.js"></script>
     <script src="Contract.js"></script>
