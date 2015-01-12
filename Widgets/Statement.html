@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+	<script src="../Scripts/jquery-1.9.1.js"></script>
+	<script src="../Scripts/Binary/Binary.Core.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Proxy.js"></script>
+	<script src="../Scripts/Binary/Binary.Api.Client.js"></script>
+</head>
+<body>
+	<style>
+		.statement
+		{
+			font-family:proxima-nova,arial;
+			font-size: 70%;
+			color: #303030;
+		}
+		.statement th, .statement td
+		{
+			border-bottom:2px dotted #AAAAAA;
+			text-align:center;
+		}
+		.statement .loss
+		{
+			color:#c00;
+		}
+		.statement .profit
+		{
+			color:#2e8836;
+		}
+	</style>
+	<table id="statement" class="statement">
+		<tr>
+			<th style="width:15%;">Date</th>
+			<th style="width:10%;">Ref.</th>
+			<th style="width:7%;">Action</th>
+			<th style="width:60%">Contract details</th>
+			<th style="width:7%;">Credit Debit</th>
+			<th style="width:10%;">Balance</th>
+		</tr>
+	</table>
+	<script>
+		$(function ()
+		{
+			Binary.Api.Client.account.statement(function (data)
+			{
+				var formatDate = function (date)
+				{
+					return date.getDay() + '-' + date.toString().split(' ')[1] + '-' + (date.getYear() + 1900) + ' ' + date.getHours() + ":" + date.getMinutes() + ':' + date.getSeconds();
+				};
+				var html = '';
+				for (var i = 0; i < data.transactions.length; i++)
+				{
+					var transaction = data.transactions[i];
+					html += String.format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td style='text-align:right'>{4}</td><td>{5}</td></tr>",
+						formatDate(new Date(transaction.transaction_time * 1000)),
+						transaction.contract_id,
+						transaction.action_type,
+						transaction.description,
+						String.format("<span class='{0}'>{1}</span>", parseFloat(transaction.amount) < 0 ? "loss" : "profit", transaction.amount),
+						transaction.balance_after);
+				}
+				$("#statement").append(html);
+			});
+		});
+	</script>
+</body>
+</html>

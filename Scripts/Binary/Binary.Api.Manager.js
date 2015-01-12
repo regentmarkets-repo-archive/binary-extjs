@@ -28,7 +28,7 @@ Binary.Api.ManagerClass = function (proxyUrl)
 			var frame = $("iframe[src*='id=" + widget.widgetID + "']");
 			if (frame.length > 0)
 			{
-				frame[0].contentWindow.postMessage(JSON.stringify({ data: listener.result, originalMessage: listener.originalMessage, apiMethod: listener.apiMethod }), "*");
+				frame[0].contentWindow.postMessage(JSON.stringify({ data: listener.result, originalMessage: widget.originalMessage, apiMethod: listener.apiMethod }), "*");
 			};
 		});
 	};
@@ -39,6 +39,7 @@ Binary.Api.ManagerClass = function (proxyUrl)
 		if (listener.cached && listener.result)
 		{
 			fireApiResult(listener);
+			return;
 		}
 		listener.firing = true;
 		$.ajax(
@@ -172,13 +173,14 @@ Binary.Api.ManagerClass = function (proxyUrl)
 							firing: false,
 							result: null,
 							cached: data.cached,
-							originalMessage: data,
 							apiMethod: data.apiMethod
 						}));
 					}
 
-					var widget = listener.getByKey(data.widgetID) || listener.add(data.widgetID, {});
+					var widget = listener.getByKey(data.widgetID) || listener.add(data.widgetID, { });
 					widget.widgetID = data.widgetID;
+					widget.listenerId = data.listenerId
+					widget.originalMessage = data;
 
 					if (!me.getToken())
 					{

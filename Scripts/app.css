@@ -1,0 +1,41 @@
+﻿	html, body
+	{
+		height:100%;
+	}
+	.x-panel-header-default-framed-top, .x-panel-header-default-framed .x-tool-img,
+	.x-panel-header-default, .x-panel-header-default .x-tool-img,
+	.x-tab-default-top,
+	.x-tab-bar-default
+	{
+		background-color:rgb(42, 48, 82);
+	}
+	.x-accordion-item .x-accordion-hd
+	{
+		background-color:rgb(233, 128, 36);
+		/*background-color:rgb(212, 218, 222);*/
+	}
+	.x-accordion-item .x-panel-header-default .x-tool-img, .x-tab-default-active
+	{
+		background-color:rgb(233, 128, 36);
+	}
+	.x-grid-row-selected .x-grid-td
+	{
+		background-color:rgb(253, 228, 136);
+	}
+	.x-accordion-hd .x-panel-header-text-container, .x-tab-default-active .x-tab-inner
+	{
+		color:white;
+	}
+	.x-panel-default, .x-panel-default-framed, .x-panel-header-default-framed-top,
+	.x-tab-bar-strip-default
+	{
+		border-color:rgb(42, 48, 82);
+	}
+	.dashboard-panel .x-panel-default-framed
+	{
+		border-width:2px;
+	}
+	.dashboard-name-tbar
+	{
+		border-bottom:1px solid red;
+	}

@@ -388,19 +388,8 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 			},
 			xAxis:
 			{
-				type: 'datetime',
+				type: 'datetime'
 				//min: this.config.from * 1000,
-			},
-			yAxis:
-			{
-				labels:
-				{
-					formatter: function () { return this.value; }
-				},
-				title:
-				{
-					text: null
-				}
 			},
 			rangeSelector:
 			{
@@ -409,6 +398,10 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 			title:
 			{
 				text: displayName
+			},
+			tooltip:
+			{
+				pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.2f}</b><br/>'
 			}
 		};
 

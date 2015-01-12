@@ -34,12 +34,12 @@ Binary.Api.ClientClass = function (autoStart)
 
 	this.markets = function (callback)
 	{
-		postMsg("/markets", callback);
+		postMsg("/markets", callback, true);
 	};
 
 	this.markets.market = function (callback, market, eventData)
 	{
-		postMsg("/markets/" + market, callback, false, null, eventData);
+		postMsg("/markets/" + market, callback, true, null, eventData);
 	};
 
 	this.markets.contract_categories = function (callback, market)
@@ -124,12 +124,12 @@ Binary.Api.ClientClass = function (autoStart)
 		if (submarket) rd.submarket = submarket;
 		if (symbol) rd.symbol = symbol;
 
-		postMsg("/offerings", callback, false, rd, rd);
+		postMsg("/offerings", callback, true, rd, rd);
 	};
 
 	this.payout_currencies = function (callback)
 	{
-		postMsg("/payout_currencies", callback);
+		postMsg("/payout_currencies", callback, true);
 	};
 
 	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, callType, barrier_low, barrier_high)
