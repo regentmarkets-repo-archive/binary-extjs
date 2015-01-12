@@ -259,7 +259,7 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 		renderTo: 'chartSettings_' + renderTo,
 		width: '100%',
 		layout: 'column',
-		bodyStyle: 'margin: 3px 3px 3px 3px',
+		style: 'padding: 7px 3px 7px 3px',
 		defaults:
 		{
 			columnWidth: 1 / 2
@@ -278,6 +278,7 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 			{
 				valueField: 'name',
 				displayField: 'displayName',
+				style: 'margin-right: 5px',
 				store: chartTypeStore,
 				queryMode: 'local',
 				editable: false,

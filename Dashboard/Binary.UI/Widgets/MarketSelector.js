@@ -53,7 +53,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 						renderTo: el,
 						width: '100%',
 						layout: 'column',
-						bodyStyle: 'margin: 3px 3px 3px 3px',
+						style: 'padding: 7px 3px 7px 3px',
 						defaults:
 						{
 							columnWidth: 1 / 2
@@ -75,6 +75,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 								store: marketStore,
 								queryMode: 'local',
 								editable: false,
+								style: 'margin-right: 5px',
 								value: 'initial',
 								listeners:
 								{

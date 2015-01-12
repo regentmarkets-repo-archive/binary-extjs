@@ -13,9 +13,9 @@
     <script src="../Scripts/Binary/Binary.Api.Proxy.js?v=1"></script>
     <script src="../Scripts/Binary/Binary.Api.Client.js?v=6"></script>
 
-	<link href="../Scripts/app.css" rel="stylesheet" />
+	<link href="../Scripts/app.css?v=1" rel="stylesheet" />
 </head>
-<body>
+<body style="overflow-x:hidden">
     <script src="Mediator.js"></script>
     <script src="MarketSelector.js"></script>
     <script src="Contract.js"></script>
@@ -25,6 +25,7 @@
         Binary = Binary || {};
         $(function ()
         {
+        	$('body').css("min-width", $(window).width()+20);
         	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
         	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
         	var prefs = new gadgets.Prefs();

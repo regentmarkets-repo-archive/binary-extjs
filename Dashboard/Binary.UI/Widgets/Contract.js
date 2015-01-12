@@ -6,6 +6,7 @@ window.Binary = window.Binary || {};
 Binary.ContractsClass = function (renderTo, symbolName)
 {
 	var symbol = symbolName;
+	var currentContract = null;
 	var el = renderTo;
 	var tabs = null;
 	var payoutCurrencies = ["USD"];
@@ -61,11 +62,12 @@ Binary.ContractsClass = function (renderTo, symbolName)
 					//layout: 'form',
 					xtype: 'form',
 					name: 'contractContainer',
+					bodyStyle: 'background-color:rgb(245,245,245)',
 					contractMetedata: category,
 					defaults:
 					{
 						labelSeparator: '',
-						labelWidth: 70,
+						labelWidth: 65,
 						anchor: '100%',
 						labelAlign: 'right'
 					},
@@ -222,7 +224,9 @@ Binary.ContractsClass = function (renderTo, symbolName)
 						{
 							xtype: 'textfield',
 							height: 40,
-							width: 250,
+							width: 200,
+							fieldStyle: 'font-size:20px',
+							labelStyle: 'margin-top:10px',
 							anchor: null,
 							name: 'spot',
 							fieldLabel: 'Spot'
@@ -299,10 +303,8 @@ Binary.ContractsClass = function (renderTo, symbolName)
 			tabs = Ext.create("Ext.tab.Panel",
 			{
 				renderTo: el,
-				bodyStyle: 'padding:10px 10px 10px 10px',
+				style: 'padding: 7px 3px 7px 3px; max-width:700px',
 				width: '100%',
-				style: 'max-width:700px',
-				cls: 'aaa',
 				items: items
 			});
 		},

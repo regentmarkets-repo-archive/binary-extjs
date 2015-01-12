@@ -30,6 +30,7 @@ Ext.define('Ext.app.DashboardPanel',
 					region: 'center',
 					flex: 1,
 					autoScroll: true,
+					//style: 'overflow-y:scroll',
 					bodyStyle: 'padding:0px 0px 10px 5px',
 					tbar:
 					{
