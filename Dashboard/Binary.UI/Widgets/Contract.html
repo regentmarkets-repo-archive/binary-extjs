@@ -27,8 +27,12 @@
         {
         	$('body').css("min-width", $(window).width()+20);
         	Binary.Mediator = Binary.Mediator || Binary.CreateMediator();
-        	Binary.MarketSelector = new Binary.MarketSelectorClass('marketSelector');
+
         	var prefs = new gadgets.Prefs();
+        	Binary.MarketSelector = new Binary.MarketSelectorClass(
+				'marketSelector',
+				prefs.getString("CurrentMarket"),
+				prefs.getString("CurrentSymbol"));
         	Binary.Mediator.on('symbolChanged', function (symbolData)
         	{
         		prefs.set("CurrentMarket", symbolData.marketDetails.market);
@@ -36,11 +40,11 @@
 
         		if (!Binary.Contracts)
         		{
-        			Binary.Contracts = new Binary.ContractsClass("contract-container", symbolData.symbolDetails.displayName);
+        			Binary.Contracts = new Binary.ContractsClass("contract-container", symbolData);
         		}
         		else
         		{
-        			Binary.Contracts.update(symbolData.symbolDetails.displayName);
+        			Binary.Contracts.update(symbolData);
         		}
         	});
 
