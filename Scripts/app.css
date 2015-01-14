@@ -2,6 +2,10 @@
 	{
 		height:100%;
 	}
+.x-tab-bar-strip-default
+{
+	background-color:white;
+}
 	.x-panel-header-default-framed-top, .x-panel-header-default-framed .x-tool-img,
 	.x-panel-header-default, .x-panel-header-default .x-tool-img,
 	.x-tab-default-top,

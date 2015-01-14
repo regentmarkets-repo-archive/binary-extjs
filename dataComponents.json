@@ -35,7 +35,20 @@
 			"IFrame": true,
 			"Url": "/Widgets/Portfolio.html",
 			"PreventExpandable": false,
-			"IconUrl": "/Widgets/contract.png"
+			"IconUrl": "/Widgets/trading_times.png"
+		}
+	},
+	{
+		"ID": 27,
+		"Options":
+		{
+			"Height": "365px",
+			"Collapsed": false,
+			"Title": "Statement",
+			"IFrame": true,
+			"Url": "/Widgets/Statement.html",
+			"PreventExpandable": false,
+			"IconUrl": "/Widgets/pricing_table.png"
 		}
 	}
 	/*,

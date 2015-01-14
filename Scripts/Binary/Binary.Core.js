@@ -127,5 +127,67 @@ Binary.log = function (message)
 
 Binary.Api.ContractTypes =
 {
-
+	"Rise/Fall":
+	{
+		name: "risefall",
+		contracts:
+		[
+			"DOUBLEDOWN", "DOUBLEUP", "FLASHD", "FLASHU", "INTRADD", "INTRADU"
+		],
+		ticksAllowed: true
+	},
+	"Ends Between/Outside":
+	{
+		name: "endsinout",
+		contracts:
+		[
+			"EXPIRYMISS", "EXPIRYRANGE"
+		],
+		ticksAllowed: true
+	},
+	"Higher/Lower":
+	{
+		name: "higherlower",
+		contracts:
+		[
+			"CALL", "PUT"
+		],
+		ticksAllowed: true
+	},
+	"Touch/No Touch":
+	{
+		name: "touchnotouch",
+		contracts:
+		[
+			"NOTOUCH", "ONETOUCH"
+		],
+		ticksAllowed: true
+	},
+	"Ends Between/Outside":
+	{
+		name: "staysinout",
+		contracts:
+		[
+			"RANGE", "UPORDOWN"
+		],
+		ticksAllowed: true
+	},
+	"Asians":
+	{
+		name: "asian",
+		contracts:
+		[
+			"ASIAND", "ASIANU"
+		],
+		ticksAllowed: true
+	},
+	"Digits" :
+	{
+		name: "digits",
+		contracts:
+		[
+			"DIGITDIFF", "DIGITMATCH"
+		],
+		ticksAllowed: true
+	}
 };
