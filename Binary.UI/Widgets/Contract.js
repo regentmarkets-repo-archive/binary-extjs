@@ -33,34 +33,10 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	var symbolDataRequestCompleted = function (data)
 	{
 		var tab = tabs.getActiveTab();
-		//set duration kind 'Duration'
-		tab.getDurationKindCombo().setValue('Duration');
-
-		//set minimum duration type for symbol
-		var durationTypeCombo = tab.getDurationTypeCombo();
-		var minStoreTime = Number.MAX_VALUE;
-		var minRecord = null;
-		durationTypeCombo.store.each(function(rec)
-		{
-			if (minStoreTime > rec.get('tick'))
-			{
-				minStoreTime = rec.get('tick');
-				minRecord = rec;
-			}
-		});
-		durationTypeCombo.setValue(minRecord.get(durationTypeCombo.valueField));
-		//set minimal value
-		//var minDurationValue = ;
-		var minIntradayDuration = Number.MAX_VALUE;
-		for (var p in data)
-		{
-			if (data[p].intraday_durations && minIntradayDuration > data[p].intraday_durations.min)
-			{
-				minIntradayDuration = data[p].intraday_durations.min;
-			}
-		}
-		tab.getDurationField().setValue(minIntradayDuration / minStoreTime);
+		tab.symboldata = data;
+		tab.updateUI();
 	};
+
 	//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
 	var symbolCache = {};
 	var requestPrice = function ()
@@ -120,12 +96,17 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					name: 'contractContainer',
 					bodyStyle: 'background-color:rgb(245,245,245)',
 					contractMetedata: category,
+					endTimeMode: false,
 					defaults:
 					{
 						labelSeparator: '',
 						labelWidth: 65,
 						anchor: '100%',
-						labelAlign: 'right'
+						labelAlign: 'right',
+						getContainer: function()
+						{
+							return this.up();	//'[name="contractContainer"]'
+						}
 					},
 					listeners:
 					{
@@ -146,23 +127,27 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						return this.down('[name="duration"]');
 					},
+					getValues: function()
+					{
+
+					},
 					updateUI: function(offering)
 					{
 						var cm = this.contractMetedata = (offering || this.contractMetedata);
+						var me = this;
 						this.down('[name="startTime"]').setVisible(
 							any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
 
 						var durationKindCombo=this.getDurationKindCombo();
-						var endTimeVisible = (durationKindCombo.getValue() == 'EndTime');
-						this.down('[name="endDay"]').setVisible(endTimeVisible);
-						this.down('[name="endTime"]').setVisible(endTimeVisible);
-						this.getDurationField().setVisible(!endTimeVisible);
+						this.down('[name="endDay"]').setVisible(me.endTimeMode);
+						this.down('[name="endTime"]').setVisible(me.endTimeMode);
+						this.getDurationField().setVisible(!me.endTimeMode);
 
 						var durationTypeCombo = this.getDurationTypeCombo();
-						durationTypeCombo.setVisible(!endTimeVisible);
+						durationTypeCombo.setVisible(!me.endTimeMode);
 						durationTypeCombo.store.clearFilter();
 
-						if (!endTimeVisible)
+						if (!me.endTimeMode)
 						{
 							durationTypeCombo.store.filter(
 							[
@@ -193,7 +178,11 @@ Binary.ContractsClass = function (renderTo, symbolData)
 							layout: 'hbox',
 							defaults:
 							{
-								flex: 1
+								flex: 1,
+								getContainer: function()
+								{
+									return this.up().getContainer();
+								}
 							},
 							items:
 							[
@@ -225,7 +214,9 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									{
 										change: function (combo, value)
 										{
-											this.up('[name="contractContainer"]').updateUI();
+											var container = this.getContainer();
+											container.endTimeMode = (value == 'Endtime');
+											container.updateUI();
 										}
 									}
 								},
@@ -241,9 +232,13 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									name: 'endTime'
 								},
 								{
-									xtype: 'textfield',
+									xtype: 'numberfield',
 									style: 'margin-right:5px',
 									value: 5,
+									minValue: 5,
+									maxValue: 15,
+									allowDecimals: false,
+									hideTrigger:true,
 									name: 'duration'
 								},
 								{

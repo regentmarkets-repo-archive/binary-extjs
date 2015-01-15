@@ -51,3 +51,4 @@ is loaded.
 
 This folder contains the styling for the application's views. See BinaryUI/sass/Readme.md
 for details.
+ 
