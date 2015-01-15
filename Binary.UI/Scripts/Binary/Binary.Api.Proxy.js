@@ -27,7 +27,7 @@ Binary.Api.DashboardProxy = function ()
 			listenerId: listenerId,
 			eventData: eventData
 		};
-		top.postMessage(JSON.stringify(message), "*");
+		top.postMessage(Binary.PostMessageApiPrefix + JSON.stringify(message), "*");
 	};
 
 	var processCallback = function (e)

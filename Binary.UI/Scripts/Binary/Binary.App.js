@@ -1,4 +1,7 @@
-﻿ns("Binary.App");
+﻿/// <reference path="Binary.Core.js" />
+/// <reference path="../Dashboard.js" />
+
+ns("Binary.App");
 
 Binary.App.run = function (proxyUrl)
 {
@@ -42,5 +45,30 @@ Binary.App.run = function (proxyUrl)
 
 	Binary.Api.Manager = new window.Binary.Api.ManagerClass(proxyUrl);
 	Binary.Api.Manager.BeginProcessing();
+
+	$(window).bind("message", function (e)
+	{
+		if (e.originalEvent.data.indexOf(Binary.PostMessageOSPrefix) == 0)
+		{
+			var data = $.parseJSON(e.originalEvent.data.substr(Binary.PostMessageOSPrefix.length));
+			if(data.action == 'set_title')
+			{
+				Ext.each(window.Dashboard.DashboardPanel.getPortalPanel().query('portlet'), function (portlet)
+				{
+					if (portlet.component.data.ID == data.widgetID)
+					{
+						portlet.setTitle(data.data);
+					}
+				});
+			}
+		}
+	});
 };
 
+Binary.App.OpenSocial =
+{
+	set_title: function (data)
+	{
+		Binary.App.getWidgetEl(data.widgetID)
+	}
+};

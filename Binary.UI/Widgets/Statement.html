@@ -48,6 +48,10 @@
 				{
 					return date.getDay() + '-' + date.toString().split(' ')[1] + '-' + (date.getYear() + 1900) + ' ' + date.getHours() + ":" + date.getMinutes() + ':' + date.getSeconds();
 				};
+				var formatDecimal = function (decimal)
+				{
+					return parseFloat(Math.round(decimal * 100) / 100).toFixed(2);
+				};
 				var html = '';
 				for (var i = 0; i < data.transactions.length; i++)
 				{
@@ -57,8 +61,8 @@
 						transaction.contract_id,
 						transaction.action_type,
 						transaction.description,
-						String.format("<span class='{0}'>{1}</span>", parseFloat(transaction.amount) < 0 ? "loss" : "profit", transaction.amount),
-						transaction.balance_after);
+						String.format("<span class='{0}'>{1}</span>", parseFloat(transaction.amount) < 0 ? "loss" : "profit", formatDecimal(transaction.amount)),
+						formatDecimal(transaction.balance_after));
 				}
 				$("#statement").append(html);
 			});

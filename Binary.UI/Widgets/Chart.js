@@ -253,13 +253,13 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 		}
 	}
 
-	Ext.fly(document.getElementById(renderTo)).update('<div id="chartSettings_' + renderTo + '"></div><br/><div id="chart_' + renderTo + '"></div>');
+	Ext.fly(document.getElementById(renderTo)).update('<div id="chartSettings_' + renderTo + '"></div><div id="chart_' + renderTo + '"></div>');
 	var chartContainer = new Ext.container.Container(
 	{
 		renderTo: 'chartSettings_' + renderTo,
 		width: '100%',
 		layout: 'column',
-		style: 'padding: 7px 3px 7px 3px',
+		style: 'padding: 3px 3px 3px 3px',
 		defaults:
 		{
 			columnWidth: 1 / 2
@@ -335,6 +335,8 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 
 	var createChart = function ()
 	{
+		gadgets.window.setTitle(displayName);
+
 		dataProcessed = false;
 		Binary.Api.Client.clearIntervals();
 		if (chart != null)
@@ -396,10 +398,11 @@ Binary.Charting.ChartClass = function (symbol, displaySymbolName, chartType, tim
 			{
 				enabled: false,
 			},
+			/*
 			title:
 			{
 				text: displayName
-			},
+			},*/
 			tooltip:
 			{
 				pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.2f}</b><br/>'

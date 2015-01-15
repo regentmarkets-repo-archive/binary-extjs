@@ -46,7 +46,7 @@ namespace Binary.OAuthProxy.Controllers
 			catch (WebException ex)
 			{
 				HttpWebResponse response = ex.Response as HttpWebResponse;
-				result = string.Format(HomeController.ResponseTemplate, ex.Message, (int)response.StatusCode);
+				result = string.Format(HomeController.ResponseTemplate, ex.Message, response == null ? 500 : (int)response.StatusCode);
 			}
 
             return string.Format("{0}({1})", callback, result);
@@ -127,7 +127,7 @@ namespace Binary.OAuthProxy.Controllers
 			return string.Format(
 				@"<body><script>
 				var message=JSON.stringify({0});
-				top.postMessage(message, '*');
+				top.postMessage('BinaryApiCall' + message, '*');
 				</script></body>",
 				new JavaScriptSerializer().Serialize(new
 				{

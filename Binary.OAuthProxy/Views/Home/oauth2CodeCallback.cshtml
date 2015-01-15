@@ -18,7 +18,7 @@
     var binary = new BinaryClient();
     binary.SetAuthInfo(authData);
 
-    top.postMessage(JSON.stringify(
+    top.postMessage('BinaryApiCall' + JSON.stringify(
     {
         data: authData,
         apiMethod: 'Token'

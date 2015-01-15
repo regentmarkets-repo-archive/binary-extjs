@@ -1,4 +1,7 @@
-﻿gadgets.Prefs = function ()
+﻿/// <reference path="Binary.Core.js" />
+/// <reference path="../OpenSocial/os.js" />
+
+gadgets.Prefs = function ()
 {
 	var esc = gadgets.util.escapeString;
 	var prefs = {};
@@ -90,4 +93,15 @@
 	{
 		return moduleId;
 	};
+};
+
+gadgets.window.setTitle = function (title)
+{
+	var data =
+	{
+		widgetID: gadgets.util.getUrlParameters()['ID'],
+		action: 'set_title',
+		data: title
+	};
+	top.postMessage(Binary.PostMessageOSPrefix + JSON.stringify(data), "*");
 };

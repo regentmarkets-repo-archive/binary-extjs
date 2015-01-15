@@ -151,7 +151,12 @@ Binary.Api.ManagerClass = function (proxyUrl)
 			processing = true;
 			$(window).bind("message", function (e)
 			{
-				var data = $.parseJSON(e.originalEvent.data);
+				if (e.originalEvent.data.indexOf(Binary.PostMessageApiPrefix) != 0)
+				{
+					return;
+				}
+
+				var data = $.parseJSON(e.originalEvent.data.substr(Binary.PostMessageApiPrefix.length));
 				if (data.apiMethod == Binary.Api.Methods.Token)
 				{
 					me.setToken(data.data);

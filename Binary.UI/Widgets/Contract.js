@@ -21,45 +21,14 @@ Binary.ContractsClass = function (renderTo, symbolData)
 		return false;
 	};
 
-	var priceRequest = function()
-	{
-		Binary.Api.Client.contract(function (contractData)
-		{
-
-		},
-		contractData);
-	};
-
-	var symbolDataRequestCompleted = function (data)
-	{
-		var tab = tabs.getActiveTab();
-		tab.symboldata = data;
-		tab.updateUI();
-	};
-
-	//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
 	var symbolCache = {};
 	var requestPrice = function ()
 	{
-		var contractData = '';
-		var contractTypeName = tabs.getActiveTab().title;
-		var contractType = Binary.Api.ContractTypes[contractTypeName].name;
-		var cacheKey = contractType + symbolInfo.symbolDetails.symbol;
-		if (symbolCache[cacheKey])
+		Binary.Api.Client.contract(function (contractData)
 		{
-			symbolDataRequestCompleted(symbolCache[cacheKey]);
-		}
-		else
-		{
-			Binary.Api.Client.markets.contract_categories.contract_category(function (data)
-			{
-				symbolCache[cacheKey] = data;
-				symbolDataRequestCompleted(symbolCache[cacheKey]);
-			},
-			symbolInfo.marketDetails.market,
-			contractType,
-			symbolInfo.symbolDetails.symbol);
-		}
+			//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
+		},
+		contractData);
 	};
 
 	var startTimeStore = Ext.create('Ext.data.Store',
@@ -96,6 +65,8 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					name: 'contractContainer',
 					bodyStyle: 'background-color:rgb(245,245,245)',
 					contractMetedata: category,
+					symbolData: symbolInfo,
+					symbolContractData: null,
 					endTimeMode: false,
 					defaults:
 					{
@@ -112,7 +83,28 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						afterrender: function ()
 						{
-							this.updateUI();
+							var me = this;
+							var contractTypeName = me.title;
+							var contractType = Binary.Api.ContractTypes[contractTypeName].name;
+							var cacheKey = contractType + me.symbolData.symbolDetails.symbol;
+							if (symbolCache[cacheKey])
+							{
+								me.symbolContractData = symbolCache[cacheKey];
+								me.updateUI();
+							}
+							else
+							{
+								me.setLoading(true);
+								Binary.Api.Client.markets.contract_categories.contract_category(function (data)
+								{
+									me.setLoading(false);
+									me.symbolContractData = symbolCache[cacheKey] = data;
+									me.updateUI();
+								},
+								me.symbolData.marketDetails.market,
+								contractType,
+								me.symbolData.symbolDetails.symbol);
+							}
 						}
 					},
 					getDurationKindCombo: function()
@@ -134,30 +126,52 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					updateUI: function(offering)
 					{
 						var cm = this.contractMetedata = (offering || this.contractMetedata);
-						var me = this;
+						//var me = this;
 						this.down('[name="startTime"]').setVisible(
 							any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
 
 						var durationKindCombo=this.getDurationKindCombo();
-						this.down('[name="endDay"]').setVisible(me.endTimeMode);
-						this.down('[name="endTime"]').setVisible(me.endTimeMode);
-						this.getDurationField().setVisible(!me.endTimeMode);
+						this.down('[name="endDay"]').setVisible(this.endTimeMode);
+						this.down('[name="endTime"]').setVisible(this.endTimeMode);
+						this.getDurationField().setVisible(!this.endTimeMode);
 
 						var durationTypeCombo = this.getDurationTypeCombo();
 						durationTypeCombo.setVisible(!me.endTimeMode);
-						durationTypeCombo.store.clearFilter();
 
-						if (!me.endTimeMode)
+						if (!this.endTimeMode)
 						{
+							durationTypeCombo.store.clearFilter();
 							durationTypeCombo.store.filter(
 							[
 								{
 									filterFn: function (rec)
 									{
-										return any(cm.available, function (item) { return !!rec.data.applicableFor[item.expiry_type]; });
+										return any(cm.available, function (item) { return rec.data.durationType==item.expiry_type; });
 									}
 								}
 							]);
+							var selectedDurationType = durationTypeCombo.store.last().get(durationTypeCombo.valueField);
+							durationTypeCombo.suspendEvents(false);
+							durationTypeCombo.setValue(selectedDurationType);
+							durationTypeCombo.resumeEvents();
+
+							if (this.symbolContractData && false)
+							{
+								var durationField = this.getDurationField();
+								var minValue = 5;
+								var maxValue = 15;
+								if (selectedDurationType != 'ticks')
+								{
+									//var property
+									for (var p in this.symbolContractData)
+									{
+										//if (this.symbolContractData[p][
+									}
+								}
+								durationField.setValue(minValue);
+								durationField.setMinValue(minValue);
+								durationField.setMaxValue(maxValue);
+							}
 						}
 					},
 					items:
@@ -251,38 +265,32 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									editable: false,
 									store: Ext.create('Ext.data.Store',
 									{
-										fields: ['durationType', 'durationName', 'applicableFor', 'tick'],
+										fields: ['durationType', 'durationName', 'timeInterval'],
 										data:
 										[
 											{
-												durationType: 'days',
+												durationType: 'daily',
 												durationName: 'days',
-												tick: 1*60*60*24,
-												applicableFor: { daily: true }
+												timeInterval: 1*60*60*24
 											},
 											{
-												durationType: 'hours',
+												durationType: 'intraday',
 												durationName: 'hours',
-												tick: 60*60,
-												applicableFor: { daily: true, intraday: true }
+												timeInterval: 60*60
 											},
 											{
-												durationType: 'minutes',
+												durationType: 'intraday',
 												durationName: 'minutes',
-												tick: 60,
-												applicableFor: { daily: true, intraday: true }
+												timeInterval: 60
 											},
 											{
-												durationType: 'seconds',
+												durationType: 'intraday',
 												durationName: 'seconds',
-												tick: 1,
-												applicableFor: { daily: true, intraday: true }
+												timeInterval: 1
 											},
 											{
 												durationType: 'ticks',
-												durationName: 'ticks',
-												tick: 3,
-												applicableFor: { daily: true, intraday: true, tick: true }
+												durationName: 'ticks'
 											}
 										]
 									})
@@ -356,6 +364,13 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									xtype: 'combobox',
 									name: 'payoutCurrency',
 									style: 'margin-right:5px',
+									listeners:
+									{
+										afterrender: function()
+										{
+											this.setValue(this.store.first());
+										}
+									},
 									store: payoutCurrencies
 								},
 								{
@@ -375,7 +390,6 @@ Binary.ContractsClass = function (renderTo, symbolData)
 				width: '100%',
 				items: items
 			});
-			requestPrice();
 		},
 		null, null, symbolInfo.symbolDetails.displayName, null, null, null, null, null, null);
 	};

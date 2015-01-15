@@ -37,6 +37,10 @@
 				{
 					return date.getDay() + '-' + date.toString().split(' ')[1] + '-' + (date.getYear() + 1900) + ' ' + date.getHours() + ":" + date.getMinutes() + ':' + date.getSeconds();
 				};
+				var formatDecimal = function (decimal)
+				{
+					return parseFloat(Math.round(decimal * 100) / 100).toFixed(2);
+				};
 				var html='';
 				for(var i=0;i<data.contracts.length;i++)
 				{
@@ -58,8 +62,8 @@
 						var html = String.format("<tr><td>{0}</td><td>{1}</td><td>{2}/{3}</td></tr>",
 							contractDetails.contract.contract_id,
 							contractDetails.contract.description,
-							contractDetails.contract.buy_price,
-							contractDetails.contract.payout_price);
+							formatDecimal(contractDetails.contract.buy_price),
+							formatDecimal(contractDetails.contract.payout_price));
 						$("#portfolio").append(html);
 					},
 					data.contracts[i].contract_id, data.contracts[i]);

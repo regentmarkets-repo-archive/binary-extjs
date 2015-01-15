@@ -14,6 +14,9 @@ window.ns = function (ns)
 
 ns("Binary.Api");
 
+Binary.PostMessageApiPrefix = "BinaryApiCall";
+Binary.PostMessageOSPrefix = "BinaryOSCall";
+
 Binary.parseUrl = function (url)
 {
 	var search = (url || location.search).substring(1);
@@ -145,6 +148,15 @@ Binary.Api.ContractTypes =
 		],
 		ticksAllowed: true
 	},
+	"Stays Between/Goes Outside":
+	{
+		name: "staysinout",
+		contracts:
+		[
+			"RANGE", "UPORDOWN"
+		],
+		ticksAllowed: true
+	},
 	"Higher/Lower":
 	{
 		name: "higherlower",
@@ -163,16 +175,7 @@ Binary.Api.ContractTypes =
 		],
 		ticksAllowed: true
 	},
-	"Ends Between/Outside":
-	{
-		name: "staysinout",
-		contracts:
-		[
-			"RANGE", "UPORDOWN"
-		],
-		ticksAllowed: true
-	},
-	"Asians":
+	"Asian Up/Down":
 	{
 		name: "asian",
 		contracts:
@@ -181,7 +184,7 @@ Binary.Api.ContractTypes =
 		],
 		ticksAllowed: true
 	},
-	"Digits" :
+	"Digit Match/Differ":
 	{
 		name: "digits",
 		contracts:

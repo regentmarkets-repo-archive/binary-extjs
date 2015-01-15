@@ -53,7 +53,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 						renderTo: el,
 						width: '100%',
 						layout: 'column',
-						style: 'padding: 7px 3px 7px 3px',
+						style: 'padding: 3px 3px 3px 3px',
 						defaults:
 						{
 							columnWidth: 1 / 2
