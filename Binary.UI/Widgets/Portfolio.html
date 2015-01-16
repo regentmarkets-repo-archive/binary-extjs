@@ -42,34 +42,18 @@
 					return parseFloat(Math.round(decimal * 100) / 100).toFixed(2);
 				};
 				var html='';
-				for(var i=0;i<data.contracts.length;i++)
+				for (var i = 0; i < data.contracts.length; i++)
 				{
-					Binary.Api.Client.portfolio(function (contractDetails, contract)
-					{
-						/*
-						html += String.format("<tr><td>{0}</td><td>{1} <strong>{2}</strong> payout if <b>{3}</b> is <b>{4}</b> than <b>{5}</b> at {6} started at {7}</td><td>{8}/{9}</td></tr>",
-							contract.contract_id,
-							'USD',
-							contract.payout_price,
-							contract.underlying_symbol,
-							'highter',//contract.contract_type,
-							'entry spot',
-							formatDate(new Date(contract.expiry_time * 1000)),
-							formatDate(new Date(contract.start_time * 1000)),
-							contract.buy_price,
-							contract.payout_price);
-						*/
-						var html = String.format("<tr><td>{0}</td><td>{1}</td><td>{2}/{3}</td></tr>",
-							contractDetails.contract.contract_id,
-							contractDetails.contract.description,
-							formatDecimal(contractDetails.contract.buy_price),
-							formatDecimal(contractDetails.contract.payout_price));
-						$("#portfolio").append(html);
-					},
-					data.contracts[i].contract_id, data.contracts[i]);
-				}
+					var contract = data.contracts[i];
+					var html = String.format("<tr><td>{0}</td><td>{1}</td><td>{2}/{3}</td></tr>",
+						contract.contract_id,
+						contract.description,
+						formatDecimal(contract.buy_price),
+						formatDecimal(contract.payout_price));
+					$("#portfolio").append(html);
+				};
 				//$("#portfolio").append(html);
-			});
+			}, true);
 		});
 	</script>
 </body>

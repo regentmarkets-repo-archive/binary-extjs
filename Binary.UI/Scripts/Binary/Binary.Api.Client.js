@@ -107,16 +107,6 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg(String.format("/symbols/{0}/price", symbol), callback, false);
 	};
 
-	this.portfolio = function (callback, contractId, eventData)
-	{
-		var url = '/portfolio/';
-		if (contractId)
-		{
-			url += contractId;
-		}
-		postMsg(url, callback, false, {}, eventData);
-	};
-
 	this.offerings = function (callback, market, submarket, symbol, contract_category, contract_type, is_forward_starting, is_path_dependent, expiry_type, payout_time)
 	{
 		var rd = {};
@@ -161,9 +151,15 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg("/account", callback);
 	};
 
-	this.account.statement = function (callback)
+	this.account.statement = function (callback, withDescription)
 	{
-		postMsg("/account/statement", callback);
+		postMsg("/account/statement" + (withDescription ? "?description=1" : ""), callback);
+	};
+
+	this.portfolio = function (callback, withDescription)
+	{
+		var url = '/portfolio' + (withDescription ? "?description=1" : "");
+		postMsg(url, callback, false, {}, null);
 	};
 
 	/*

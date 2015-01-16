@@ -134,63 +134,129 @@ Binary.Api.ContractTypes =
 	{
 		name: "risefall",
 		contracts:
-		[
-			"DOUBLEDOWN", "DOUBLEUP", "FLASHD", "FLASHU", "INTRADD", "INTRADU"
-		],
+		{
+			"DOUBLEDOWN":
+			{
+				is_forward_starting: false,
+				minDuration: '1day'
+			},
+			"DOUBLEUP":
+			{
+				is_forward_starting: false
+			},
+			"FLASHD":
+			{
+				is_forward_starting: false
+			},
+			"FLASHU":
+			{
+				is_forward_starting: false
+			},
+			"INTRADD":
+			{
+				is_forward_starting: true
+			},
+			"INTRADU":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Ends Between/Outside":
 	{
 		name: "endsinout",
 		contracts:
-		[
-			"EXPIRYMISS", "EXPIRYRANGE"
-		],
+		{
+			"EXPIRYMISS":
+			{
+				is_forward_starting: true
+			},
+			"EXPIRYRANGE":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Stays Between/Goes Outside":
 	{
 		name: "staysinout",
 		contracts:
-		[
-			"RANGE", "UPORDOWN"
-		],
+		{
+			"RANGE":
+			{
+				is_forward_starting: true
+			},
+			"UPORDOWN":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Higher/Lower":
 	{
 		name: "higherlower",
 		contracts:
-		[
-			"CALL", "PUT"
-		],
+		{
+			"CALL":
+			{
+				is_forward_starting: true
+			},
+			"PUT":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Touch/No Touch":
 	{
 		name: "touchnotouch",
 		contracts:
-		[
-			"NOTOUCH", "ONETOUCH"
-		],
+		{
+			"NOTOUCH":
+			{
+				is_forward_starting: true
+			},
+			"ONETOUCH":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Asian Up/Down":
 	{
 		name: "asian",
 		contracts:
-		[
-			"ASIAND", "ASIANU"
-		],
+		{
+			"ASIAND":
+			{
+				is_forward_starting: true
+			},
+			"ASIANU":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	},
 	"Digit Match/Differ":
 	{
 		name: "digits",
 		contracts:
-		[
-			"DIGITDIFF", "DIGITMATCH"
-		],
+		{
+			"DIGITDIFF":
+			{
+				is_forward_starting: true
+			},
+			"DIGITMATCH":
+			{
+				is_forward_starting: true
+			}
+		},
 		ticksAllowed: true
 	}
 };
