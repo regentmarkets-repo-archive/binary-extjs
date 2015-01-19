@@ -138,27 +138,32 @@ Binary.Api.ContractTypes =
 			"DOUBLEDOWN":
 			{
 				is_forward_starting: false,
-				minDuration: '1day'
+				duration: 'daily'
 			},
 			"DOUBLEUP":
 			{
-				is_forward_starting: false
+				is_forward_starting: false,
+				duration: 'daily'
 			},
 			"FLASHD":
 			{
-				is_forward_starting: false
+				is_forward_starting: false,
+				duration: 'intraday'
 			},
 			"FLASHU":
 			{
-				is_forward_starting: false
+				is_forward_starting: false,
+				duration: 'intraday'
 			},
 			"INTRADD":
 			{
-				is_forward_starting: true
+				is_forward_starting: true,
+				duration: 'intraday'
 			},
 			"INTRADU":
 			{
-				is_forward_starting: true
+				is_forward_starting: true,
+				duration: 'intraday'
 			}
 		},
 		ticksAllowed: true

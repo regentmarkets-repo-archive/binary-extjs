@@ -46,7 +46,7 @@
 				{
 					var contract = data.contracts[i];
 					var html = String.format("<tr><td>{0}</td><td>{1}</td><td>{2}/{3}</td></tr>",
-						contract.contract_id,
+						contract.contract_id ? contract.contract_id : '',
 						contract.description,
 						formatDecimal(contract.buy_price),
 						formatDecimal(contract.payout_price));

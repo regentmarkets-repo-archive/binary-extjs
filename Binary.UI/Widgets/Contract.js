@@ -1,6 +1,7 @@
 ﻿/// <reference path="../Scripts/ext-all-debug-w-comments.js" />
 /// <reference path="../Scripts/Binary/Binary.Core.js" />
 /// <reference path="../Scripts/Binary/Binary.Api.Client.js" />
+/// <reference path="../Scripts/Binary/Linq.js" />
 
 window.Binary = window.Binary || {};
 
@@ -12,14 +13,6 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	var tabs = null;
 	var payoutCurrencies = ["USD"];
 	var me = this;
-	var any = function (array, expression)
-	{
-		for (var i = 0; i < array.length; i++)
-		{
-			if (expression(array[i])) return true;
-		}
-		return false;
-	};
 
 	var symbolCache = {};
 	var requestPrice = function ()
@@ -34,14 +27,26 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	var startTimeStore = Ext.create('Ext.data.Store',
 	{
 		fields: ['startTime', 'startTimeLabel'],
-		data:
-		[
+		data: []
+	});
+
+	var refreshStartTime = function()
+	{
+		startTimeStore.removeAll();
+		startTimeStore.add(
 			{
 				startTime: 'Now',
 				startTimeLabel: 'Now'
-			}
-		]
-	});
+			});
+		var now = new Date();
+		var minutes = Math.floor(now.getUTCMinutes() / 5);
+		var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), minutes, now.getUTCSeconds());
+
+		//for(var i=0;i<new Date().getUTCDate()
+	};
+	refreshStartTime();
+
+	//window.setInterval(refreshStartTime, 5*60*1000);
 
 	this.update = function (symbolInfo)
 	{
@@ -119,20 +124,37 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						return this.down('[name="duration"]');
 					},
+					getEndDayField: function()
+					{
+						return this.down('[name="endDay"]');
+					},
+					getEndTimefield: function()
+					{
+						return this.down('[name="endTime"]');
+					},
+					
 					getValues: function()
 					{
-
+						var me = this;
+						var requestValues =
+						{
+							contractType: linq.first(Binary.Api.ContractTypes[this.title].contracts, function(c)
+							{
+								return c.is_forward_starting == me.endTimeMode;
+							}),
+							start: me.endTimeMode ? 
+						};
 					},
 					updateUI: function(offering)
 					{
 						var cm = this.contractMetedata = (offering || this.contractMetedata);
 						//var me = this;
 						this.down('[name="startTime"]').setVisible(
-							any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
+							linq.any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
 
 						var durationKindCombo=this.getDurationKindCombo();
-						this.down('[name="endDay"]').setVisible(this.endTimeMode);
-						this.down('[name="endTime"]').setVisible(this.endTimeMode);
+						this.getEndDayField().setVisible(this.endTimeMode);
+						this.getEndTimefield().setVisible(this.endTimeMode);
 						this.getDurationField().setVisible(!this.endTimeMode);
 
 						var durationTypeCombo = this.getDurationTypeCombo();
@@ -146,7 +168,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 								{
 									filterFn: function (rec)
 									{
-										return any(cm.available, function (item) { return rec.data.durationType==item.expiry_type; });
+										return linq.any(cm.available, function (item) { return rec.data.durationType==item.expiry_type; });
 									}
 								}
 							]);
@@ -181,7 +203,6 @@ Binary.ContractsClass = function (renderTo, symbolData)
 							name: 'startTime',
 							displayField: 'startTimeLabel',
 							valueField: 'startTime',
-							disabled: true,
 							value: 'Now',
 							store: startTimeStore,
 							fieldLabel: 'Start Time'
@@ -229,7 +250,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 										change: function (combo, value)
 										{
 											var container = this.getContainer();
-											container.endTimeMode = (value == 'Endtime');
+											container.endTimeMode = (value == 'EndTime');
 											container.updateUI();
 										}
 									}

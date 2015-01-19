@@ -48,6 +48,7 @@ Binary.MarketSelectorClass = function (el, currentMarket, currentSymbol)
 				if (marketsCount == 0)
 				{
 					Binary.Mediator.fireEvent('marketsAvailable', Binary.Markets);
+					symbolStore.sort('displayName', 'ASC');
 					selectorContainer = new Ext.container.Container(
 					{
 						renderTo: el,

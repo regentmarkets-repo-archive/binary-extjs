@@ -58,7 +58,7 @@
 					var transaction = data.transactions[i];
 					html += String.format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td style='text-align:right'>{4}</td><td>{5}</td></tr>",
 						formatDate(new Date(transaction.transaction_time * 1000)),
-						transaction.contract_id,
+						transaction.contract_id ? transaction.contract_id : '',
 						transaction.action_type,
 						transaction.description,
 						String.format("<span class='{0}'>{1}</span>", parseFloat(transaction.amount) < 0 ? "loss" : "profit", formatDecimal(transaction.amount)),
