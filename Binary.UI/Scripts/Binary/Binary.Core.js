@@ -122,146 +122,264 @@ if (!String.format)
 	};
 }
 
+if (!Number.zeroFill)
+{
+	Number.zeroFill = function (num, places)
+	{
+		var zero = places - num.toString().length + 1;
+		return Array(+(zero > 0 && zero)).join("0") + num;
+	};
+}
+
 Binary.log = function (message)
 {
 	var dt=new Date();
 	console.log(dt.getMinutes() + ":" + dt.getSeconds() + ":" + dt.getMilliseconds() + " " + message);
 };
 
+Binary.ifHasValue = function (value, defaultValue)
+{
+	return (typeof value !== 'undefined' && value != null) ? value : defaultValue;
+};
+Binary.getUtcDate = function (year, month, day, hours, mins, secs)
+{
+	var now=new Date();
+	return new Date(
+		Binary.ifHasValue(year, now.getUTCFullYear()),
+		Binary.ifHasValue(month, now.getUTCMonth()),
+		Binary.ifHasValue(day, now.getUTCDate()),
+		Binary.ifHasValue(hours, now.getUTCHours()),
+		Binary.ifHasValue(mins, now.getUTCMinutes()),
+		Binary.ifHasValue(secs, now.getUTCSeconds()));
+};
+
 Binary.Api.ContractTypes =
 {
 	"Rise/Fall":
 	{
-		name: "risefall",
-		contracts:
-		{
-			"DOUBLEDOWN":
+		category_systemName: "risefall",
+		available:
+		[
 			{
-				is_forward_starting: false,
-				duration: 'daily'
+				contract_name: "DOUBLEDOWN",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			},
-			"DOUBLEUP":
 			{
-				is_forward_starting: false,
-				duration: 'daily'
+				contract_name: "DOUBLEUP",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			},
-			"FLASHD":
 			{
-				is_forward_starting: false,
-				duration: 'intraday'
+				contract_name: "FLASHD",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"FLASHU":
 			{
-				is_forward_starting: false,
-				duration: 'intraday'
+				contract_name: "FLASHD",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
 			},
-			"INTRADD":
 			{
-				is_forward_starting: true,
-				duration: 'intraday'
+				contract_name: "FLASHU",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"INTRADU":
 			{
-				is_forward_starting: true,
-				duration: 'intraday'
+				contract_name: "FLASHU",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
+			},
+			{
+				contract_name: "INTRADD",
+				is_forward_starting: 'Y',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "INTRADU",
+				is_forward_starting: 'Y',
+				expiry_type: 'intraday'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Ends Between/Outside":
 	{
-		name: "endsinout",
-		contracts:
-		{
-			"EXPIRYMISS":
+		category_systemName: "endsinout",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "EXPIRYMISS",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"EXPIRYRANGE":
 			{
-				is_forward_starting: true
+				contract_name: "EXPIRYMISS",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "EXPIRYRANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "EXPIRYRANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Stays Between/Goes Outside":
 	{
-		name: "staysinout",
-		contracts:
-		{
-			"RANGE":
+		category_systemName: "staysinout",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "RANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"UPORDOWN":
 			{
-				is_forward_starting: true
+				contract_name: "RANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "UPORDOWN",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "UPORDOWN",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Higher/Lower":
 	{
-		name: "higherlower",
-		contracts:
-		{
-			"CALL":
+		category_systemName: "higherlower",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "CALL",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"PUT":
 			{
-				is_forward_starting: true
+				contract_name: "CALL",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "PUT",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "PUT",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Touch/No Touch":
 	{
-		name: "touchnotouch",
-		contracts:
-		{
-			"NOTOUCH":
+		category_systemName: "touchnotouch",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "NOTOUCH",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
 			},
-			"ONETOUCH":
 			{
-				is_forward_starting: true
+				contract_name: "NOTOUCH",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "ONETOUCH",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "ONETOUCH",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Asian Up/Down":
 	{
-		name: "asian",
-		contracts:
-		{
-			"ASIAND":
+		category_systemName: "asian",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "ASIAND",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
 			},
-			"ASIANU":
 			{
-				is_forward_starting: true
+				contract_name: "ASIANU",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
 			}
-		},
-		ticksAllowed: true
+		]
 	},
 	"Digit Match/Differ":
 	{
-		name: "digits",
-		contracts:
-		{
-			"DIGITDIFF":
+		category_systemName: "digits",
+		available:
+		[
 			{
-				is_forward_starting: true
+				contract_name: "DIGITMATCH",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
 			},
-			"DIGITMATCH":
 			{
-				is_forward_starting: true
+				contract_name: "DIGITMATCH",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
+			},
+			{
+				contract_name: "DIGITDIFF",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
+			},
+			{
+				contract_name: "DIGITDIFF",
+				is_forward_starting: 'N',
+				expiry_type: 'tick'
 			}
-		},
-		ticksAllowed: true
+		]
 	}
 };
+
+(function ()
+{
+	for(var p in Binary.Api.ContractTypes)
+	{
+		var contract = Binary.Api.ContractTypes[p];
+		for (var i = 0; i < contract.available.length; i++)
+		{
+			var min = 60 * 2;
+			var max = 60 * 60 * 24;
+			if (contract.available[i].expiry_type == 'daily')
+			{
+				min = 1;
+				max = 355;
+			}
+			if (contract.available[i].expiry_type == 'tick')
+			{
+				min = 5;
+				max = 15;
+			}
+			contract.available[i].durations =
+			{
+				min: min,
+				max: max
+			};
+		}
+	}
+})();
