@@ -15,13 +15,16 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	var me = this;
 
 	var symbolCache = {};
-	var requestPrice = function ()
+	var refreshPrice = function (tabs)
 	{
+		var requestData = tabs.getActiveTab().getValues();
+		/*
 		Binary.Api.Client.contract(function (contractData)
 		{
 			//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
 		},
 		contractData);
+		*/
 	};
 
 	var timers = [];
@@ -50,14 +53,12 @@ Binary.ContractsClass = function (renderTo, symbolData)
 		var now = new Date();
 		var startMinute = Math.floor(now.getUTCMinutes() / 5 + 1) * 5;
 		var utcNow = Binary.getUtcDate(null, null, null, null, startMinute, null);
-		var startTimeComboboxes = tabPanel.query('[name="startTime"]');
-
 		Ext.each(tabPanel.query('[name="endTime"]'), function (endTimeField)
 		{
 			endTimeField.setMinValue(utcNow);
-			endTimeField.setMaxValue(Binary.getUtcDate(null, null, null, 24, 0, 0));
+			endTimeField.setMaxValue(Binary.getUtcDate(null, null, null, 23, 55, 0));
 		});
-
+		
 		startTimeStore.removeAll();
 		startTimeStore.add(
 			{
@@ -101,10 +102,14 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					xtype: 'form',
 					name: 'contractContainer',
 					bodyStyle: 'background-color:rgb(245,245,245)',
-					contractMetedata: Ext.apply(category, Binary.Api.ContractTypes[category.contract_category]),
+					contractMetadata: Ext.apply(category, Binary.Api.ContractTypes[category.contract_category]),
 					symbolData: symbolInfo,
 					endTimeMode: false,
 					isForward: false,
+					isForwardStarting: function()
+					{
+						return this.isForward ? 'Y' : 'N';
+					},
 					defaults:
 					{
 						labelSeparator: '',
@@ -143,36 +148,123 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						return this.down('[name="endTime"]');
 					},
+					getStartTimeCombo: function()
+					{
+						return this.down('[name="startTime"]');
+					},
+					getStartTime: function()
+					{
+						//return Binary.getUtcDate(null, null, null,)
+					},
 					getValues: function()
 					{
 						var me = this;
+						var durationUnit = 'sec';
+						var duration = 100;
+						var utcNow = Binary.getUtcDate();
+						if (me.endTimeMode)
+						{
+							if (me.getEndDayField().getValue() > utcNow)
+							{
+								durationUnit = 'day';
+								duration = 1;
+							}
+							else
+							{
+								
+							}
+						}
+						else
+						{
+							var selectedDuration = me.getDurationTypeCombo().valueModels[0];
+							durationUnit = selectedDuration.data.durationType == 'daily' ?
+								'day' : (selectedDuration.data.durationType == 'intraday' ? 'sec' : 'tick');
+
+							var durationValue = me.getDurationField().getValue();
+							duration = (durationUnit == 'tick' || durationUnit == 'daily') ? durationValue : durationValue * selectedDuration.data.timeInterval;
+						}
+						var endTime = me.getEndTimefield().getValue();
+						if (me.isForward)
+						{
+							if (me.endTimeMode)
+							{
+								//var endDate = Binary.getUtcDate(null, null, null, 
+							}
+						}
+						//var durationUnit = selectedDurationType == 'daily' ? 'day' : (selectedDurationType == 'intraday' ? 'sec' : 'tick');
 						var requestValues =
 						{
-							contractType: linq.first(Binary.Api.ContractTypes[this.title].contracts, function(c)
+							
+							contractTypes: linq.where(me.contractMetadata.available, function (c)
 							{
-								return c.is_forward_starting == me.endTimeMode;
+								return c.is_forward_starting == me.isForwardStarting() && c.expiry_type == selectedDurationType;
 							}),
-							start: me.endTimeMode
+							symbol: me.symbolData.symbolDetails.symbol,
+							//durationUnit: durationUnit,
+							duration: null, //durationUnit == 'day'
+							startTime: me.isForward ? me.getStartTimeCombo().getValue() : 0,
+							barrierLow: 0,
+							barrierHigh: 0
 						};
+						return requestValues;
 					},
 					updateUI: function()
 					{
-						var cm = this.contractMetedata;
-						//var me = this;
-						this.down('[name="startTime"]').setVisible(
+						var cm = this.contractMetadata;
+						var me = this;
+
+						me.getStartTimeCombo().setVisible(
 							linq.any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
 
-						var durationKindCombo=this.getDurationKindCombo();
-						this.getEndDayField().setVisible(this.endTimeMode);
-						this.getEndTimefield().setVisible(this.endTimeMode);
-						this.getDurationField().setVisible(!this.endTimeMode);
-						//this.getDurationTypeCombo().setVisible(!this.endTimeMode);
+						me.getDurationField().setVisible(!me.endTimeMode);
 
-						var durationTypeCombo = this.getDurationTypeCombo();
-						durationTypeCombo.setVisible(!this.endTimeMode);
+						var durationTypeCombo = me.getDurationTypeCombo();
+						durationTypeCombo.setVisible(!me.endTimeMode);
 
-						var fwdString = this.isForward ? 'Y' : 'N';
-						if (!this.endTimeMode)
+						var endDayField = me.getEndDayField();
+						endDayField.setVisible(me.endTimeMode);
+
+						var endTimeField = me.getEndTimefield();
+						endTimeField.setVisible(me.endTimeMode);
+
+						var utcNow = Binary.getUtcDate();
+						endDayField.setMinValue(utcNow);
+						if (me.isForward)
+						{
+							endDayField.setMaxValue(utcNow);
+							endDayField.oldValue = endDayField.getValue();
+							endDayField.setValue(utcNow);
+						}
+						else
+						{
+							endDayField.setMaxValue(Binary.getUtcDate(null, 12, 31, 24));
+							if (endDayField.oldValue)
+							{
+								endDayField.setValue(endDayField.oldValue);
+								endDayField.oldValue = null;
+							}
+						}
+
+						if (endDayField.getValue() > Binary.getUtcDate())
+						{
+							if (!endTimeField.oldValue)
+							{
+								endTimeField.oldValue = endTimeField.getValue();
+							}
+							endTimeField.setValue('11:59 PM');
+							endTimeField.disable();
+						}
+						else
+						{
+							if (endTimeField.oldValue)
+							{
+								endTimeField.setValue(endTimeField.oldValue);
+								endTimeField.oldValue = null;
+							}
+							endTimeField.enable();
+						}
+
+						if (!me.endTimeMode)
 						{
 							durationTypeCombo.store.clearFilter();
 							durationTypeCombo.store.filter(
@@ -182,7 +274,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									{
 										return linq.any(cm.available, function (cType)
 										{
-											return rec.data.durationType == cType.expiry_type && cType.is_forward_starting == fwdString;
+											return rec.data.durationType == cType.expiry_type && cType.is_forward_starting == me.isForwardStarting();
 										});
 									}
 								}
@@ -197,13 +289,13 @@ Binary.ContractsClass = function (renderTo, symbolData)
 								durationTypeCombo.suspendEvents(false);
 								durationTypeCombo.setValue(selectedDurationType);
 								durationTypeCombo.resumeEvents();
-								rec = durationTypeCombo.store.findRecord(durationTypeCombo.valueField, durationTypeCombo.getValue());
 							}
+							rec = durationTypeCombo.valueModels[0];
 
 							var durationField = this.getDurationField();
 							var contract = linq.first(cm.available, function(c)
 							{
-								return c.expiry_type == selectedDurationType && c.is_forward_starting == fwdString;
+								return c.expiry_type == selectedDurationType && c.is_forward_starting == me.isForwardStarting();
 							});
 
 							if (selectedDurationType == 'intraday')
@@ -216,6 +308,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 								durationField.setMinValue(contract.durations.min);
 								durationField.setMaxValue(contract.durations.max);
 							}
+							durationField.validate();
 						}
 					},
 					items:
@@ -320,7 +413,14 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									hidden: true,
 									editable: false,
 									style: 'margin-right:5px',
-									name: 'endDay'
+									name: 'endDay',
+									listeners:
+									{
+										change: function ()
+										{
+											this.getContainer().updateUI();
+										}
+									}
 								},
 								{
 									xtype: 'timefield',
@@ -373,7 +473,8 @@ Binary.ContractsClass = function (renderTo, symbolData)
 											},
 											{
 												durationType: 'tick',
-												durationName: 'ticks'
+												durationName: 'ticks',
+												timeInterval: 1
 											}
 										]
 									}),
@@ -487,8 +588,10 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						refreshTimePickers(this);
 						displayCurrentUTC(this);
-						this.timers.push(window.setInterval(displayCurrentUTC, 1000, this));
+						refreshPrice(this);
 						this.timers.push(window.setInterval(refreshTimePickers, 5 * 60 * 1000, this));
+						this.timers.push(window.setInterval(displayCurrentUTC, 1000, this));
+						//this.timers.push(window.setInterval(refreshPrice, 3000, this));
 					},
 					beforedestroy: function ()
 					{

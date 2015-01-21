@@ -38,5 +38,17 @@
 			}
 		});
 		return result;
+	},
+	where: function (obj, fn)
+	{
+		var result = [];
+		window.linq.iterate(obj, function (item)
+		{
+			if (fn(item))
+			{
+				result.push(item);
+			}
+		});
+		return result;
 	}
 };
