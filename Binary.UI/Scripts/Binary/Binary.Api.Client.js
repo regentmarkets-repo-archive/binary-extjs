@@ -29,7 +29,7 @@ Binary.Api.ClientClass = function (autoStart)
 			cached: isCached,
 			widgetID: Binary.Gadget.id
 		};
-		Binary.Api.Proxy.apiCall(message, callback, eventData);
+		return Binary.Api.Proxy.apiCall(message, callback, eventData);
 	};
 
 	this.markets = function (callback)
@@ -122,28 +122,12 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg("/payout_currencies", callback, true);
 	};
 
-	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, callType, barrier_low, barrier_high)
+	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high, callType, eventData)
 	{
 		var CallType = callType || "info";
-		if (!barrier_low) barrier_low = 'S0P';
-		if (!barrier_high) barrier_high = 'S0P';
-		postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: CallType });
-
-		//var CallType = callType || "info";
-		//if (!barrier_low) barrier_low = 'S0P';
-		//if (!barrier_high) barrier_high = 'S0P';
-
-		//var url = String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high);
-		//var data =
-		//{
-		//	apiMethod: url,
-		//	callback: callback,
-		//	intervalCallback: function (params)
-		//	{
-		//		postMsg(params.apiMethod, params.callback, false, { callType: CallType });
-		//	}
-		//};
-		//this.addInterval(data);
+		if (!barrier_low) barrier_low = '0';
+		if (!barrier_high) barrier_high = '0';
+		return postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: CallType }, eventData);
 	};
 
 	this.account = function (callback)
@@ -162,13 +146,10 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg(url, callback, false, {}, null);
 	};
 
-	/*
-	this.unsubscribeAll = function ()
+	this.removeListener = function (listenerId)
 	{
-		this.clearIntervals();
-		Binary.Api.Proxy.unsubscribeAll();
+		Binary.Api.Proxy.removeListener(listenerId);
 	};
-	*/
 
 	this.clearIntervals = function ()
 	{

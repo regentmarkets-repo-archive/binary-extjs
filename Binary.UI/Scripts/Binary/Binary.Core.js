@@ -141,7 +141,8 @@ Binary.ifHasValue = function (value, defaultValue)
 {
 	return (typeof value !== 'undefined' && value != null) ? value : defaultValue;
 };
-Binary.getUtcDate = function (year, month, day, hours, mins, secs)
+
+Date.getUtcDate = function (year, month, day, hours, mins, secs)
 {
 	var now=new Date();
 	return new Date(
@@ -153,11 +154,44 @@ Binary.getUtcDate = function (year, month, day, hours, mins, secs)
 		Binary.ifHasValue(secs, now.getUTCSeconds()));
 };
 
+Date.prototype.toUtc=function()
+{
+	return Date.getUtcDate(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate(), this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds());
+};
+
+Date.prototype.addDays = function (days)
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate() + days, this.getHours(), this.getMinutes(), this.getSeconds());
+};
+
+Date.prototype.addTime = function (date)
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours() + date.getHours(), this.getMinutes() + date.getMinutes(), this.getSeconds() + date.getSeconds());
+};
+
+Date.prototype.getDatePart = function ()
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate());
+};
+
 Binary.Api.ContractTypes =
 {
 	"Rise/Fall":
 	{
 		category_systemName: "risefall",
+		contractPair:
+		[
+			{
+				displayName: 'Rises',
+				img: 'risefall_1.png',
+				use: ['DOUBLEUP', 'FLASHU', 'INTRADU']
+			},
+			{
+				displayName: 'Falls',
+				img: 'risefall_2.png',
+				use: ['DOUBLEDOWN', 'FLASHD', 'INTRADD']
+			}
+		],
 		available:
 		[
 			{
@@ -202,63 +236,22 @@ Binary.Api.ContractTypes =
 			}
 		]
 	},
-	"Ends Between/Outside":
-	{
-		category_systemName: "endsinout",
-		available:
-		[
-			{
-				contract_name: "EXPIRYMISS",
-				is_forward_starting: 'N',
-				expiry_type: 'intraday'
-			},
-			{
-				contract_name: "EXPIRYMISS",
-				is_forward_starting: 'N',
-				expiry_type: 'daily'
-			},
-			{
-				contract_name: "EXPIRYRANGE",
-				is_forward_starting: 'N',
-				expiry_type: 'intraday'
-			},
-			{
-				contract_name: "EXPIRYRANGE",
-				is_forward_starting: 'N',
-				expiry_type: 'daily'
-			}
-		]
-	},
-	"Stays Between/Goes Outside":
-	{
-		category_systemName: "staysinout",
-		available:
-		[
-			{
-				contract_name: "RANGE",
-				is_forward_starting: 'N',
-				expiry_type: 'intraday'
-			},
-			{
-				contract_name: "RANGE",
-				is_forward_starting: 'N',
-				expiry_type: 'daily'
-			},
-			{
-				contract_name: "UPORDOWN",
-				is_forward_starting: 'N',
-				expiry_type: 'intraday'
-			},
-			{
-				contract_name: "UPORDOWN",
-				is_forward_starting: 'N',
-				expiry_type: 'daily'
-			}
-		]
-	},
 	"Higher/Lower":
 	{
 		category_systemName: "higherlower",
+		contractPair:
+		[
+			{
+				displayName: 'Higher',
+				img: 'higherlower_1.png',
+				use: ['CALL']
+			},
+			{
+				displayName: 'Lower',
+				img: 'higherlower_2.png',
+				use: ['PUT']
+			}
+		],
 		available:
 		[
 			{
@@ -286,6 +279,19 @@ Binary.Api.ContractTypes =
 	"Touch/No Touch":
 	{
 		category_systemName: "touchnotouch",
+		contractPair:
+		[
+			{
+				displayName: 'Touches',
+				img: 'touchnotouch_1.png',
+				use: ['ONETOUCH']
+			},
+			{
+				displayName: 'Does Not Touch',
+				img: 'touchnotouch_2.png',
+				use: ['NOTOUCH']
+			}
+		],
 		available:
 		[
 			{
@@ -310,9 +316,102 @@ Binary.Api.ContractTypes =
 			}
 		]
 	},
+	"Stays Between/Goes Outside":
+	{
+		category_systemName: "staysinout",
+		contractPair:
+		[
+			{
+				displayName: 'Stays Between',
+				img: 'staysinout_1.png',
+				use: ['RANGE']
+			},
+			{
+				displayName: 'Goes Outside',
+				img: 'staysinout_2.png',
+				use: ['UPORDOWN']
+			}
+		],
+		available:
+		[
+			{
+				contract_name: "RANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "RANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "UPORDOWN",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "UPORDOWN",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			}
+		]
+	},
+	"Ends Between/Outside":
+	{
+		category_systemName: "endsinout",
+		contractPair:
+		[
+			{
+				displayName: 'Ends Between',
+				img: 'endsinout_1.png',
+				use: ['EXPIRYRANGE']
+			},
+			{
+				displayName: 'Ends Outside',
+				img: 'endsinout_2.png',
+				use: ['EXPIRYMISS']
+			}
+		],
+		available:
+		[
+			{
+				contract_name: "EXPIRYMISS",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "EXPIRYMISS",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			},
+			{
+				contract_name: "EXPIRYRANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'intraday'
+			},
+			{
+				contract_name: "EXPIRYRANGE",
+				is_forward_starting: 'N',
+				expiry_type: 'daily'
+			}
+		]
+	},
 	"Asian Up/Down":
 	{
 		category_systemName: "asian",
+		contractPair:
+		[
+			{
+				displayName: 'Asian Up',
+				img: 'asian_1.png',
+				use: ['ASIANU']
+			},
+			{
+				displayName: 'Asian Down',
+				img: 'asian_2.png',
+				use: ['ASIAND']
+			}
+		],
 		available:
 		[
 			{
@@ -330,20 +429,23 @@ Binary.Api.ContractTypes =
 	"Digit Match/Differ":
 	{
 		category_systemName: "digits",
+		contractPair:
+		[
+			{
+				displayName: 'Matches',
+				img: 'digits_1.png',
+				use: ['DIGITMATCH']
+			},
+			{
+				displayName: 'Differs',
+				img: 'digits_2.png',
+				use: ['DIGITDIFF']
+			}
+		],
 		available:
 		[
 			{
 				contract_name: "DIGITMATCH",
-				is_forward_starting: 'N',
-				expiry_type: 'tick'
-			},
-			{
-				contract_name: "DIGITMATCH",
-				is_forward_starting: 'N',
-				expiry_type: 'tick'
-			},
-			{
-				contract_name: "DIGITDIFF",
 				is_forward_starting: 'N',
 				expiry_type: 'tick'
 			},
