@@ -15,16 +15,31 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	var me = this;
 
 	var symbolCache = {};
-	var refreshPrice = function (tabs)
+	var priceRequestData = null;
+	var refreshPrice = function (tabPanel)
 	{
-		var requestData = tabs.getActiveTab().getValues();
-		/*
-		Binary.Api.Client.contract(function (contractData)
+		var requestData = tabPanel.getActiveTab().getValues();
+		priceRequestData = {};
+		for (var i = 0; i < requestData.contractTypes[0].length; i++)
 		{
-			//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
-		},
-		contractData);
-		*/
+			requestPriceListener = Binary.Api.Client.contract(function (contractData, eventData)
+			{
+				var s = contractData;
+				//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
+			},
+			requestData.contractTypes[0].contract_name,
+			requestData.symbol,
+			requestData.durationUnit,
+			requestData.duration,
+			requestData.payoutCurrency,
+			requestData.payoutAmount,
+			requestData.startTime,
+			requestData.barrierLow,
+			requestData.barrierHigh,
+			null,
+			priceRequestData);
+			priceRequestData[requestPriceListener] = {};
+		}
 	};
 
 	var timers = [];
@@ -37,7 +52,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 
 	var displayCurrentUTC = function (tabPanel)
 	{
-		var utcNow=Binary.getUtcDate();
+		var utcNow = Date.getUtcDate();
 		Ext.each(tabPanel.query('[name="utcNow"]'), function (utcNowField)
 		{
 			utcNowField.setValue(String.format("{0}:{1}:{2}", Number.zeroFill(utcNow.getHours(), 2), Number.zeroFill(utcNow.getMinutes(), 2), Number.zeroFill(utcNow.getSeconds(), 2)));
@@ -50,13 +65,28 @@ Binary.ContractsClass = function (renderTo, symbolData)
 	};
 	var refreshTimePickers = function (tabPanel)
 	{
-		var now = new Date();
-		var startMinute = Math.floor(now.getUTCMinutes() / 5 + 1) * 5;
-		var utcNow = Binary.getUtcDate(null, null, null, null, startMinute, null);
+		var startMinute = Math.floor(Date.getUtcDate().getMinutes() / 5 + 1) * 5;
+		var utcNow = Date.getUtcDate(null, null, null, null, startMinute, 0);
 		Ext.each(tabPanel.query('[name="endTime"]'), function (endTimeField)
 		{
 			endTimeField.setMinValue(utcNow);
-			endTimeField.setMaxValue(Binary.getUtcDate(null, null, null, 23, 55, 0));
+			endTimeField.setMaxValue(Date.getUtcDate(null, null, null, 23, 55, 0));
+			if (endTimeField.getValue() == null)
+			{
+				endTimeField.setValue(utcNow);
+			}
+			endTimeField.validate();
+		});
+
+		var utcToday = Date.getUtcDate().getDatePart();
+		Ext.each(tabPanel.query('[name="endDay"]'), function (endDayField)
+		{
+			endDayField.setMinValue(utcToday);
+			if (endDayField.getValue() == null)
+			{
+				endDayField.setValue(utcToday);
+			}
+			endDayField.validate();
 		});
 		
 		startTimeStore.removeAll();
@@ -67,17 +97,17 @@ Binary.ContractsClass = function (renderTo, symbolData)
 				startDate: null
 			});
 
-		var tomorrow = Binary.getUtcDate(null, null, now.getUTCDate() + 1, 0, 0, 0);
+		var tomorrow = utcNow.addDays(1);
 		while(utcNow < tomorrow)
 		{
 			startTimeStore.add(
 			{
-				startTime: Math.floor(utcNow.getTime() / 1000),
+				startTime: utcNow,
 				startTimeLabel: String.format("{0}:{1}", Number.zeroFill(utcNow.getHours(), 2), Number.zeroFill(utcNow.getMinutes(), 2)),
 				startDate: utcNow
 			});
 			startMinute += 5;
-			utcNow = Binary.getUtcDate(null, null, null, null, startMinute, null);
+			utcNow = Date.getUtcDate(null, null, null, null, startMinute, null);
 		}
 	};
 
@@ -144,7 +174,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						return this.down('[name="endDay"]');
 					},
-					getEndTimefield: function()
+					getEndTimeField: function()
 					{
 						return this.down('[name="endTime"]');
 					},
@@ -152,57 +182,58 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					{
 						return this.down('[name="startTime"]');
 					},
-					getStartTime: function()
+					getPayoutCurrency: function()
 					{
-						//return Binary.getUtcDate(null, null, null,)
+						return this.down('[name="payoutCurrency"]').getValue();
+					},
+					getPayoutAmount: function()
+					{
+						return this.down('[name="payoutAmount"]').getValue();
 					},
 					getValues: function()
 					{
 						var me = this;
+						var durationTypeCombo = me.getDurationTypeCombo();
+						var selectedDuration = durationTypeCombo.store.findRecord('durationName', durationTypeCombo.getRawValue());
+						
 						var durationUnit = 'sec';
 						var duration = 100;
-						var utcNow = Binary.getUtcDate();
+						var utcNow = Date.getUtcDate();
 						if (me.endTimeMode)
 						{
 							if (me.getEndDayField().getValue() > utcNow)
 							{
 								durationUnit = 'day';
-								duration = 1;
+								duration = new Date(me.getEndDayField().getValue() - utcNow).getDate();
 							}
 							else
 							{
-								
+								var endDate = me.getEndDayField().getValue().addTime(me.getEndTimeField().getValue());
+								var startDate = me.getEndDayField().getValue().addTime(me.getStartTimeCombo().getValue());
+								duration = (startDate - endDate) / 1000;
 							}
 						}
 						else
 						{
-							var selectedDuration = me.getDurationTypeCombo().valueModels[0];
 							durationUnit = selectedDuration.data.durationType == 'daily' ?
 								'day' : (selectedDuration.data.durationType == 'intraday' ? 'sec' : 'tick');
 
 							var durationValue = me.getDurationField().getValue();
 							duration = (durationUnit == 'tick' || durationUnit == 'daily') ? durationValue : durationValue * selectedDuration.data.timeInterval;
 						}
-						var endTime = me.getEndTimefield().getValue();
-						if (me.isForward)
-						{
-							if (me.endTimeMode)
-							{
-								//var endDate = Binary.getUtcDate(null, null, null, 
-							}
-						}
-						//var durationUnit = selectedDurationType == 'daily' ? 'day' : (selectedDurationType == 'intraday' ? 'sec' : 'tick');
+
 						var requestValues =
 						{
-							
 							contractTypes: linq.where(me.contractMetadata.available, function (c)
 							{
-								return c.is_forward_starting == me.isForwardStarting() && c.expiry_type == selectedDurationType;
+								return c.is_forward_starting == me.isForwardStarting() && c.expiry_type == selectedDuration.data.durationType;
 							}),
 							symbol: me.symbolData.symbolDetails.symbol,
-							//durationUnit: durationUnit,
-							duration: null, //durationUnit == 'day'
-							startTime: me.isForward ? me.getStartTimeCombo().getValue() : 0,
+							durationUnit: durationUnit,
+							duration: duration,
+							payoutCurrency: me.getPayoutCurrency(),
+							payoutAmount: me.getPayoutAmount(),
+							startTime: me.isForward ? Math.round(me.getStartTimeCombo().getValue().getTime() / 1000) : 0,
 							barrierLow: 0,
 							barrierHigh: 0
 						};
@@ -224,28 +255,27 @@ Binary.ContractsClass = function (renderTo, symbolData)
 						var endDayField = me.getEndDayField();
 						endDayField.setVisible(me.endTimeMode);
 
-						var endTimeField = me.getEndTimefield();
+						var endTimeField = me.getEndTimeField();
 						endTimeField.setVisible(me.endTimeMode);
 
-						var utcNow = Binary.getUtcDate();
-						endDayField.setMinValue(utcNow);
+						var utcNow = Date.getUtcDate();
+						var utcTomorrow = utcNow.addDays(1);
+
 						if (me.isForward)
 						{
-							endDayField.setMaxValue(utcNow);
-							endDayField.oldValue = endDayField.getValue();
-							endDayField.setValue(utcNow);
+							endDayField.setMaxValue(utcTomorrow);
+							endDayField.validate();
+							if (endDayField.getValue().getDate() == utcNow.getDate())
+							{
+
+							}
 						}
 						else
 						{
-							endDayField.setMaxValue(Binary.getUtcDate(null, 12, 31, 24));
-							if (endDayField.oldValue)
-							{
-								endDayField.setValue(endDayField.oldValue);
-								endDayField.oldValue = null;
-							}
+							endDayField.setMaxValue(Date.getUtcDate(null, 12, 31, 24));
 						}
 
-						if (endDayField.getValue() > Binary.getUtcDate())
+						if (endDayField.getValue() > Date.getUtcDate() && !me.isForward)
 						{
 							if (!endTimeField.oldValue)
 							{
@@ -566,11 +596,31 @@ Binary.ContractsClass = function (renderTo, symbolData)
 									store: payoutCurrencies
 								},
 								{
-									xtype: 'textfield',
+									xtype: 'numberfield',
 									value: 30,
+									minValue: 5,
+									maxValue: 15,
+									allowDecimals: true,
+									hideTrigger:true,
 									name: 'payoutAmount'
 								}
 							]
+						},
+						{
+							xtype: 'button',
+							text: 'Get Prices',
+							handler: function ()
+							{
+								//refreshPrice(tabs);
+								var values = tabs.getActiveTab().getValues();
+								this.up().down('[name="test"]').update(JSON.stringify(values));
+								refreshPrice(tabs);
+							}
+						},
+						{
+							xtype: 'container',
+							name: 'test',
+							html: ''
 						}
 					]
 				});

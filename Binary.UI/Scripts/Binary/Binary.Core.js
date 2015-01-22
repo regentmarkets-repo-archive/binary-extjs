@@ -141,7 +141,8 @@ Binary.ifHasValue = function (value, defaultValue)
 {
 	return (typeof value !== 'undefined' && value != null) ? value : defaultValue;
 };
-Binary.getUtcDate = function (year, month, day, hours, mins, secs)
+
+Date.getUtcDate = function (year, month, day, hours, mins, secs)
 {
 	var now=new Date();
 	return new Date(
@@ -151,6 +152,26 @@ Binary.getUtcDate = function (year, month, day, hours, mins, secs)
 		Binary.ifHasValue(hours, now.getUTCHours()),
 		Binary.ifHasValue(mins, now.getUTCMinutes()),
 		Binary.ifHasValue(secs, now.getUTCSeconds()));
+};
+
+Date.prototype.toUtc=function()
+{
+	return Date.getUtcDate(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate(), this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds());
+};
+
+Date.prototype.addDays = function (days)
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate() + days, this.getHours(), this.getMinutes(), this.getSeconds());
+};
+
+Date.prototype.addTime = function (date)
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours() + date.getHours(), this.getMinutes() + date.getMinutes(), this.getSeconds() + date.getSeconds());
+};
+
+Date.prototype.getDatePart = function ()
+{
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate());
 };
 
 Binary.Api.ContractTypes =

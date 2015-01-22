@@ -5,6 +5,7 @@ Binary.Api.ProxyBase = function ()
 {
 	this.apiCall = function (apiMethod, callback, data) { };
 	this.processCallback = function (data) { };
+	this.removeListener = function (listenerId) { };
 	this.start();
 	this.stop();
 };
@@ -28,6 +29,12 @@ Binary.Api.DashboardProxy = function ()
 			eventData: eventData
 		};
 		top.postMessage(Binary.PostMessageApiPrefix + JSON.stringify(message), "*");
+		return listenerId;
+	};
+
+	this.removeListener = function (listenerId)
+	{
+		delete me.Listeners[listenerId];
 	};
 
 	var processCallback = function (e)
