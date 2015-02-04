@@ -15,5 +15,9 @@
 }
 .contract-container .contract-description
 {
-	clear:both;
+	margin:0px 0px 0px 10px;
+}
+.contract-container .contract-buy
+{
+
 }

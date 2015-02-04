@@ -107,6 +107,11 @@ Binary.Api.ClientClass = function (autoStart)
 		postMsg(String.format("/symbols/{0}/price", symbol), callback, false);
 	};
 
+	this.symbols.contracts = function (callback, symbol)
+	{
+		postMsg(String.format("/symbols/{0}/contracts", symbol), callback, false);
+	};
+
 	this.offerings = function (callback, market, submarket, symbol, contract_category, contract_type, is_forward_starting, is_path_dependent, expiry_type, payout_time)
 	{
 		var rd = {};
@@ -124,10 +129,11 @@ Binary.Api.ClientClass = function (autoStart)
 
 	this.contract = function (callback, contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high, callType, eventData)
 	{
-		var CallType = callType || "info";
+		var cType = callType || "info";
+		if (duration_unit == "tick") duration_unit = "tic";
 		if (!barrier_low) barrier_low = '0';
 		if (!barrier_high) barrier_high = '0';
-		return postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: CallType }, eventData);
+		return postMsg(String.format("/contract/{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", contract_type, symbol, duration_unit, duration, payout_currency, payout, start_time, barrier_low, barrier_high), callback, false, { callType: cType }, eventData);
 	};
 
 	this.account = function (callback)
