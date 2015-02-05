@@ -2,20 +2,25 @@
 {
 	padding:5px 5px 5px 5px;
 }
+.contract-container .contract-data td
+{
+	vertical-align:top;
+	padding-top:3px;
+}
 .contract-container .contract-image
 {
-	float:left;
+	
 }
 .contract-container .contract-name
 {
-	font-size:120%;
+	font-size:110%;
 	font-weight:bold;
-	float:left;
-	margin:6px 0px 0px 10px;
+	margin-left:3px;
 }
 .contract-container .contract-description
 {
-	margin:0px 0px 0px 10px;
+	font-size:90%;
+	margin-left:3px;
 }
 .contract-container .contract-buy
 {

@@ -109,7 +109,7 @@ Binary.Api.ClientClass = function (autoStart)
 
 	this.symbols.contracts = function (callback, symbol)
 	{
-		postMsg(String.format("/symbols/{0}/contracts", symbol), callback, false);
+		postMsg(String.format("/symbols/{0}/contracts", symbol), callback, true);
 	};
 
 	this.offerings = function (callback, market, submarket, symbol, contract_category, contract_type, is_forward_starting, is_path_dependent, expiry_type, payout_time)

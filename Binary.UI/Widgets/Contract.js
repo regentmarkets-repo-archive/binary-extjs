@@ -34,7 +34,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 			Binary.Api.Client.contract(function (contractData, eventData)
 			{
 				//http://rmg-prod.apigee.net/v1/binary/contract/INTRADU/R_100/sec/30/USD/20/0/0/0
-				eventData.responses[eventData.getCalling().contract_name] = contractData;
+				eventData.responses[eventData.getCalling().contract_type] = contractData;
 				eventData.requestCount--;
 				if (eventData.requestCount == 0)
 				{
@@ -46,7 +46,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 					contractCall();
 				}
 			},
-			priceRequestData.getCalling().contract_name,
+			priceRequestData.getCalling().contract_type,
 			requestData.symbol,
 			requestData.durationUnit,
 			requestData.duration,
@@ -137,21 +137,20 @@ Binary.ContractsClass = function (renderTo, symbolData)
 			tabs.destroy();
 		}
 
-		Binary.Api.Client.offerings(function (data)
+		Binary.Api.Client.symbols.contracts(function (data)
 		{
-			var contractCategories = data.offerings[0].available[0].available[0].available;
+			var contractCategories = data.available;
 			var items = [];
 			for (var i = 0; i < contractCategories.length; i++)
 			{
 				var category = contractCategories[i];
 				items.push(
 				{
-					title: category.contract_category,
-					//layout: 'form',
+					title: category.category_display_name,
 					xtype: 'form',
 					name: 'contractContainer',
 					bodyStyle: 'background-color:rgb(245,245,245)',
-					contractMetadata: Ext.apply(category, Binary.Api.ContractTypes[category.contract_category]),
+					contractMetadata: category,
 					symbolData: symbolInfo,
 					endTimeMode: false,
 					isForward: false,
@@ -263,9 +262,24 @@ Binary.ContractsClass = function (renderTo, symbolData)
 						var cm = this.contractMetadata;
 						var me = this;
 
-						me.getStartTimeCombo().setVisible(
-							linq.any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
+						me.getStartTimeCombo().setDisabled(
+							!linq.any(cm.available, function (item) { return item.is_forward_starting == "Y"; }));
 
+						me.down('[name="barrier"]').setVisible(!!cm.available[0].barrier);
+						me.down('[name="high_barrier"]').setVisible(!!cm.available[0].high_barrier);
+						me.down('[name="low_barrier"]').setVisible(!!cm.available[0].low_barrier);
+
+						/*
+						var allowForward = linq.any(cm.available, function (item) { return item.is_forward_starting == "Y"; });
+						var startTimeCombo = me.getStartTimeCombo();
+						startTimeCombo.setDisabled(!allowForward);
+						if (!allowForward)
+						{
+							startTimeCombo.suspendEvents(false);
+							startTimeCombo.setValue("Now");
+							startTimeCombo.resumeEvents();
+						}
+						*/
 						me.getDurationField().setVisible(!me.endTimeMode);
 
 						var durationTypeCombo = me.getDurationTypeCombo();
@@ -349,16 +363,10 @@ Binary.ContractsClass = function (renderTo, symbolData)
 								return c.expiry_type == selectedDurationType && c.is_forward_starting == me.isForwardStarting();
 							});
 
-							if (selectedDurationType == 'intraday')
-							{
-								durationField.setMinValue(contract.durations.min / rec.get('timeInterval'));
-								durationField.setMaxValue(contract.durations.max / rec.get('timeInterval'));
-							}
-							else
-							{
-								durationField.setMinValue(contract.durations.min);
-								durationField.setMaxValue(contract.durations.max);
-							}
+							var minInterval = Binary.Api.parseTimeInterval(contract.min);
+							var maxInterval = Binary.Api.parseTimeInterval(contract.max);
+							durationField.setMinValue(Math.ceil(minInterval / rec.get('timeInterval')));
+							durationField.setMaxValue(Math.ceil(maxInterval / rec.get('timeInterval')));
 							durationField.validate();
 						}
 					},
@@ -547,8 +555,7 @@ Binary.ContractsClass = function (renderTo, symbolData)
 							layout: 'hbox',
 							defaults:
 							{
-								flex: 1,
-								height: 80,
+								//height: 115,
 								getContainer: function()
 								{
 									return this.up().getContainer();
@@ -558,45 +565,60 @@ Binary.ContractsClass = function (renderTo, symbolData)
 							[
 								{
 									xtype: 'textfield',
-									fieldStyle: 'font-size:20px',
+									fieldStyle: 'font-size:30px',
 									labelStyle: 'margin-top:10px',
 									style: 'margin-right:5px',
 									anchor: null,
+									height: '100%',
+									width: 100,
 									name: 'spot'
 								},
 								{
 									xtype: 'container',
-									name: 'pair0',
-									cls: 'contract-container',
-									html: '123',
-									style: 'border: solid 1px #AAAAAA; margin-right:5px'
-								},
-								{
-									xtype: 'container',
-									name: 'pair1',
-									cls: 'contract-container',
-									html: '456',
-									style: 'border: solid 1px #AAAAAA'
+									flex: 1,
+									layout: 'vbox',
+									items:
+									[
+										{
+											xtype: 'container',
+											name: 'pair0',
+											width: '100%',
+											flex: 1,
+											cls: 'contract-container',
+											html: '-',
+											style: 'border: solid 1px #BBBBBB;'
+										},
+										{
+											xtype: 'container',
+											name: 'pair1',
+											cls: 'contract-container',
+											width: '100%',
+											flex: 1,
+											html: '-',
+											style: 'border: solid 1px #BBBBBB; margin-top:3px'
+										}
+
+									]
 								}
 							]
 						},
 						{
 							xtype: 'textfield',
-							name: 'barrierOffset',
+							name: 'barrier',
 							hidden: true,
-							fieldLabel: 'Barrier offset'
+							fieldLabel: 'Barrier'
 						},
 						{
 							xtype: 'textfield',
-							name: 'highBarrierOffset',
+							name: 'high_barrier',
 							hidden: true,
-							fieldLabel: 'High barrier offset'
+							fieldLabel: 'High barrier'
 						},
 						{
 							xtype: 'textfield',
-							name: 'lowBarrierOffset',
+							name: 'low_barrier',
 							hidden: true,
-							fieldLabel: 'Low barrier offset'
+							fieldLabel: 'Low barrier'
 						},
 						{
 							xtype: 'fieldcontainer',
@@ -650,8 +672,6 @@ Binary.ContractsClass = function (renderTo, symbolData)
 								{
 									xtype: 'numberfield',
 									value: 30,
-									minValue: 5,
-									maxValue: 15,
 									allowDecimals: true,
 									hideTrigger:true,
 									name: 'payoutAmount'
@@ -664,25 +684,44 @@ Binary.ContractsClass = function (renderTo, symbolData)
 							handler: function ()
 							{
 								var me = this;
-								var values = tabs.getActiveTab().getValues();
-								values = JSON.stringify(values);
 								refreshPrice(tabs, function (data)
 								{
-									me.up().down('[name="test"]').update(values + "<br/>" + JSON.stringify(data));
+									//me.up().down('[name="test"]').update(values + "<br/><hr/>" + JSON.stringify(data));
 									var contractMetadata = me.getContainer().contractMetadata;
+									var contractPair = Binary.Api.ContractTypes[contractMetadata.category_display_name].contractPair;
 									var i = 0;
 									for(var p in data.responses)
 									{
-										var contractPart = linq.first(contractMetadata.contractPair, function(pair)
+										var contractPart = linq.first(contractPair, function(pair)
 										{
 											return pair.use.indexOf(p)>-1;
 										});
+										var contractContainer = me.getContainer().down('[name="pair' + i + '"]');
 
-										me.getContainer().down('[name="pair' + i + '"]').update(String.format(
-											'<img src="{0}" class="contract-image" /><div class="contract-name">{1}</div><div class="contract-description">{2}</div>',
+										var button = Ext.getCmp(contractContainer.getId() + '-buy-button');
+										if (button) button.destroy();
+										contractContainer.update(String.format(
+'<table class="contract-data"><tr>'+
+'<td><img src="{0}" class="contract-image" /></td>'+
+'<td><div class="contract-name">{1}</div><div class="contract-description">{2}</div></td>' +
+'<td id="{3}"></td>' +
+'</tr></table>',
 											contractPart.img,
 											contractPart.displayName,
-											data.responses[p].longcode || data.responses[p].fault.faultstring));
+											data.responses[p].longcode || data.responses[p].fault.faultstring,
+											contractContainer.getId() + '-button-container'));
+										
+										Ext.create("Ext.Button",
+											{
+												renderTo: contractContainer.getId() + '-button-container',
+												id: contractContainer.getId() + '-buy-button',
+												text: 'Buy',
+												height: 36,
+												handler: function ()
+												{
+													alert('Buy');
+												}
+											});
 										i++;
 									};
 								});
@@ -720,11 +759,15 @@ Binary.ContractsClass = function (renderTo, symbolData)
 						{
 							window.clearInterval(this.timers[i]);
 						}
+					},
+					tabChange: function (panel, tab)
+					{
+						var s = "";
 					}
 				}
 			});
 		},
-		null, null, symbolInfo.symbolDetails.displayName, null, null, null, null, null, null);
+		symbolInfo.symbolDetails.symbol);
 	};
 
 	Binary.Api.Client.payout_currencies(function (data)
